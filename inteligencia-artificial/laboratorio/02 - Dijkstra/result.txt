@@ -1,0 +1,26 @@
+Algoritmo de Dijkstra
+Nombre: Fabricio Jesus Huaquisto Quispe
+Nodo Inicio: Tacna
+Nodo Final: Ica
+X1: 17
+X2: 23
+
+Node|Distance|Parent
+Tacna|0|null
+Cajamarca|17|Tacna
+Apurimac|23|Tacna
+Loreto|68|Apurimac
+Huanuco|32|Apurimac
+Ayacucho|37|Apurimac
+Lambayeque|38|Cajamarca
+LaLibertad|36|Cajamarca
+SanMartin|60|Huanuco
+Pasco|46|Huanuco
+Huancavelica|52|Ayacucho
+Piura|64|LaLibertad
+Ancash|61|LaLibertad
+Callao|58|Pasco
+Junin|69|Huancavelica
+Tumbes|83|Piura
+Lima|61|Callao
+Ica|57|Lambayeque

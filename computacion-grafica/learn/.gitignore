@@ -1,0 +1,6 @@
+*
+!.gitignore
+!thirdparty
+!thirdparty/**
+!*.cpp
+!Makefile
