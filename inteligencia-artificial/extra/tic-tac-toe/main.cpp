@@ -1,7 +1,13 @@
 #include <iostream>
 #include <vector>
+#include <queue>
 
-void drawBoard(const char playerSymbol, const char aiSymbol, const std::vector<std::vector<char>> &board)
+int difficulty = -1;
+
+char playerSymbol = 'X';
+char aiSymbol = 'O';
+
+void drawBoard(const char board[3][3])
 {
   for (int i = 0; i < 3; i++)
   {
@@ -21,9 +27,47 @@ void drawBoard(const char playerSymbol, const char aiSymbol, const std::vector<s
   std::cout << "Player: " << playerSymbol << " | AI: " << aiSymbol << std::endl;
 }
 
+int checkGame(const char board[3][3])
+{
+  int winner = 10;
+  int draw = 0;
+  int lose = -10;
+
+  for (int i = 0; i < 3; i++)
+  {
+    if (board[i][0] != ' ' && board[i][0] == board[i][1] && board[i][1] == board[i][2])
+      if (board[i][0] == aiSymbol)
+        return winner;
+      else
+        return lose;
+  }
+
+  for (int j = 0; j < 3; j++)
+  {
+    if (board[0][j] != ' ' && board[0][j] == board[1][j] && board[1][j] == board[2][j])
+      if (board[0][j] == aiSymbol)
+        return winner;
+      else
+        return lose;
+  }
+
+  if (board[0][0] != ' ' && board[0][0] == board[1][1] && board[1][1] == board[2][2])
+    if (board[0][0] == aiSymbol)
+      return winner;
+    else
+      return lose;
+
+  if (board[0][2] != ' ' && board[0][2] == board[1][1] && board[1][1] == board[2][0])
+    if (board[0][2] == aiSymbol)
+      return winner;
+    else
+      return lose;
+
+  return 0;
+}
+
 int main(int argc, char *argv[])
 {
-  int difficulty = -1;
 
   if (argc > 1)
     difficulty = std::stoi(argv[1]);
@@ -39,22 +83,26 @@ int main(int argc, char *argv[])
 
   std::cout << std::endl;
 
-  char playerSymbol = 'X';
-  char aiSymbol = 'O';
-
   if (choice == 2)
   {
     playerSymbol = 'O';
     aiSymbol = 'X';
   }
 
-  std::vector<std::vector<char>> board(3, std::vector<char>(3, ' '));
+  char board[3][3];
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      board[i][j] = ' ';
+    }
+  }
 
   char winner = ' ';
 
   while (winner == ' ')
   {
-    drawBoard(playerSymbol, aiSymbol, board);
+    drawBoard(board);
 
     std::cout << "Enter your move (row and column): ";
     int row, col;
