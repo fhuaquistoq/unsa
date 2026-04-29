@@ -309,334 +309,274 @@ INSERT INTO Trained_In VALUES(7,5,'2008-01-01','2008-12-31');
 INSERT INTO Trained_In VALUES(7,6,'2008-01-01','2008-12-31');
 INSERT INTO Trained_In VALUES(7,7,'2008-01-01','2008-12-31');
 
+-- 2. Diseñar un cubo OLAP de 4 dimensiones
+--    Dimensiones: medico, paciente, tiempo y procedimiento
+--    Hechos: costo_tratamiento, duracion_dias
 
--- 02. Diseñar un ( ó 2) cubo(s) OLAP de 4 dimensiones:
+-- 3. Implementar el cubo OLAP en PostgreSQL (esquema estrella)
+-- 3.b + 3.c: DDL de creacion del esquema
 
-DROP TABLE IF EXISTS Fact_Treatment CASCADE;
-DROP TABLE IF EXISTS Dim_Time CASCADE;
-DROP TABLE IF EXISTS Dim_Procedure CASCADE;
-DROP TABLE IF EXISTS Dim_Patient CASCADE;
-DROP TABLE IF EXISTS Dim_Physician CASCADE;
+DROP VIEW IF EXISTS dw_cubo_tratamientos_4d CASCADE;
+DROP TABLE IF EXISTS dw_fact_tratamiento CASCADE;
+DROP TABLE IF EXISTS dw_dim_tiempo CASCADE;
+DROP TABLE IF EXISTS dw_dim_procedimiento CASCADE;
+DROP TABLE IF EXISTS dw_dim_paciente CASCADE;
+DROP TABLE IF EXISTS dw_dim_medico CASCADE;
 
-CREATE TABLE Dim_Physician (
-  PhysicianKey INTEGER PRIMARY KEY NOT NULL,
-  Physician INTEGER NOT NULL,
-  Name VARCHAR(30) NOT NULL,
-  LastName VARCHAR(30) NOT NULL,
-  Specialty INTEGER NOT NULL,
-  CONSTRAINT fk_Dim_Physician_Physician_EmployeeID FOREIGN KEY(Physician) REFERENCES Physician(EmployeeID),
-  CONSTRAINT fk_Dim_Physician_Procedures_Code FOREIGN KEY(Specialty) REFERENCES Procedures(Code)
+CREATE TABLE dw_dim_medico (
+  medico_id INTEGER PRIMARY KEY,
+  nombre VARCHAR(30) NOT NULL,
+  especialidad VARCHAR(255) NOT NULL,
+  ssn INTEGER NOT NULL
 );
 
-CREATE TABLE Dim_Patient (
-  PatientKey INTEGER PRIMARY KEY NOT NULL,
-  Patient INTEGER NOT NULL,
-  Name VARCHAR(30) NOT NULL,
-  LastName VARCHAR(30) NOT NULL,
-  Address VARCHAR(30) NOT NULL,
-  Phone VARCHAR(30) NOT NULL,
-  InsuranceID INTEGER NOT NULL,
-  CONSTRAINT fk_Dim_Patient_Patient_SSN FOREIGN KEY(Patient) REFERENCES Patient(SSN)
+CREATE TABLE dw_dim_paciente (
+  paciente_id INTEGER PRIMARY KEY,
+  nombre VARCHAR(30) NOT NULL,
+  direccion VARCHAR(30) NOT NULL,
+  telefono VARCHAR(30) NOT NULL,
+  seguro INTEGER NOT NULL
 );
 
-CREATE TABLE Dim_Procedure (
-  ProcedureKey INTEGER PRIMARY KEY NOT NULL,
-  ProcedureCode INTEGER NOT NULL,
-  Name VARCHAR(30) NOT NULL,
-  Cost REAL NOT NULL,
-  CONSTRAINT fk_Dim_Procedure_Procedures_Code FOREIGN KEY(ProcedureCode) REFERENCES Procedures(Code)
+CREATE TABLE dw_dim_procedimiento (
+  procedimiento_id INTEGER PRIMARY KEY,
+  nombre VARCHAR(30) NOT NULL,
+  costo_base NUMERIC(12,2) NOT NULL
 );
 
-CREATE TABLE Dim_Time (
-  TimeKey INTEGER PRIMARY KEY NOT NULL,
-  DateValue TIMESTAMP NOT NULL,
-  Minute INTEGER NOT NULL,
-  Hour INTEGER NOT NULL,
-  Day INTEGER NOT NULL,
-  Week INTEGER NOT NULL,
-  Month INTEGER NOT NULL,
-  Year INTEGER NOT NULL
+CREATE TABLE dw_dim_tiempo (
+  tiempo_id TIMESTAMP PRIMARY KEY,
+  fecha DATE NOT NULL,
+  hora SMALLINT NOT NULL,
+  minuto SMALLINT NOT NULL,
+  dia SMALLINT NOT NULL,
+  semana SMALLINT NOT NULL,
+  mes SMALLINT NOT NULL,
+  anio SMALLINT NOT NULL
 );
 
-CREATE TABLE Fact_Treatment (
-  FactTreatmentID INTEGER PRIMARY KEY NOT NULL,
-  PhysicianKey INTEGER NOT NULL,
-  PatientKey INTEGER NOT NULL,
-  ProcedureKey INTEGER NOT NULL,
-  TimeKey INTEGER NOT NULL,
-  TreatmentCost REAL NOT NULL,
-  DurationDays INTEGER NOT NULL,
-  CONSTRAINT fk_Fact_Treatment_Dim_Physician_PhysicianKey FOREIGN KEY(PhysicianKey) REFERENCES Dim_Physician(PhysicianKey),
-  CONSTRAINT fk_Fact_Treatment_Dim_Patient_PatientKey FOREIGN KEY(PatientKey) REFERENCES Dim_Patient(PatientKey),
-  CONSTRAINT fk_Fact_Treatment_Dim_Procedure_ProcedureKey FOREIGN KEY(ProcedureKey) REFERENCES Dim_Procedure(ProcedureKey),
-  CONSTRAINT fk_Fact_Treatment_Dim_Time_TimeKey FOREIGN KEY(TimeKey) REFERENCES Dim_Time(TimeKey)
+CREATE TABLE dw_fact_tratamiento (
+  fact_id BIGSERIAL PRIMARY KEY,
+  medico_id INTEGER NOT NULL,
+  paciente_id INTEGER NOT NULL,
+  procedimiento_id INTEGER NOT NULL,
+  tiempo_id TIMESTAMP NOT NULL,
+  estancia_id INTEGER NOT NULL,
+  costo_tratamiento NUMERIC(12,2) NOT NULL,
+  duracion_dias NUMERIC(12,2) NOT NULL,
+  CONSTRAINT fk_fact_medico FOREIGN KEY (medico_id) REFERENCES dw_dim_medico(medico_id),
+  CONSTRAINT fk_fact_paciente FOREIGN KEY (paciente_id) REFERENCES dw_dim_paciente(paciente_id),
+  CONSTRAINT fk_fact_procedimiento FOREIGN KEY (procedimiento_id) REFERENCES dw_dim_procedimiento(procedimiento_id),
+  CONSTRAINT fk_fact_tiempo FOREIGN KEY (tiempo_id) REFERENCES dw_dim_tiempo(tiempo_id)
 );
 
--- 03. Implementar el (o los) cubo(s) OLAP en la herramienta de su preferencia: PostgreSQL o Oracle o SQL Server
+CREATE INDEX idx_fact_medico ON dw_fact_tratamiento(medico_id);
+CREATE INDEX idx_fact_paciente ON dw_fact_tratamiento(paciente_id);
+CREATE INDEX idx_fact_procedimiento ON dw_fact_tratamiento(procedimiento_id);
+CREATE INDEX idx_fact_tiempo ON dw_fact_tratamiento(tiempo_id);
 
--- 03.e. Crear los scripts SQL (DML) para poblar las tablas de hechos y dimensiones.
-INSERT INTO Dim_Physician
+-- 3.e + 3.f: DML para poblar dimensiones y hechos
+INSERT INTO dw_dim_medico (medico_id, nombre, especialidad, ssn)
 SELECT
-  ROW_NUMBER() OVER(ORDER BY src.Physician, src.Specialty) AS PhysicianKey,
-  src.Physician,
-  src.Name,
-  src.LastName,
-  src.Specialty
-FROM (
-  SELECT DISTINCT
-    p.EmployeeID AS Physician,
-    SPLIT_PART(p.Name, ' ', 1) AS Name,
-    REGEXP_REPLACE(p.Name, '^.*\\s', '') AS LastName,
-    ti.Treatment AS Specialty
-  FROM Physician p
-  INNER JOIN Trained_In ti
-    ON ti.Physician = p.EmployeeID
+  p.EmployeeID,
+  p.Name,
+  COALESCE(
+    string_agg(DISTINCT pr.Name, ', ' ORDER BY pr.Name),
+    p.Position
+  ) AS especialidad,
+  p.SSN
+FROM Physician p
+LEFT JOIN Trained_In ti ON ti.Physician = p.EmployeeID
+LEFT JOIN Procedures pr ON pr.Code = ti.Treatment
+GROUP BY p.EmployeeID, p.Name, p.Position, p.SSN;
 
-  UNION
-
-  SELECT DISTINCT
-    p.EmployeeID AS Physician,
-    SPLIT_PART(p.Name, ' ', 1) AS Name,
-    REGEXP_REPLACE(p.Name, '^.*\\s', '') AS LastName,
-    u.Treatment AS Specialty
-  FROM Physician p
-  INNER JOIN Undergoes u
-    ON u.Physician = p.EmployeeID
-) src;
-
-INSERT INTO Dim_Patient
+INSERT INTO dw_dim_paciente (paciente_id, nombre, direccion, telefono, seguro)
 SELECT
-  ROW_NUMBER() OVER(ORDER BY p.SSN) AS PatientKey,
-  p.SSN AS Patient,
-  SPLIT_PART(p.Name, ' ', 1) AS Name,
-  REGEXP_REPLACE(p.Name, '^.*\\s', '') AS LastName,
-  p.Address,
-  p.Phone,
-  p.InsuranceID
-FROM Patient p;
+  pa.SSN,
+  pa.Name,
+  pa.Address,
+  pa.Phone,
+  pa.InsuranceID
+FROM Patient pa;
 
-INSERT INTO Dim_Procedure
+INSERT INTO dw_dim_procedimiento (procedimiento_id, nombre, costo_base)
 SELECT
-  ROW_NUMBER() OVER(ORDER BY pr.Code) AS ProcedureKey,
-  pr.Code AS ProcedureCode,
+  pr.Code,
   pr.Name,
-  pr.Cost
+  pr.Cost::NUMERIC(12,2)
 FROM Procedures pr;
 
-INSERT INTO Dim_Time
-SELECT
-  ROW_NUMBER() OVER(ORDER BY t.DateValue) AS TimeKey,
-  t.DateValue,
-  EXTRACT(MINUTE FROM t.DateValue)::INTEGER AS Minute,
-  EXTRACT(HOUR FROM t.DateValue)::INTEGER AS Hour,
-  EXTRACT(DAY FROM t.DateValue)::INTEGER AS Day,
-  EXTRACT(WEEK FROM t.DateValue)::INTEGER AS Week,
-  EXTRACT(MONTH FROM t.DateValue)::INTEGER AS Month,
-  EXTRACT(YEAR FROM t.DateValue)::INTEGER AS Year
-FROM (
-  SELECT DISTINCT
-    u.DateUndergoes AS DateValue
-  FROM Undergoes u
-) t;
+INSERT INTO dw_dim_tiempo (tiempo_id, fecha, hora, minuto, dia, semana, mes, anio)
+SELECT DISTINCT
+  date_trunc('minute', u.DateUndergoes) AS tiempo_id,
+  date_trunc('day', u.DateUndergoes)::DATE AS fecha,
+  EXTRACT(HOUR FROM u.DateUndergoes)::SMALLINT AS hora,
+  EXTRACT(MINUTE FROM u.DateUndergoes)::SMALLINT AS minuto,
+  EXTRACT(DAY FROM u.DateUndergoes)::SMALLINT AS dia,
+  EXTRACT(WEEK FROM u.DateUndergoes)::SMALLINT AS semana,
+  EXTRACT(MONTH FROM u.DateUndergoes)::SMALLINT AS mes,
+  EXTRACT(YEAR FROM u.DateUndergoes)::SMALLINT AS anio
+FROM Undergoes u;
 
-INSERT INTO Fact_Treatment
-SELECT
-  ROW_NUMBER() OVER(ORDER BY u.Patient, u.Treatment, u.Stay, u.DateUndergoes) AS FactTreatmentID,
-  dph.PhysicianKey,
-  dpa.PatientKey,
-  dpr.ProcedureKey,
-  dt.TimeKey,
-  pr.Cost AS TreatmentCost,
-  GREATEST((s.StayEnd::DATE - s.StayStart::DATE), 0) AS DurationDays
-FROM Undergoes u
-INNER JOIN Stay s
-  ON s.StayID = u.Stay
-INNER JOIN Procedures pr
-  ON pr.Code = u.Treatment
-INNER JOIN Dim_Physician dph
-  ON dph.Physician = u.Physician
-  AND dph.Specialty = u.Treatment
-INNER JOIN Dim_Patient dpa
-  ON dpa.Patient = u.Patient
-INNER JOIN Dim_Procedure dpr
-  ON dpr.ProcedureCode = u.Treatment
-INNER JOIN Dim_Time dt
-  ON dt.DateValue = u.DateUndergoes;
-
--- 03.g. Validar el esquema actualizado.
-
-SELECT 'Dim_Physician' AS TableName, COUNT(*) AS RowsCount FROM Dim_Physician;
-SELECT 'Dim_Patient' AS TableName, COUNT(*) AS RowsCount FROM Dim_Patient;
-SELECT 'Dim_Procedure' AS TableName, COUNT(*) AS RowsCount FROM Dim_Procedure;
-SELECT 'Dim_Time' AS TableName, COUNT(*) AS RowsCount FROM Dim_Time;
-SELECT 'Fact_Treatment' AS TableName, COUNT(*) AS RowsCount FROM Fact_Treatment;
-
-SELECT
-  ft.FactTreatmentID,
-  dph.Physician,
-  dpa.Patient,
-  dpr.ProcedureCode,
-  dt.DateValue,
-  ft.TreatmentCost,
-  ft.DurationDays
-FROM Fact_Treatment ft
-INNER JOIN Dim_Physician dph
-  ON dph.PhysicianKey = ft.PhysicianKey
-INNER JOIN Dim_Patient dpa
-  ON dpa.PatientKey = ft.PatientKey
-INNER JOIN Dim_Procedure dpr
-  ON dpr.ProcedureKey = ft.ProcedureKey
-INNER JOIN Dim_Time dt
-  ON dt.TimeKey = ft.TimeKey
-ORDER BY ft.FactTreatmentID;
-
-
--- 05. Entender operaciones OLAP usando SQL y las funciones de RANKING, GROUPING SETS, ROLLUP y CUBE.
-
--- 05.a. Funciones de RANKING.
--- RANK() y DENSE_RANK() permiten asignar posiciones al ordenar un conjunto de datos.
--- Ambas ordenan por costo y duracion del tratamiento, pero manejan empates de forma distinta.
-
--- 05.a.ii. RANK() en consulta separada.
-SELECT
-  dpa.Patient AS PatientID,
-  dpa.Name AS PatientName,
-  dpa.LastName AS PatientLastName,
-  dpr.ProcedureCode,
-  dpr.Name AS ProcedureName,
-  ft.TreatmentCost,
-  ft.DurationDays,
-  RANK() OVER(ORDER BY ft.TreatmentCost DESC, ft.DurationDays DESC) AS TreatmentRank
-FROM Fact_Treatment ft
-INNER JOIN Dim_Patient dpa
-  ON dpa.PatientKey = ft.PatientKey
-INNER JOIN Dim_Procedure dpr
-  ON dpr.ProcedureKey = ft.ProcedureKey
-ORDER BY ft.TreatmentCost DESC, ft.DurationDays DESC;
-
--- 05.a.ii. DENSE_RANK() en consulta separada.
-SELECT
-  dpa.Patient AS PatientID,
-  dpa.Name AS PatientName,
-  dpa.LastName AS PatientLastName,
-  dpr.ProcedureCode,
-  dpr.Name AS ProcedureName,
-  ft.TreatmentCost,
-  ft.DurationDays,
-  DENSE_RANK() OVER(ORDER BY ft.TreatmentCost DESC, ft.DurationDays DESC) AS TreatmentDenseRank
-FROM Fact_Treatment ft
-INNER JOIN Dim_Patient dpa
-  ON dpa.PatientKey = ft.PatientKey
-INNER JOIN Dim_Procedure dpr
-  ON dpr.ProcedureKey = ft.ProcedureKey
-ORDER BY ft.TreatmentCost DESC, ft.DurationDays DESC;
-
--- 05.a.iii. Diferencia:
--- RANK() deja huecos despues de empates (1,1,3), DENSE_RANK() no deja huecos (1,1,2).
-
--- 05.b. Funciones GROUPING SETS, ROLLUP y CUBE.
--- Estas funciones generan agregaciones en multiples niveles sobre las mismas dimensiones.
--- Se resume el costo total por paciente, anio y medico responsable.
-
--- 05.b.ii. GROUPING SETS en consulta separada.
-SELECT
-  dpa.Patient AS PatientID,
-  dt.Year,
-  dph.Physician AS PhysicianID,
-  SUM(ft.TreatmentCost) AS TotalTreatmentCost
-FROM Fact_Treatment ft
-INNER JOIN Dim_Patient dpa
-  ON dpa.PatientKey = ft.PatientKey
-INNER JOIN Dim_Time dt
-  ON dt.TimeKey = ft.TimeKey
-INNER JOIN Dim_Physician dph
-  ON dph.PhysicianKey = ft.PhysicianKey
-GROUP BY GROUPING SETS (
-  (dpa.Patient, dt.Year, dph.Physician),
-  (dpa.Patient, dt.Year),
-  (dpa.Patient),
-  ()
+INSERT INTO dw_fact_tratamiento (
+  medico_id,
+  paciente_id,
+  procedimiento_id,
+  tiempo_id,
+  estancia_id,
+  costo_tratamiento,
+  duracion_dias
 )
-ORDER BY dpa.Patient, dt.Year, dph.Physician;
-
--- 05.b.ii. ROLLUP en consulta separada.
 SELECT
-  dpa.Patient AS PatientID,
-  dt.Year,
-  dph.Physician AS PhysicianID,
-  SUM(ft.TreatmentCost) AS TotalTreatmentCost
-FROM Fact_Treatment ft
-INNER JOIN Dim_Patient dpa
-  ON dpa.PatientKey = ft.PatientKey
-INNER JOIN Dim_Time dt
-  ON dt.TimeKey = ft.TimeKey
-INNER JOIN Dim_Physician dph
-  ON dph.PhysicianKey = ft.PhysicianKey
-GROUP BY ROLLUP (dpa.Patient, dt.Year, dph.Physician)
-ORDER BY dpa.Patient, dt.Year, dph.Physician;
+  u.Physician,
+  u.Patient,
+  u.Treatment,
+  date_trunc('minute', u.DateUndergoes),
+  u.Stay,
+  pr.Cost::NUMERIC(12,2),
+  ROUND(EXTRACT(EPOCH FROM (s.StayEnd - s.StayStart)) / 86400.0, 2)::NUMERIC(12,2)
+FROM Undergoes u
+JOIN Stay s ON s.StayID = u.Stay
+JOIN Procedures pr ON pr.Code = u.Treatment;
 
--- 05.b.ii. CUBE en consulta separada.
+CREATE OR REPLACE VIEW dw_cubo_tratamientos_4d AS
 SELECT
-  dpa.Patient AS PatientID,
-  dt.Year,
-  dph.Physician AS PhysicianID,
-  SUM(ft.TreatmentCost) AS TotalTreatmentCost
-FROM Fact_Treatment ft
-INNER JOIN Dim_Patient dpa
-  ON dpa.PatientKey = ft.PatientKey
-INNER JOIN Dim_Time dt
-  ON dt.TimeKey = ft.TimeKey
-INNER JOIN Dim_Physician dph
-  ON dph.PhysicianKey = ft.PhysicianKey
-GROUP BY CUBE (dpa.Patient, dt.Year, dph.Physician)
-ORDER BY dpa.Patient, dt.Year, dph.Physician;
+  CASE
+    WHEN GROUPING(m.medico_id) = 1 THEN 'TOTAL'
+    ELSE m.nombre
+  END AS medico,
+  CASE
+    WHEN GROUPING(p.paciente_id) = 1 THEN 'TOTAL'
+    ELSE p.nombre
+  END AS paciente,
+  CASE
+    WHEN GROUPING(t.tiempo_id) = 1 THEN 'TOTAL'
+    ELSE to_char(t.tiempo_id, 'DD/MM/YYYY HH24:MI')
+  END AS tiempo,
+  CASE
+    WHEN GROUPING(pr.procedimiento_id) = 1 THEN 'TOTAL'
+    ELSE pr.nombre
+  END AS procedimiento,
+  SUM(f.costo_tratamiento) AS costo_total,
+  SUM(f.duracion_dias) AS duracion_total_dias,
+  COUNT(*) AS cantidad_tratamientos
+FROM dw_fact_tratamiento f
+JOIN dw_dim_medico m ON m.medico_id = f.medico_id
+JOIN dw_dim_paciente p ON p.paciente_id = f.paciente_id
+JOIN dw_dim_tiempo t ON t.tiempo_id = f.tiempo_id
+JOIN dw_dim_procedimiento pr ON pr.procedimiento_id = f.procedimiento_id
+GROUP BY CUBE (
+  (m.medico_id, m.nombre),
+  (p.paciente_id, p.nombre),
+  (t.tiempo_id),
+  (pr.procedimiento_id, pr.nombre)
+);
 
--- 05.b.iii. Diferencias:
--- GROUPING SETS: define niveles especificos de agregacion.
--- ROLLUP: genera jerarquias acumuladas (detalle a total general).
--- CUBE: genera todas las combinaciones posibles entre dimensiones.
+-- 
+-- 4. Consultas usando RANK() y DENSE_RANK()
+-- a) Ordenar los tratamientos recibidos por cada paciente por costo (desc) y por duracion (desc)
+--    Usamos primero RANK(), luego DENSE_RANK() para comparar resultados.
 
--- 05.c. Operaciones OLAP slice y dice.
-
--- 05.c.i. Slice: tratamientos del mes de mayo de 2008.
+-- RANK() por costo (mayor a menor) — deja huecos si hay empates
+-- Muestra la posición del tratamiento por paciente según el costo
+-- Consulta 1: RANK() por costo y luego duracion (por paciente)
 SELECT
-  ft.FactTreatmentID,
-  dpa.Patient AS PatientID,
-  dpr.ProcedureCode,
-  dph.Physician AS PhysicianID,
-  dt.DateValue,
-  ft.TreatmentCost,
-  ft.DurationDays
-FROM Fact_Treatment ft
-INNER JOIN Dim_Patient dpa
-  ON dpa.PatientKey = ft.PatientKey
-INNER JOIN Dim_Procedure dpr
-  ON dpr.ProcedureKey = ft.ProcedureKey
-INNER JOIN Dim_Physician dph
-  ON dph.PhysicianKey = ft.PhysicianKey
-INNER JOIN Dim_Time dt
-  ON dt.TimeKey = ft.TimeKey
-WHERE dt.Year = 2008
-  AND dt.Month = 5
-ORDER BY dt.DateValue;
+  f.paciente_id,
+  p.nombre AS paciente,
+  pr.nombre AS procedimiento,
+  f.costo_tratamiento,
+  f.duracion_dias,
+  RANK() OVER (
+    PARTITION BY f.paciente_id
+    ORDER BY f.costo_tratamiento DESC, f.duracion_dias DESC
+  ) AS rank_costo_duracion
+FROM dw_fact_tratamiento f
+JOIN dw_dim_paciente p ON p.paciente_id = f.paciente_id
+JOIN dw_dim_procedimiento pr ON pr.procedimiento_id = f.procedimiento_id
+ORDER BY f.paciente_id, rank_costo_duracion, f.costo_tratamiento DESC, f.duracion_dias DESC;
 
--- 05.c.ii. Dice: tratamientos filtrando por medicos especificos.
+-- Consulta 2: DENSE_RANK() por costo y luego duracion (por paciente)
 SELECT
-  ft.FactTreatmentID,
-  dpa.Patient AS PatientID,
-  dpr.ProcedureCode,
-  dph.Physician AS PhysicianID,
-  dt.DateValue,
-  ft.TreatmentCost,
-  ft.DurationDays
-FROM Fact_Treatment ft
-INNER JOIN Dim_Patient dpa
-  ON dpa.PatientKey = ft.PatientKey
-INNER JOIN Dim_Procedure dpr
-  ON dpr.ProcedureKey = ft.ProcedureKey
-INNER JOIN Dim_Physician dph
-  ON dph.PhysicianKey = ft.PhysicianKey
-INNER JOIN Dim_Time dt
-  ON dt.TimeKey = ft.TimeKey
-WHERE dph.Physician IN (3, 7)
-ORDER BY dph.Physician, dt.DateValue;
+  f.paciente_id,
+  p.nombre AS paciente,
+  pr.nombre AS procedimiento,
+  f.costo_tratamiento,
+  f.duracion_dias,
+  DENSE_RANK() OVER (
+    PARTITION BY f.paciente_id
+    ORDER BY f.costo_tratamiento DESC, f.duracion_dias DESC
+  ) AS dense_rank_costo_duracion
+FROM dw_fact_tratamiento f
+JOIN dw_dim_paciente p ON p.paciente_id = f.paciente_id
+JOIN dw_dim_procedimiento pr ON pr.procedimiento_id = f.procedimiento_id
+ORDER BY f.paciente_id, dense_rank_costo_duracion, f.costo_tratamiento DESC, f.duracion_dias DESC;
+
+-- Explicacion corta (para el entregable):
+-- - RANK(): asigna el mismo rango a las filas empatadas pero deja huecos en la numeracion siguiente.
+--   Ej: valores [100,100,90] -> RANKs [1,1,3].
+-- - DENSE_RANK(): asigna el mismo rango a las filas empatadas pero la numeracion siguiente no tiene huecos.
+--   Ej: valores [100,100,90] -> DENSE_RANKs [1,1,2].
+-- Uso: elegir RANK si queres reflejar saltos en posiciones; elegir DENSE_RANK si preferis posiciones compactas.
+
+-- 5. Consulta avanzada sobre el cubo OLAP
+-- Obtener pacientes con tratamientos de un día de duración de la primera semana
+-- de mayo de 2008, con análisis multidimensional usando CUBE, RANKING y SUB-QUERIES
+
+-- Obtener el listado de pacientes con tratamientos de un día de duración de la
+-- primera semana del mes de mayo de 2008, ordenar el listado por nombre de
+-- paciente.
+
+SELECT
+FROM dw_fact_tratamiento f
+JOIN dw_dim_paciente p ON p.paciente_id = f.paciente_id
+JOIN dw_dim_procedimiento pr ON pr.procedimiento_id = f.procedimiento_id
+JOIN dw_dim_tiempo t ON t.tiempo_id = f.tiempo_id
+
+SELECT
+  COALESCE(p.nombre, 'TOTAL GENERAL') AS paciente,
+  COALESCE(pr.nombre, 'TOTAL PROCEDIMIENTO') AS procedimiento,
+  COALESCE(t.fecha::TEXT, 'TOTAL FECHA') AS fecha,
+  f.duracion_dias,
+  COUNT(1) AS cantidad_tratamientos,
+  SUM(f.costo_tratamiento) AS costo_total,
+  AVG(f.costo_tratamiento) AS costo_promedio,
+  RANK() OVER (
+    PARTITION BY p.nombre
+    ORDER BY SUM(f.costo_tratamiento) DESC
+  ) AS rank_costo_por_paciente,
+  DENSE_RANK() OVER (
+    ORDER BY SUM(f.costo_tratamiento) DESC
+  ) AS dense_rank_costo_global,
+  GROUPING(p.nombre) AS grouping_paciente,
+  GROUPING(pr.nombre) AS grouping_procedimiento,
+  GROUPING(t.fecha) AS grouping_fecha
+FROM dw_fact_tratamiento f
+JOIN dw_dim_paciente p ON p.paciente_id = f.paciente_id
+JOIN dw_dim_procedimiento pr ON pr.procedimiento_id = f.procedimiento_id
+JOIN dw_dim_tiempo t ON t.tiempo_id = f.tiempo_id
+WHERE
+  -- SUB-QUERY: Filtrar solo pacientes con al menos un tratamiento de 1 día en mayo 2008 semana 1
+  f.paciente_id IN (
+    SELECT DISTINCT sub_f.paciente_id
+    FROM dw_fact_tratamiento sub_f
+    JOIN dw_dim_tiempo sub_t ON sub_t.tiempo_id = sub_f.tiempo_id
+    WHERE sub_f.duracion_dias = 1
+      AND sub_t.anio = 2008
+      AND sub_t.mes = 5
+      AND sub_t.dia BETWEEN 1 AND 7
+  )
+  -- WHERE: Filtros principales
+  AND f.duracion_dias = 1
+  AND t.anio = 2008
+  AND t.mes = 5
+  AND t.dia BETWEEN 1 AND 7
+GROUP BY
+  -- CUBE: Genera todas las combinaciones de dimensiones
+  CUBE(p.nombre, pr.nombre, t.fecha, f.duracion_dias)
+ORDER BY
+  GROUPING(p.nombre) ASC,
+  paciente ASC,
+  GROUPING(pr.nombre) ASC,
+  procedimiento ASC,
+  fecha ASC;
+
