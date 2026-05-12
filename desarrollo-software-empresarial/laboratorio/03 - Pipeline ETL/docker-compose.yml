@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: lab3-etl-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: lab3_etl
+      POSTGRES_USER: lab3_user
+      POSTGRES_PASSWORD: lab3_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lab3_user -d lab3_etl"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
