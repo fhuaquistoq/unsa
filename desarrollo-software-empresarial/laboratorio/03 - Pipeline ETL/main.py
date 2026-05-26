@@ -4,7 +4,12 @@ from difflib import get_close_matches
 from pathlib import Path
 
 import pandas as pd
-from pandas.api.types import is_bool_dtype, is_datetime64_any_dtype, is_object_dtype, is_string_dtype
+from pandas.api.types import (
+    is_bool_dtype,
+    is_datetime64_any_dtype,
+    is_object_dtype,
+    is_string_dtype,
+)
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -102,7 +107,7 @@ def clean_text(series: pd.Series) -> pd.Series:
     return series.fillna("").astype(str).str.strip()
 
 
-def standardize_code(value: object, valid_codes: set[str]) -> str | pd.NA:
+def standardize_code(value: object, valid_codes: set[str]) -> str:
     if pd.isna(value):
         return pd.NA
 
@@ -110,7 +115,9 @@ def standardize_code(value: object, valid_codes: set[str]) -> str | pd.NA:
     if not raw:
         return pd.NA
 
-    translated = raw.translate(str.maketrans({"O": "0", "I": "1", "!": "1", ")": "0", "(": "0"}))
+    translated = raw.translate(
+        str.maketrans({"O": "0", "I": "1", "!": "1", ")": "0", "(": "0"})
+    )
     translated = re.sub(r"[^A-Z0-9]", "", translated)
 
     if translated in valid_codes:
@@ -118,7 +125,9 @@ def standardize_code(value: object, valid_codes: set[str]) -> str | pd.NA:
 
     prefix_match = re.match(r"^[A-Z]{2}", translated)
     prefix = prefix_match.group(0) if prefix_match else ""
-    candidates = [code for code in valid_codes if code.startswith(prefix)] or list(valid_codes)
+    candidates = [code for code in valid_codes if code.startswith(prefix)] or list(
+        valid_codes
+    )
     close = get_close_matches(translated, candidates, n=1, cutoff=0.74)
     if close:
         return close[0]
@@ -126,7 +135,7 @@ def standardize_code(value: object, valid_codes: set[str]) -> str | pd.NA:
     return translated
 
 
-def canonical_catalog_from_code(product_code: object) -> str | pd.NA:
+def canonical_catalog_from_code(product_code: object) -> str:
     if pd.isna(product_code):
         return pd.NA
     prefix = str(product_code).strip().upper()[:2]
@@ -158,7 +167,9 @@ def parse_catalog_dates(series: pd.Series) -> pd.Series:
 
 def clean_products(products_raw: pd.DataFrame) -> pd.DataFrame:
     products = normalize_columns(products_raw).copy()
-    products["product_key"] = pd.to_numeric(products["id"], errors="coerce").astype("Int64")
+    products["product_key"] = pd.to_numeric(products["id"], errors="coerce").astype(
+        "Int64"
+    )
     products["product_code"] = clean_text(products["pcode"]).str.upper()
     products["product_type"] = clean_text(products["type"])
     products["description"] = clean_text(products["descrip"])
@@ -183,19 +194,33 @@ def clean_products(products_raw: pd.DataFrame) -> pd.DataFrame:
     ].drop_duplicates(subset=["product_code"])
 
 
-def clean_orders(orders_raw: pd.DataFrame, valid_codes: set[str], source: str) -> pd.DataFrame:
+def clean_orders(
+    orders_raw: pd.DataFrame, valid_codes: set[str], source: str
+) -> pd.DataFrame:
     orders = orders_raw.copy()
-    orders["source_transaction_id"] = pd.to_numeric(orders["id"], errors="coerce").astype("Int64")
-    orders["invoice_number"] = pd.to_numeric(orders["inv"], errors="coerce").astype("Int64")
+    orders["source_transaction_id"] = pd.to_numeric(
+        orders["id"], errors="coerce"
+    ).astype("Int64")
+    orders["invoice_number"] = pd.to_numeric(orders["inv"], errors="coerce").astype(
+        "Int64"
+    )
     orders["customer_identifier"] = clean_text(orders["customer_raw"])
     orders["catalog_original"] = clean_text(orders["catalog_raw"])
     orders["product_code_original"] = clean_text(orders["product_code_raw"])
-    orders["product_code"] = orders["product_code_original"].map(lambda value: standardize_code(value, valid_codes))
+    orders["product_code"] = orders["product_code_original"].map(
+        lambda value: standardize_code(value, valid_codes)
+    )
     orders["catalog"] = orders["product_code"].map(canonical_catalog_from_code)
-    orders["quantity_original_missing"] = orders["qty"].isna() | clean_text(orders["qty"]).eq("")
+    orders["quantity_original_missing"] = orders["qty"].isna() | clean_text(
+        orders["qty"]
+    ).eq("")
     orders["quantity"] = pd.to_numeric(orders["qty"], errors="coerce")
     orders["quantity"] = orders["quantity"].fillna(1).astype("Int64")
-    orders["order_date"] = parse_web_dates(orders["order_date_raw"]) if source == "web" else parse_catalog_dates(orders["order_date_raw"])
+    orders["order_date"] = (
+        parse_web_dates(orders["order_date_raw"])
+        if source == "web"
+        else parse_catalog_dates(orders["order_date_raw"])
+    )
     orders["order_year"] = orders["order_date"].dt.year.astype("Int64")
     orders["order_month"] = orders["order_date"].dt.month.astype("Int64")
 
@@ -219,7 +244,9 @@ def clean_orders(orders_raw: pd.DataFrame, valid_codes: set[str], source: str) -
     ]
 
 
-def build_dimensions_and_fact(clean_orders_df: pd.DataFrame, dim_products: pd.DataFrame) -> dict[str, pd.DataFrame]:
+def build_dimensions_and_fact(
+    clean_orders_df: pd.DataFrame, dim_products: pd.DataFrame
+) -> dict[str, pd.DataFrame]:
     dim_customers = (
         clean_orders_df[["source_system", "customer_identifier"]]
         .drop_duplicates()
@@ -241,13 +268,23 @@ def build_dimensions_and_fact(clean_orders_df: pd.DataFrame, dim_products: pd.Da
     dim_dates["month"] = dim_dates["order_date"].dt.month
     dim_dates["day"] = dim_dates["order_date"].dt.day
     dim_dates["weekday"] = dim_dates["order_date"].dt.day_name()
-    dim_dates = dim_dates[["date_key", "order_date", "year", "quarter", "month", "day", "weekday"]]
+    dim_dates = dim_dates[
+        ["date_key", "order_date", "year", "quarter", "month", "day", "weekday"]
+    ]
 
     fact_orders = clean_orders_df.merge(dim_products, on="product_code", how="left")
-    fact_orders = fact_orders.merge(dim_customers, on=["source_system", "customer_identifier"], how="left")
-    fact_orders = fact_orders.merge(dim_dates[["date_key", "order_date"]], on="order_date", how="left")
-    fact_orders["gross_sales"] = fact_orders["quantity"].astype(float) * fact_orders["price"]
-    fact_orders["gross_cost"] = fact_orders["quantity"].astype(float) * fact_orders["cost"]
+    fact_orders = fact_orders.merge(
+        dim_customers, on=["source_system", "customer_identifier"], how="left"
+    )
+    fact_orders = fact_orders.merge(
+        dim_dates[["date_key", "order_date"]], on="order_date", how="left"
+    )
+    fact_orders["gross_sales"] = (
+        fact_orders["quantity"].astype(float) * fact_orders["price"]
+    )
+    fact_orders["gross_cost"] = (
+        fact_orders["quantity"].astype(float) * fact_orders["cost"]
+    )
     fact_orders["gross_profit"] = fact_orders["gross_sales"] - fact_orders["gross_cost"]
     fact_orders.insert(0, "order_fact_key", range(1, len(fact_orders) + 1))
 
@@ -350,11 +387,18 @@ def profile_dataset(name: str, df: pd.DataFrame) -> str:
     lines.append(dataframe_block(summarize_dataframe(df)))
 
     numeric_source = df.drop(
-        columns=[column for column in df.columns if is_bool_dtype(df[column].dtype) or is_datetime64_any_dtype(df[column].dtype)],
+        columns=[
+            column
+            for column in df.columns
+            if is_bool_dtype(df[column].dtype)
+            or is_datetime64_any_dtype(df[column].dtype)
+        ],
         errors="ignore",
     )
     numeric_df = numeric_source.apply(pd.to_numeric, errors="coerce")
-    numeric_cols = [column for column in numeric_df.columns if numeric_df[column].notna().any()]
+    numeric_cols = [
+        column for column in numeric_df.columns if numeric_df[column].notna().any()
+    ]
     if numeric_cols:
         variances = numeric_df[numeric_cols].var().sort_values(ascending=False).head(3)
         lines.append("\n### Distribución de atributos numéricos clave")
@@ -364,7 +408,14 @@ def profile_dataset(name: str, df: pd.DataFrame) -> str:
     if object_cols:
         lines.append("\n### Distribución de atributos categóricos clave")
         for column in object_cols[:5]:
-            counts = df[column].fillna("<NULL>").astype(str).value_counts().head(8).to_frame("count")
+            counts = (
+                df[column]
+                .fillna("<NULL>")
+                .astype(str)
+                .value_counts()
+                .head(8)
+                .to_frame("count")
+            )
             counts["ratio"] = counts["count"] / len(df)
             lines.append(f"\n#### {column}")
             lines.append(dataframe_block(counts))
@@ -409,23 +460,43 @@ def profile_dataset(name: str, df: pd.DataFrame) -> str:
         for pattern_name, pattern in patterns.items():
             ratio = sample.str.match(pattern).mean()
             if ratio >= 0.5:
-                pattern_rows.append({"column": column, "pattern": pattern_name, "ratio": round(float(ratio), 3)})
-    lines.append(dataframe_block(pd.DataFrame(pattern_rows) if pattern_rows else pd.DataFrame({"message": ["Sin patrones dominantes"]})))
+                pattern_rows.append(
+                    {
+                        "column": column,
+                        "pattern": pattern_name,
+                        "ratio": round(float(ratio), 3),
+                    }
+                )
+    lines.append(
+        dataframe_block(
+            pd.DataFrame(pattern_rows)
+            if pattern_rows
+            else pd.DataFrame({"message": ["Sin patrones dominantes"]})
+        )
+    )
 
     lines.append("\n### Propiedades de sub-poblaciones")
-    subpopulation_columns = [column for column in df.columns if 2 <= df[column].nunique(dropna=True) <= 10]
+    subpopulation_columns = [
+        column for column in df.columns if 2 <= df[column].nunique(dropna=True) <= 10
+    ]
     if subpopulation_columns:
         for column in subpopulation_columns[:3]:
-            counts = df[column].fillna("<NULL>").astype(str).value_counts().to_frame("count")
+            counts = (
+                df[column].fillna("<NULL>").astype(str).value_counts().to_frame("count")
+            )
             lines.append(f"\n#### {column}")
             lines.append(dataframe_block(counts))
     else:
-        lines.append("No se detectaron sub-poblaciones claras con cardinalidad entre 2 y 10.")
+        lines.append(
+            "No se detectaron sub-poblaciones claras con cardinalidad entre 2 y 10."
+        )
 
     return "\n".join(lines)
 
 
-def write_exploration_report(path: Path, datasets: dict[str, pd.DataFrame], title: str) -> None:
+def write_exploration_report(
+    path: Path, datasets: dict[str, pd.DataFrame], title: str
+) -> None:
     sections = [f"# {title}", ""]
     for name, df in datasets.items():
         sections.append(profile_dataset(name, df))
@@ -474,11 +545,20 @@ def build_quality_report(
     )
 
 
-def write_quality_markdown(path: Path, quality: pd.DataFrame, clean_orders_df: pd.DataFrame) -> None:
-    invalid_catalog_examples = (
-        clean_orders_df.loc[clean_orders_df["catalog_original"] != clean_orders_df["catalog"], ["source_system", "source_transaction_id", "catalog_original", "catalog", "product_code_original", "product_code"]]
-        .head(25)
-    )
+def write_quality_markdown(
+    path: Path, quality: pd.DataFrame, clean_orders_df: pd.DataFrame
+) -> None:
+    invalid_catalog_examples = clean_orders_df.loc[
+        clean_orders_df["catalog_original"] != clean_orders_df["catalog"],
+        [
+            "source_system",
+            "source_transaction_id",
+            "catalog_original",
+            "catalog",
+            "product_code_original",
+            "product_code",
+        ],
+    ].head(25)
     missing_qty_examples = clean_orders_df.loc[
         clean_orders_df["quantity_original_missing"],
         ["source_system", "source_transaction_id", "product_code", "quantity"],
@@ -498,7 +578,11 @@ def write_quality_markdown(path: Path, quality: pd.DataFrame, clean_orders_df: p
         "",
         "## Valores faltantes",
         "La cantidad (`QTY`) tiene valores faltantes/corruptos puntuales. No se eliminaron filas; se imputó `1` y se conservó una bandera de auditoría.",
-        dataframe_block(missing_qty_examples if not missing_qty_examples.empty else pd.DataFrame({"message": ["Sin QTY faltantes"]})),
+        dataframe_block(
+            missing_qty_examples
+            if not missing_qty_examples.empty
+            else pd.DataFrame({"message": ["Sin QTY faltantes"]})
+        ),
     ]
     path.write_text("\n".join(content), encoding="utf-8")
 
@@ -636,7 +720,11 @@ def main() -> None:
     pd.set_option("display.width", 180)
 
     raw = read_source_data()
-    write_exploration_report(OUTPUT_DIR / "01_exploracion_inicial.md", raw, "Exploración inicial de datasets crudos")
+    write_exploration_report(
+        OUTPUT_DIR / "01_exploracion_inicial.md",
+        raw,
+        "Exploración inicial de datasets crudos",
+    )
 
     dim_products = clean_products(raw["products_raw"])
     valid_codes = set(dim_products["product_code"])
@@ -654,7 +742,9 @@ def main() -> None:
         df.to_csv(OUTPUT_DIR / f"{table_name}.csv", index=False)
 
     quality = build_quality_report(raw_orders, clean_orders_df, valid_codes)
-    write_quality_markdown(OUTPUT_DIR / "02_informe_calidad.md", quality, clean_orders_df)
+    write_quality_markdown(
+        OUTPUT_DIR / "02_informe_calidad.md", quality, clean_orders_df
+    )
     write_exploration_report(
         OUTPUT_DIR / "03_exploracion_final.md",
         {
@@ -669,7 +759,7 @@ def main() -> None:
 
     write_schema_sql(SQL_DIR / "schema.sql")
     write_pipeline_graph(OUTPUT_DIR / "04_pipeline_etl.md")
-    load_status = try_load_postgresql(warehouse_tables)
+    try_load_postgresql(warehouse_tables)
 
     print("Pipeline ETL ejecutado correctamente.")
     print(f"Filas integradas en fact_orders: {len(warehouse_tables['fact_orders']):,}")
