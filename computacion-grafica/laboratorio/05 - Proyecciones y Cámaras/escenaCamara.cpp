@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <GL/glut.h>
+#include <iostream>
 
 #define RED 0.05f
 #define GREEN 0.05f
@@ -14,7 +15,7 @@ int windowHeight = 800;
 
 float eyeX = 0.0f;
 float eyeY = 4.0f;
-float eyeZ = 18.0f;
+float eyeZ = 0.0f;
 float centerX = 0.0f;
 float centerY = 0.0f;
 float centerZ = 0.0f;
@@ -87,7 +88,7 @@ GLvoid window_display()
     glLoadIdentity();
     gluLookAt(eyeX, eyeY, eyeZ,
               centerX, centerY, centerZ,
-              0.0f, 1.0f, 0.0f);
+              -1.0f, -1.0f, 0.0f);
 
     glPushMatrix();
     glTranslatef(-5.0f, 0.0f, 0.0f);
@@ -107,6 +108,8 @@ GLvoid window_display()
     glColor3f(1.0f, 0.2f, 0.9f);
     glutSolidTorus(0.6f, 1.6f, 32, 32);
     glPopMatrix();
+
+    std::cout << centerX << " " << centerY << " " << centerZ << std::endl;
 
     glutSwapBuffers();
 }
