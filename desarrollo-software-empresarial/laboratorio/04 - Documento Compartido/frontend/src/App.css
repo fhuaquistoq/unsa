@@ -1,0 +1,153 @@
+.app {
+  --page-padding: clamp(12px, 4vw, 24px);
+
+  box-sizing: border-box;
+  min-height: 100vh;
+  background: #f5f1e8;
+  color: #202124;
+  font-family: Inter, system-ui, sans-serif;
+  padding: 0 var(--page-padding) var(--page-padding);
+  width: 100%;
+}
+
+.app * {
+  box-sizing: inherit;
+}
+
+.topbar {
+  background: rgb(245 241 232 / 94%);
+  border-bottom: 1px solid #ded7c8;
+  box-shadow: 0 8px 30px rgb(60 64 67 / 10%);
+  margin: 0 calc(var(--page-padding) * -1) 24px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.topbar-content {
+  display: grid;
+  gap: 12px;
+  margin: 0 auto;
+  max-width: 900px;
+  padding: 18px var(--page-padding) 14px;
+}
+
+.toolbar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.toolbar button,
+.toolbar select,
+.title,
+.document-body {
+  border: 1px solid #d6d0c4;
+  border-radius: 10px;
+  box-sizing: border-box;
+  font: inherit;
+  padding: 12px 14px;
+}
+
+.toolbar button {
+  background: white;
+  color: #202124;
+  cursor: pointer;
+  min-width: 44px;
+}
+
+.toolbar button.active {
+  background: #1a73e8;
+  border-color: #1a73e8;
+  color: white;
+}
+
+.toolbar button:disabled,
+.toolbar select:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.toolbar select {
+  background: white;
+  cursor: pointer;
+}
+
+.toolbar span {
+  color: #5f6368;
+  margin-left: auto;
+}
+
+.editor {
+  display: grid;
+  margin: 0 auto;
+  max-width: 900px;
+  width: 100%;
+}
+
+.title {
+  background: white;
+  font-size: clamp(28px, 6vw, 48px);
+  font-weight: 700;
+  max-width: 100%;
+  min-width: 0;
+  outline: none;
+  width: 100%;
+}
+
+.document-body {
+  background: white;
+  border-radius: 18px;
+  line-height: 1.7;
+  min-height: 55vh;
+  outline: none;
+  overflow-wrap: anywhere;
+  padding: clamp(16px, 4vw, 28px);
+  width: 100%;
+  white-space: pre-wrap;
+}
+
+.document-body:empty::before {
+  color: #8a8172;
+  content: attr(data-placeholder);
+}
+
+.document-body strong,
+.document-body b {
+  font-weight: 700;
+}
+
+.document-body em,
+.document-body i {
+  font-style: italic;
+}
+
+.document-body u {
+  text-decoration: underline;
+}
+
+.document-body s,
+.document-body strike {
+  text-decoration: line-through;
+}
+
+.document-body font[size="2"] {
+  font-size: 14px;
+}
+
+.document-body font[size="3"] {
+  font-size: 16px;
+}
+
+.document-body font[size="4"] {
+  font-size: 18px;
+}
+
+.document-body font[size="5"] {
+  font-size: 24px;
+}
+
+.document-body font[size="6"] {
+  font-size: 32px;
+}
