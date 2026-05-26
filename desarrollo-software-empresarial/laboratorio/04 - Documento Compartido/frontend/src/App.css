@@ -32,15 +32,14 @@
   padding: 18px var(--page-padding) 14px;
 }
 
-.toolbar {
+.document-info {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.toolbar button,
-.toolbar select,
+.document-info input,
 .title,
 .document-body {
   border: 1px solid #d6d0c4;
@@ -50,31 +49,23 @@
   padding: 12px 14px;
 }
 
-.toolbar button {
+.username-field {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+.username-field span {
+  color: #5f6368;
+  font-size: 13px;
+}
+
+.username-field input {
   background: white;
-  color: #202124;
-  cursor: pointer;
-  min-width: 44px;
+  max-width: 150px;
 }
 
-.toolbar button.active {
-  background: #1a73e8;
-  border-color: #1a73e8;
-  color: white;
-}
-
-.toolbar button:disabled,
-.toolbar select:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
-}
-
-.toolbar select {
-  background: white;
-  cursor: pointer;
-}
-
-.toolbar span {
+.document-info > span {
   color: #5f6368;
   margin-left: auto;
 }
@@ -83,6 +74,7 @@
   display: grid;
   margin: 0 auto;
   max-width: 900px;
+  position: relative;
   width: 100%;
 }
 
@@ -113,41 +105,35 @@
   content: attr(data-placeholder);
 }
 
-.document-body strong,
-.document-body b {
+.remote-cursors {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.remote-cursor {
+  background: var(--cursor-color);
+  border-radius: 999px;
+  opacity: 1;
+  position: absolute;
+  transform: translateX(-1px);
+  transition:
+    left 90ms linear,
+    top 90ms linear,
+    height 90ms linear;
+  width: 2px;
+}
+
+.remote-cursor span {
+  background: var(--cursor-color);
+  border-radius: 6px 6px 6px 0;
+  color: white;
+  font-size: 11px;
   font-weight: 700;
-}
-
-.document-body em,
-.document-body i {
-  font-style: italic;
-}
-
-.document-body u {
-  text-decoration: underline;
-}
-
-.document-body s,
-.document-body strike {
-  text-decoration: line-through;
-}
-
-.document-body font[size="2"] {
-  font-size: 14px;
-}
-
-.document-body font[size="3"] {
-  font-size: 16px;
-}
-
-.document-body font[size="4"] {
-  font-size: 18px;
-}
-
-.document-body font[size="5"] {
-  font-size: 24px;
-}
-
-.document-body font[size="6"] {
-  font-size: 32px;
+  left: 0;
+  line-height: 1;
+  padding: 4px 6px;
+  position: absolute;
+  top: -20px;
+  white-space: nowrap;
 }

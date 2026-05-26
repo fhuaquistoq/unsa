@@ -9,7 +9,6 @@ Last updated: 2026-05-26
 - /home/fhuaquisto/.config/opencode/skills
 - /home/fhuaquisto/.copilot/skills
 - /home/fhuaquisto/.codex/skills
-- /home/fhuaquisto/.qwen/skills
 
 ## Contract
 
@@ -23,6 +22,7 @@ Last updated: 2026-05-26
 | --- | --- | --- | --- |
 | `branch-pr` | Create Gentle AI pull requests with issue-first checks. Trigger: creating, opening, or preparing PRs for review. | user | `/home/fhuaquisto/.config/opencode/skills/branch-pr/SKILL.md` |
 | `chained-pr` | Trigger: PRs over 400 lines, stacked PRs, review slices. Split oversized changes into chained PRs that protect review focus. | user | `/home/fhuaquisto/.config/opencode/skills/chained-pr/SKILL.md` |
+| `code-quality-review` | — | user | `/home/fhuaquisto/.config/opencode/skills/code-quality-review/SKILL.md` |
 | `cognitive-doc-design` | Design docs that reduce cognitive load. Trigger: writing guides, READMEs, RFCs, onboarding, architecture, or review-facing docs. | user | `/home/fhuaquisto/.config/opencode/skills/cognitive-doc-design/SKILL.md` |
 | `comment-writer` | Write warm, direct collaboration comments. Trigger: PR feedback, issue replies, reviews, Slack messages, or GitHub comments. | user | `/home/fhuaquisto/.config/opencode/skills/comment-writer/SKILL.md` |
 | `go-testing` | Trigger: Go tests, go test coverage, Bubbletea teatest, golden files. Apply focused Go testing patterns. | user | `/home/fhuaquisto/.config/opencode/skills/go-testing/SKILL.md` |
@@ -31,7 +31,6 @@ Last updated: 2026-05-26
 | `judgment-day` | Trigger: judgment day, dual review, adversarial review, juzgar. Run blind dual review, fix confirmed issues, then re-judge. | user | `/home/fhuaquisto/.config/opencode/skills/judgment-day/SKILL.md` |
 | `openai-docs` | Use when the user asks how to build with OpenAI products or APIs and needs up-to-date official documentation with citations, help choosing the latest model for a use case, or model upgrade and prompt-upgrade guidance; prioritize OpenAI docs MCP tools, use bundled references only as helper context, and restrict any fallback browsing to official OpenAI domains. | user | `/home/fhuaquisto/.codex/skills/.system/openai-docs/SKILL.md` |
 | `plugin-creator` | Create and scaffold plugin directories for Codex with a required `.codex-plugin/plugin.json`, optional plugin folders/files, and baseline placeholders you can edit before publishing or testing. Use when Codex needs to create a new personal plugin, add optional plugin structure, or generate or update personal or repo-root `.agents/plugins/marketplace.json` entries for plugin ordering and availability metadata. | user | `/home/fhuaquisto/.codex/skills/.system/plugin-creator/SKILL.md` |
-| `project-architect-skill` | — | user | `/home/fhuaquisto/.config/opencode/skills/project-architect-skill/SKILL.md` |
 | `skill-creator` | Trigger: new skills, agent instructions, documenting AI usage patterns. Create LLM-first skills with valid frontmatter. | user | `/home/fhuaquisto/.config/opencode/skills/skill-creator/SKILL.md` |
 | `skill-improver` | Trigger: improve skills, audit skills, refactor skills, skill quality. Audit and upgrade existing LLM-first skills. | user | `/home/fhuaquisto/.config/opencode/skills/skill-improver/SKILL.md` |
 | `skill-installer` | Install Codex skills into $CODEX_HOME/skills from a curated list or a GitHub repo path. Use when a user asks to list installable skills, install a curated skill, or install a skill from another repo (including private repos). | user | `/home/fhuaquisto/.codex/skills/.system/skill-installer/SKILL.md` |
