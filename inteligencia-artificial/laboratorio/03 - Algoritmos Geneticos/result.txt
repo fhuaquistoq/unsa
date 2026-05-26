@@ -1,0 +1,347 @@
+Algoritmo Genetico:
+Cantidad de generaciones: 5
+Cantidad de individuos: 10
+Cantidad de edificios: 17
+Presupuesto maximo: 85000
+Probabilidad de cruzamiento: 0.8
+Probabilidad de mutacion: 0.02
+Representacion: binaria
+Seleccion: ruleta
+Cruzamiento: un punto
+Mutacion: por gen
+----------------------------------------
+
+Generacion 1:
+Individuo 1:
+Cromosoma: 10011111001000011
+Costo total: 76500
+Fitness total: 48150
+Estado: valido
+
+Individuo 2:
+Cromosoma: 01001011101011101
+Costo total: 104000
+Fitness total: 0
+Estado: invalido
+
+Individuo 3:
+Cromosoma: 11010110110110100
+Costo total: 100500
+Fitness total: 0
+Estado: invalido
+
+Individuo 4:
+Cromosoma: 10101110011000100
+Costo total: 69500
+Fitness total: 47010
+Estado: valido
+
+Individuo 5:
+Cromosoma: 10111010111101100
+Costo total: 102500
+Fitness total: 0
+Estado: invalido
+
+Individuo 6:
+Cromosoma: 11010101101101000
+Costo total: 81000
+Fitness total: 51470
+Estado: valido
+
+Individuo 7:
+Cromosoma: 10001111111000111
+Costo total: 104500
+Fitness total: 0
+Estado: invalido
+
+Individuo 8:
+Cromosoma: 01011000001011111
+Costo total: 91500
+Fitness total: 0
+Estado: invalido
+
+Individuo 9:
+Cromosoma: 11011000110101110
+Costo total: 97000
+Fitness total: 0
+Estado: invalido
+
+Individuo 10:
+Cromosoma: 01010000001110011
+Costo total: 70500
+Fitness total: 48030
+Estado: valido
+
+----------------------------------------
+
+Generacion 2:
+Individuo 1:
+Cromosoma: 11010101101101000
+Costo total: 81000
+Fitness total: 51470
+Estado: valido
+
+Individuo 2:
+Cromosoma: 11010101101101000
+Costo total: 81000
+Fitness total: 51470
+Estado: valido
+
+Individuo 3:
+Cromosoma: 10101110011000100
+Costo total: 69500
+Fitness total: 47010
+Estado: valido
+
+Individuo 4:
+Cromosoma: 01010100001101000
+Costo total: 47500
+Fitness total: 27090
+Estado: valido
+
+Individuo 5:
+Cromosoma: 11010101101110011
+Costo total: 109000
+Fitness total: 0
+Estado: invalido
+
+Individuo 6:
+Cromosoma: 11010101101000100
+Costo total: 81000
+Fitness total: 56590
+Estado: valido
+
+Individuo 7:
+Cromosoma: 10101110011101000
+Costo total: 69500
+Fitness total: 41890
+Estado: valido
+
+Individuo 8:
+Cromosoma: 10101110011001000
+Costo total: 61000
+Fitness total: 37130
+Estado: valido
+
+Individuo 9:
+Cromosoma: 11010101101100100
+Costo total: 89500
+Fitness total: 0
+Estado: invalido
+
+Individuo 10:
+Cromosoma: 10011111011000100
+Costo total: 75000
+Fitness total: 47290
+Estado: valido
+
+----------------------------------------
+
+Generacion 3:
+Individuo 1:
+Cromosoma: 11010101101000100
+Costo total: 81000
+Fitness total: 56590
+Estado: valido
+
+Individuo 2:
+Cromosoma: 00101110011101100
+Costo total: 73500
+Fitness total: 45390
+Estado: valido
+
+Individuo 3:
+Cromosoma: 10101110011000100
+Costo total: 69500
+Fitness total: 47010
+Estado: valido
+
+Individuo 4:
+Cromosoma: 10001110011101000
+Costo total: 61500
+Fitness total: 36290
+Estado: valido
+
+Individuo 5:
+Cromosoma: 10101111111001000
+Costo total: 82500
+Fitness total: 52010
+Estado: valido
+
+Individuo 6:
+Cromosoma: 10110101101000100
+Costo total: 79000
+Fitness total: 54540
+Estado: valido
+
+Individuo 7:
+Cromosoma: 11001110011001000
+Costo total: 63000
+Fitness total: 39180
+Estado: valido
+
+Individuo 8:
+Cromosoma: 10101110011001000
+Costo total: 61000
+Fitness total: 37130
+Estado: valido
+
+Individuo 9:
+Cromosoma: 01010101101000100
+Costo total: 69000
+Fitness total: 47090
+Estado: valido
+
+Individuo 10:
+Cromosoma: 11010101101000100
+Costo total: 81000
+Fitness total: 56590
+Estado: valido
+
+----------------------------------------
+
+Generacion 4:
+Individuo 1:
+Cromosoma: 11010101101000100
+Costo total: 81000
+Fitness total: 56590
+Estado: valido
+
+Individuo 2:
+Cromosoma: 10110101101000100
+Costo total: 79000
+Fitness total: 54540
+Estado: valido
+
+Individuo 3:
+Cromosoma: 10101110011001000
+Costo total: 61000
+Fitness total: 37130
+Estado: valido
+
+Individuo 4:
+Cromosoma: 10110101101000100
+Costo total: 79000
+Fitness total: 54540
+Estado: valido
+
+Individuo 5:
+Cromosoma: 10111111111001000
+Costo total: 89500
+Fitness total: 0
+Estado: invalido
+
+Individuo 6:
+Cromosoma: 10101110011001000
+Costo total: 61000
+Fitness total: 37130
+Estado: valido
+
+Individuo 7:
+Cromosoma: 10101111111001000
+Costo total: 82500
+Fitness total: 52010
+Estado: valido
+
+Individuo 8:
+Cromosoma: 10101110011000100
+Costo total: 69500
+Fitness total: 47010
+Estado: valido
+
+Individuo 9:
+Cromosoma: 10110001101000100
+Costo total: 74000
+Fitness total: 52540
+Estado: valido
+
+Individuo 10:
+Cromosoma: 10010101101000100
+Costo total: 71000
+Fitness total: 48940
+Estado: valido
+
+----------------------------------------
+
+Generacion 5:
+Individuo 1:
+Cromosoma: 11010101101000100
+Costo total: 81000
+Fitness total: 56590
+Estado: valido
+
+Individuo 2:
+Cromosoma: 10110101101000100
+Costo total: 79000
+Fitness total: 54540
+Estado: valido
+
+Individuo 3:
+Cromosoma: 10001110011000100
+Costo total: 61500
+Fitness total: 41410
+Estado: valido
+
+Individuo 4:
+Cromosoma: 10010110001000100
+Costo total: 58500
+Fitness total: 40060
+Estado: valido
+
+Individuo 5:
+Cromosoma: 10101101101000100
+Costo total: 78000
+Fitness total: 54690
+Estado: valido
+
+Individuo 6:
+Cromosoma: 10110101101001100
+Costo total: 86500
+Fitness total: 0
+Estado: invalido
+
+Individuo 7:
+Cromosoma: 10110101101000100
+Costo total: 79000
+Fitness total: 54540
+Estado: valido
+
+Individuo 8:
+Cromosoma: 10110101101000100
+Costo total: 79000
+Fitness total: 54540
+Estado: valido
+
+Individuo 9:
+Cromosoma: 10010101111000100
+Costo total: 75000
+Fitness total: 50140
+Estado: valido
+
+Individuo 10:
+Cromosoma: 10111101101000100
+Costo total: 85000
+Fitness total: 57690
+Estado: valido
+
+----------------------------------------
+
+
+Mejor solucion encontrada:
+Cromosoma: 10111101101000100
+Costo total: 85000
+Fitness total: 57690
+Estado: valido
+Presupuesto maximo: 85000
+Presupuesto utilizado: 85000
+Presupuesto restante: 0
+Edificios seleccionados:
+- Hospital_Goyeneche
+- Colegio_Independencia
+- Municipalidad_Cayma
+- Centro_Salud_Yanahuara
+- Biblioteca_Regional
+- Mercado_San_Camilo
+- Estadio_Melgar
+- UNSA_Pabellon_B
+- Aeropuerto_Rodriguez_Ballon
