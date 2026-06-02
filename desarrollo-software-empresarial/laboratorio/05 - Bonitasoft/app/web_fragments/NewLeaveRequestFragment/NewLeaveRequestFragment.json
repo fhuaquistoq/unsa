@@ -1,0 +1,193 @@
+{
+  "id" : "NewLeaveRequestFragment",
+  "name" : "NewLeaveRequestFragment",
+  "type" : "fragment",
+  "modelVersion" : "2.6",
+  "lastUpdate" : 1780423355027,
+  "rows" : [
+    [
+      {
+        "type" : "component",
+        "dimension" : {
+          "md" : 12,
+          "sm" : 12,
+          "xs" : 12,
+          "lg" : 12
+        },
+        "propertyValues" : {
+          "hidden" : {
+            "type" : "constant",
+            "value" : false
+          },
+          "dateFormat" : {
+            "type" : "constant",
+            "value" : "MM/dd/yyyy"
+          },
+          "cssClasses" : {
+            "type" : "constant",
+            "value" : ""
+          },
+          "labelWidth" : {
+            "type" : "constant",
+            "value" : 1
+          },
+          "readOnly" : {
+            "type" : "constant",
+            "value" : false
+          },
+          "label" : {
+            "type" : "interpolation",
+            "value" : "Leave start date"
+          },
+          "type" : {
+            "type" : "constant"
+          },
+          "required" : {
+            "type" : "constant",
+            "value" : true
+          },
+          "todayLabel" : {
+            "type" : "constant",
+            "value" : "Today"
+          },
+          "labelHidden" : {
+            "type" : "constant",
+            "value" : false
+          },
+          "showToday" : {
+            "type" : "constant",
+            "value" : false
+          },
+          "labelPosition" : {
+            "type" : "constant",
+            "value" : "top"
+          },
+          "placeholder" : {
+            "type" : "constant",
+            "value" : "Enter a date (mm/dd/yyyy)"
+          },
+          "dimension" : {
+            "type" : "constant",
+            "value" : 12
+          },
+          "value" : {
+            "type" : "variable",
+            "value" : "dataExt"
+          },
+          "allowHTML" : {
+            "type" : "constant",
+            "value" : false
+          }
+        },
+        "reference" : "0d7c997b-2661-46fa-bc8b-9acdc816fb17",
+        "hasValidationError" : false,
+        "id" : "pbDatePicker",
+        "description" : ""
+      }
+    ],
+    [
+      {
+        "type" : "component",
+        "dimension" : {
+          "md" : 12,
+          "sm" : 12,
+          "xs" : 12,
+          "lg" : 12
+        },
+        "propertyValues" : {
+          "labelHidden" : {
+            "type" : "constant",
+            "value" : false
+          },
+          "hidden" : {
+            "type" : "constant",
+            "value" : false
+          },
+          "labelPosition" : {
+            "type" : "constant",
+            "value" : "top"
+          },
+          "cssClasses" : {
+            "type" : "constant",
+            "value" : ""
+          },
+          "labelWidth" : {
+            "type" : "constant",
+            "value" : 1
+          },
+          "readOnly" : {
+            "type" : "constant",
+            "value" : false
+          },
+          "label" : {
+            "type" : "interpolation",
+            "value" : "Number of days"
+          },
+          "placeholder" : {
+            "type" : "constant"
+          },
+          "type" : {
+            "type" : "constant",
+            "value" : "number"
+          },
+          "dimension" : {
+            "type" : "constant",
+            "value" : 12
+          },
+          "value" : {
+            "type" : "variable",
+            "value" : "dataExt"
+          },
+          "required" : {
+            "type" : "constant",
+            "value" : true
+          },
+          "allowHTML" : {
+            "type" : "constant",
+            "value" : false
+          },
+          "minLength" : {
+            "type" : "constant",
+            "value" : ""
+          },
+          "maxLength" : {
+            "type" : "constant",
+            "value" : ""
+          },
+          "debounce" : {
+            "type" : "constant",
+            "value" : 0
+          },
+          "min" : {
+            "type" : "constant",
+            "value" : 1
+          },
+          "max" : {
+            "type" : "constant"
+          },
+          "step" : {
+            "type" : "constant",
+            "value" : 1
+          }
+        },
+        "reference" : "d5da1aaf-83df-4acd-9a8a-2992e81002ca",
+        "hasValidationError" : false,
+        "id" : "pbInput",
+        "description" : ""
+      }
+    ]
+  ],
+  "variables" : {
+    "dataExt" : {
+      "type" : "constant",
+      "value" : [
+        ""
+      ],
+      "exposed" : true
+    }
+  },
+  "assets" : [ ],
+  "inactiveAssets" : [ ],
+  "webResources" : [ ],
+  "hasValidationError" : false
+}

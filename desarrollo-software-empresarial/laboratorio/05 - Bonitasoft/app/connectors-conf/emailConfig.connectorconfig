@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<connectorconfiguration:ConnectorConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:connectorconfiguration="http://www.bonitasoft.org/model/connector/configuration" xmlns:expression="http://www.bonitasoft.org/ns/bpm/expression" definitionId="email" version="1.3.0" name="emailConfig" modelVersion="9">
+  <parameters key="smtpHost">
+    <expression xsi:type="expression:Expression" name="localhost" content="localhost" returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="smtpPort">
+    <expression xsi:type="expression:Expression" name="2525" content="2525" returnType="java.lang.Integer" returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="sslSupport">
+    <expression xsi:type="expression:Expression" name="false" content="false" returnType="java.lang.Boolean" returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="starttlsSupport">
+    <expression xsi:type="expression:Expression" name="false" content="false" returnType="java.lang.Boolean" returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="trustCertificate">
+    <expression xsi:type="expression:Expression" name="false" content="false" returnType="java.lang.Boolean" returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="authType">
+    <expression xsi:type="expression:Expression" name="Basic authentication" content="Basic authentication" returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="userName">
+    <expression xsi:type="expression:Expression" content="" returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="password">
+    <expression xsi:type="expression:Expression" content="" returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="oauth2AccessToken">
+    <expression xsi:type="expression:Expression" content="" returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="from">
+    <expression xsi:type="expression:Expression" name="user1@bonita.com" content="user1@bonita.com" returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="returnPath">
+    <expression xsi:type="expression:Expression" content="" returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="to">
+    <expression xsi:type="expression:Expression" name="user2@bonita.com" content="user2@bonita.com" returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="bcc">
+    <expression xsi:type="expression:Expression" content="" returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="cc">
+    <expression xsi:type="expression:Expression" content="" returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="subject">
+    <expression xsi:type="expression:Expression" name="Bonita test " content="Bonita test " returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="html">
+    <expression xsi:type="expression:Expression" name="false" content="false" returnType="java.lang.Boolean" returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="message">
+    <expression xsi:type="expression:Expression" name="&lt;pattern-expression>" content="&lt;p>Prueba&lt;/p>&#xA;" type="TYPE_PATTERN" returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="headers">
+    <expression xsi:type="expression:TableExpression"/>
+  </parameters>
+  <parameters key="charset">
+    <expression xsi:type="expression:Expression" name="UTF-8" content="UTF-8" returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="replyTo">
+    <expression xsi:type="expression:Expression" content="" returnTypeFixed="true"/>
+  </parameters>
+  <parameters key="attachments">
+    <expression xsi:type="expression:ListExpression"/>
+  </parameters>
+</connectorconfiguration:ConnectorConfiguration>

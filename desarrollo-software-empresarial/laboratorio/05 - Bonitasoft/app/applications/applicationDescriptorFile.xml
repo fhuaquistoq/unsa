@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.1">
+    <application homePage="leave-request" layout="custompage_layoutBonita" theme="custompage_themeBonita" token="leave-request" version="1.0" profile="User" state="ACTIVATED">
+        <displayName>Leave requests application</displayName>
+        <applicationPages>
+            <applicationPage customPage="custompage_LeaveRequestStatus" token="leave-request"/>
+        </applicationPages>
+        <applicationMenus>
+            <applicationMenu applicationPage="leave-request">
+                <displayName>Requests follow-up</displayName>
+            </applicationMenu>
+        </applicationMenus>
+    </application>
+</applications>

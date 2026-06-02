@@ -1,0 +1,73 @@
+{
+  "connectorImplementations" : [ {
+    "type" : "CONNECTOR",
+    "className" : "org.bonitasoft.connectors.email.EmailConnector",
+    "implementationId" : "email-impl",
+    "implementationVersion" : "1.5.0",
+    "definitionId" : "email",
+    "definitionVersion" : "1.3.0",
+    "artifact" : {
+      "groupId" : "org.bonitasoft.connectors",
+      "artifactId" : "bonita-connector-email",
+      "version" : "1.5.0",
+      "file" : "/home/fhuaquisto/.m2/repository/org/bonitasoft/connectors/bonita-connector-email/1.5.0/bonita-connector-email-1.5.0.jar"
+    },
+    "jarEntry" : "email.impl"
+  } ],
+  "filterImplementations" : [ {
+    "type" : "ACTOR_FILTER",
+    "className" : "org.bonitasoft.actorfilter.initiator.manager.ProcessInitiatorManagerUserFilter",
+    "implementationId" : "bonita-actorfilter-initiator-manager-impl",
+    "implementationVersion" : "1.0.0",
+    "definitionId" : "bonita-actorfilter-initiator-manager",
+    "definitionVersion" : "1.0",
+    "artifact" : {
+      "groupId" : "org.bonitasoft.actorfilter",
+      "artifactId" : "bonita-actorfilter-initiator-manager",
+      "version" : "1.0.0",
+      "file" : "/home/fhuaquisto/.m2/repository/org/bonitasoft/actorfilter/bonita-actorfilter-initiator-manager/1.0.0/bonita-actorfilter-initiator-manager-1.0.0.jar"
+    },
+    "jarEntry" : "bonita-actorfilter-initiator-manager.impl"
+  } ],
+  "connectorDefinitions" : [ {
+    "definitionId" : "email",
+    "definitionVersion" : "1.3.0",
+    "artifact" : {
+      "groupId" : "org.bonitasoft.connectors",
+      "artifactId" : "bonita-connector-email",
+      "version" : "1.5.0",
+      "file" : "/home/fhuaquisto/.m2/repository/org/bonitasoft/connectors/bonita-connector-email/1.5.0/bonita-connector-email-1.5.0.jar"
+    },
+    "jarEntry" : "email.def"
+  } ],
+  "filterDefinitions" : [ {
+    "definitionId" : "bonita-actorfilter-initiator-manager",
+    "definitionVersion" : "1.0",
+    "artifact" : {
+      "groupId" : "org.bonitasoft.actorfilter",
+      "artifactId" : "bonita-actorfilter-initiator-manager",
+      "version" : "1.0.0",
+      "file" : "/home/fhuaquisto/.m2/repository/org/bonitasoft/actorfilter/bonita-actorfilter-initiator-manager/1.0.0/bonita-actorfilter-initiator-manager-1.0.0.jar"
+    },
+    "jarEntry" : "bonita-actorfilter-initiator-manager.def"
+  } ],
+  "restApiExtensions" : [ ],
+  "pages" : [ ],
+  "forms" : [ ],
+  "themes" : [ ],
+  "applicationDescriptors" : [ {
+    "displayName" : "Bonita Administrator Application",
+    "version" : "8.0",
+    "description" : "This application allows to deploy and manage all the elements of Bonita projects.",
+    "profile" : "Administrator",
+    "appToken" : "adminAppBonita",
+    "artifact" : {
+      "groupId" : "org.bonitasoft.web.application",
+      "artifactId" : "bonita-admin-application",
+      "version" : "10.4.0",
+      "classifier" : "application",
+      "file" : "/home/fhuaquisto/.m2/repository/org/bonitasoft/web/application/bonita-admin-application/10.4.0/bonita-admin-application-10.4.0-application.zip"
+    }
+  } ],
+  "issues" : [ ]
+}
