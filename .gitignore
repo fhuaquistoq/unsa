@@ -3,3 +3,16 @@
 **/*.o
 **/.vscode
 **/build
+**/.atl/
+**/__pycache__/
+**/*.py[cod]
+**/.eslintcache
+**/node_modules/
+**/.venv/
+**/.mypy_cache/
+**/.pytest_cache/
+**/*.aux
+**/*.log
+**/*.toc
+**/*.synctex.gz
+ingenieria-software-3/AlToke/
