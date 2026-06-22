@@ -1,0 +1,516 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{geometry}
+
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{cppstyle}{
+  language=C++,
+  backgroundcolor=\color{backcolour},
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{codegreen},
+  stringstyle=\color{codepurple},
+  numberstyle=\tiny\color{codegray},
+  numbers=left,
+  numbersep=8pt,
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  tabsize=4
+}
+
+\lstset{style=cppstyle}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    {\bfseries\LARGE UNIVERSIDAD NACIONAL DE SAN AGUSTÍN DE AREQUIPA \par}
+    \vspace{0.2cm}
+    {\scshape\LARGE Ciencia de la Computación \par}
+    \vspace{1cm}
+    {\includegraphics[width=0.4\textwidth]{Escudo_UNSA.png}\par}
+    \vspace{1cm}
+    {\Large Computación Gráfica \par}
+    \vspace{0.25cm}
+    {\bfseries\scshape\LARGE Editor 3D \par}
+    \vspace{0.25cm}
+    {\Large Presentado por: \par}
+    {\Large Fabricio Jesús Huaquisto Quispe \par}
+    \vfill
+    {\Large Docente: \par}
+    {\Large Percy Maldonado Quispe \par}
+    \vfill
+    {\bfseries\Large Perú, Arequipa 2026 \par}
+\end{titlepage}
+
+
+
+\section{Ventana principal en OpenGL}
+
+La aplicación crea una ventana de \texttt{1280 x 720} píxeles con GLUT y usa doble buffer, color RGB y buffer de profundidad. El programa trabaja con una escena tridimensional, por lo que el renderizado se apoya en cámara, proyección perspectiva, iluminación y prueba de profundidad.
+
+% Imagen: captura de la ventana principal del editor 3D con la grilla, ejes y un objeto seleccionado.
+
+El punto de entrada exige un archivo de escena y normaliza su extensión a \texttt{.f3d}. Por eso, \texttt{./editor escena} y \texttt{./editor escena.f3d} cargan y guardan el mismo archivo.
+
+\begin{lstlisting}
+static std::string normalizeScenePath(const std::string& scenePath) {
+    std::filesystem::path path(scenePath);
+
+    if (path.extension() == ".f3d") {
+        return path.string();
+    }
+
+    path.replace_extension(".f3d");
+    return path.string();
+}
+
+int main(int argc, char** argv) {
+    if (argc != 2) {
+        std::cerr << "Usage: editor nombre_archivo[.f3d]" << std::endl;
+        return 1;
+    }
+
+    EditorApp app(argc, argv, normalizeScenePath(argv[1]));
+    return app.run();
+}
+\end{lstlisting}
+
+La clase \texttt{EditorApp} registra los callbacks de GLUT y conserva el estado general del editor.
+
+\begin{lstlisting}
+void EditorApp::initializeGlut(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(this->width_, this->height_);
+    glutCreateWindow("Editor 3D - OpenGL Lab");
+    glutDisplayFunc(displayCallback);
+    glutReshapeFunc(reshapeCallback);
+    glutKeyboardFunc(keyboardCallback);
+    glutSpecialFunc(specialKeyboardCallback);
+    glutMouseFunc(mouseCallback);
+    glutMotionFunc(motionCallback);
+}
+\end{lstlisting}
+
+\section{Arquitectura del editor}
+
+El editor se divide en módulos claros. \texttt{EditorApp} coordina la entrada del usuario, operaciones de edición y guardado; \texttt{Scene} administra objetos y selección; \texttt{Renderer} dibuja la escena; y \texttt{SceneSerializer} importa y exporta el archivo \texttt{.f3d}.
+
+% Mermaid: diagrama de módulos EditorApp, Scene, Renderer y SceneSerializer.
+% graph TD
+%     User[Usuario] -->|teclado y mouse| EditorApp[EditorApp]
+%     EditorApp -->|administra objetos y seleccion| Scene[Scene]
+%     EditorApp -->|estado de camara, modo y eje| EditorState[EditorState]
+%     EditorApp -->|solicita renderizado| Renderer[Renderer]
+%     EditorApp -->|carga y guarda .f3d| SceneSerializer[SceneSerializer]
+%     Scene -->|contiene| SceneObject[SceneObject]
+%     SceneObject -->|tipo, posicion, rotacion, escala y color| ObjectData[Datos del objeto]
+%     Renderer -->|lee objetos| Scene
+%     Renderer -->|lee camara y proyeccion| EditorState
+%     SceneSerializer -->|serializa objetos| Scene
+%     SceneSerializer -->|serializa camara y wireframe| EditorState
+
+\begin{lstlisting}
+class EditorApp {
+private:
+    Scene scene_;
+    EditorState state_;
+    Renderer renderer_;
+    std::string scenePath_;
+    TransformMode mode_ = TransformMode::Translate;
+    TransformAxis axis_ = TransformAxis::X;
+    int width_ = 1280;
+    int height_ = 720;
+
+    void initializeGlut(int argc, char** argv);
+    void initializeSceneFile();
+    void createObject(ObjectType type);
+    bool transformSelected(int dx, int dy);
+    void display();
+};
+\end{lstlisting}
+
+La escena usa identificadores estables para seleccionar objetos. Así, la selección no depende directamente de la posición del objeto dentro del vector.
+
+\begin{lstlisting}
+class Scene {
+public:
+    SceneObject& addObject(ObjectType type);
+    SceneObject* selectedObject();
+    void selectNext();
+    void selectPrevious();
+    void duplicateSelected();
+    void deleteSelected();
+
+private:
+    std::vector<SceneObject> objects_;
+    int selectedId_ = -1;
+    int nextId_ = 1;
+};
+\end{lstlisting}
+
+\section{Objetos y primitivas 3D}
+
+Cada elemento de la escena es un \texttt{SceneObject}. El objeto almacena su tipo de primitiva, posición, rotación, escala y color. Las primitivas implementadas son cubo, esfera, toroide y tetera.
+
+% Imagen: captura de cubo, esfera, toroide y tetera dentro de la escena.
+
+\begin{lstlisting}
+enum class ObjectType
+{
+    Cube,
+    Sphere,
+    Torus,
+    Teapot
+};
+
+struct SceneObject
+{
+    int id = 0;
+    ObjectType type = ObjectType::Cube;
+    Vec3 position;
+    Vec3 rotation;
+    Vec3 scale = {1.0f, 1.0f, 1.0f};
+    Vec3 color = {0.8f, 0.8f, 0.8f};
+};
+\end{lstlisting}
+
+Las teclas \texttt{1}, \texttt{2}, \texttt{3} y \texttt{4} crean cubo, esfera, toroide y tetera. Cada objeto nuevo queda seleccionado y se guarda automáticamente porque la operación modifica la escena.
+
+\begin{lstlisting}
+void EditorApp::createObject(ObjectType type) {
+    SceneObject& object = this->scene_.addObject(type);
+    object.position.y = 0.5f;
+    this->autosaveAfterObjectChange();
+    this->showSelectedObjectLog("created");
+    glutPostRedisplay();
+}
+\end{lstlisting}
+
+\section{Cámara y proyección}
+
+La cámara se define con ángulos de \textit{yaw} y \textit{pitch}, distancia al objetivo y punto observado. La proyección usa campo de visión, plano cercano y plano lejano.
+
+% Imagen: captura mostrando el cambio de perspectiva y el gizmo de orientación de la esquina.
+
+\begin{lstlisting}
+struct CameraState {
+    float yaw = 35.0f;
+    float pitch = 25.0f;
+    float distance = 10.0f;
+    Vec3 target = {0.0f, 0.0f, 0.0f};
+};
+
+struct ProjectionState {
+    float fov = 60.0f;
+    float nearPlane = 0.1f;
+    float farPlane = 100.0f;
+};
+\end{lstlisting}
+
+El renderizador convierte esos valores en una cámara real con \texttt{gluPerspective} y \texttt{gluLookAt}.
+
+\begin{lstlisting}
+void Renderer::setupCamera(const CameraState& camera,
+                           const ProjectionState& projection,
+                           int width,
+                           int height) const {
+    const float aspect = height == 0 ? 1.0f :
+        static_cast<float>(width) / static_cast<float>(height);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(projection.fov, aspect,
+                   projection.nearPlane, projection.farPlane);
+
+    const float yaw = radians(camera.yaw);
+    const float pitch = radians(camera.pitch);
+    const float x = camera.target.x + camera.distance * std::cos(pitch) * std::sin(yaw);
+    const float y = camera.target.y + camera.distance * std::sin(pitch);
+    const float z = camera.target.z + camera.distance * std::cos(pitch) * std::cos(yaw);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(x, y, z, camera.target.x, camera.target.y, camera.target.z, 0.0f, 1.0f, 0.0f);
+}
+\end{lstlisting}
+
+\section{Transformaciones e interacción}
+
+El editor tiene tres modos de transformación: traslación, rotación y escala. Las teclas \texttt{t}, \texttt{r} y \texttt{s} cambian el modo; \texttt{x}, \texttt{y} y \texttt{z} seleccionan el eje activo; y el arrastre izquierdo aplica la transformación al objeto seleccionado.
+
+% Imagen: captura del gizmo local con el eje activo resaltado.
+
+\begin{lstlisting}
+enum class TransformMode {
+    Translate,
+    Rotate,
+    Scale
+};
+
+enum class TransformAxis {
+    X,
+    Y,
+    Z
+};
+\end{lstlisting}
+
+La traslación proyecta el eje activo sobre la pantalla para que el movimiento sea coherente con la cámara. La rotación modifica el ángulo del eje activo y la escala aplica un factor uniforme limitado.
+
+\begin{lstlisting}
+bool EditorApp::transformSelected(int dx, int dy) {
+    SceneObject* object = this->scene_.selectedObject();
+    if (!object || (dx == 0 && dy == 0)) {
+        return false;
+    }
+
+    switch (this->mode_) {
+        case TransformMode::Translate: {
+            const float amount = screenProjectedDragAmount(
+                this->state_.camera, this->axis_, dx, dy) * 0.025f;
+            if (this->axis_ == TransformAxis::X) object->position.x += amount;
+            if (this->axis_ == TransformAxis::Y) object->position.y += amount;
+            if (this->axis_ == TransformAxis::Z) object->position.z += amount;
+            break;
+        }
+        case TransformMode::Rotate: {
+            const float amount = dragAmountForAxis(this->axis_, dx, dy) * 0.6f;
+            if (this->axis_ == TransformAxis::X) object->rotation.x += amount;
+            if (this->axis_ == TransformAxis::Y) object->rotation.y += amount;
+            if (this->axis_ == TransformAxis::Z) object->rotation.z += amount;
+            break;
+        }
+        case TransformMode::Scale: {
+            const float delta = 1.0f + static_cast<float>(dx - dy) * 0.008f;
+            const float factor = clampFloat(delta, 0.85f, 1.15f);
+            object->scale.x = clampFloat(object->scale.x * factor, 0.1f, 8.0f);
+            object->scale.y = clampFloat(object->scale.y * factor, 0.1f, 8.0f);
+            object->scale.z = clampFloat(object->scale.z * factor, 0.1f, 8.0f);
+            break;
+        }
+    }
+    return true;
+}
+\end{lstlisting}
+
+\section{Selección y operaciones de edición}
+
+La selección se realiza por objeto activo. \texttt{Tab} avanza al siguiente objeto, \texttt{Shift + Tab} o \texttt{Home} retrocede, y \texttt{End} avanza usando teclas especiales de GLUT. También se puede duplicar con \texttt{d} y eliminar con \texttt{Delete} o \texttt{Backspace}.
+
+% Imagen: captura de un objeto seleccionado con contorno naranja.
+
+\begin{lstlisting}
+void Scene::selectNext() {
+    if (this->objects_.empty()) {
+        this->selectedId_ = -1;
+        return;
+    }
+    auto it = std::find_if(this->objects_.begin(), this->objects_.end(), [this](const SceneObject& object) {
+        return object.id == this->selectedId_;
+    });
+    if (it == this->objects_.end() || ++it == this->objects_.end()) {
+        this->selectedId_ = this->objects_.front().id;
+    } else {
+        this->selectedId_ = it->id;
+    }
+}
+
+void Scene::duplicateSelected() {
+    SceneObject* selected = this->selectedObject();
+    if (!selected) {
+        return;
+    }
+    SceneObject copy = *selected;
+    copy.id = this->nextId_++;
+    copy.position = copy.position + Vec3{0.8f, 0.0f, 0.8f};
+    this->objects_.push_back(copy);
+    this->selectedId_ = copy.id;
+}
+\end{lstlisting}
+
+Después de una transformación por arrastre, el guardado automático ocurre al soltar el botón izquierdo. Esto evita escribir el archivo en cada movimiento del mouse.
+
+\begin{lstlisting}
+void EditorApp::mouse(int button, int state, int x, int y) {
+    this->lastMouseX_ = x;
+    this->lastMouseY_ = y;
+
+    if (button == GLUT_LEFT_BUTTON) {
+        if (state == GLUT_DOWN) {
+            this->leftDragging_ = true;
+            this->transformedDuringDrag_ = false;
+        } else {
+            this->leftDragging_ = false;
+            if (this->transformedDuringDrag_) {
+                this->autosaveAfterObjectChange();
+                this->showSelectedObjectLog("updated", true);
+                this->transformedDuringDrag_ = false;
+            }
+        }
+    } else if (button == GLUT_RIGHT_BUTTON) {
+        this->rightDragging_ = state == GLUT_DOWN;
+    }
+}
+\end{lstlisting}
+
+\section{Renderizado de la escena}
+
+El renderizador limpia los buffers, configura la cámara, dibuja la grilla, los ejes globales, los objetos y los gizmos. También alterna entre modo sólido y modo alámbrico con \texttt{w} mediante \texttt{glPolygonMode}.
+
+% Imagen: captura comparando modo sólido y modo alámbrico.
+
+\begin{lstlisting}
+void Renderer::render(const Scene& scene, const EditorState& state,
+                      const RenderUiState& ui, int width, int height) const {
+    glViewport(0, 0, width, height);
+    glClearColor(0.12f, 0.12f, 0.12f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    this->setupCamera(state.camera, state.projection, width, height);
+    this->drawGrid();
+    this->drawWorldAxes();
+
+    glPolygonMode(GL_FRONT_AND_BACK, state.wireframe ? GL_LINE : GL_FILL);
+    for (const SceneObject& object : scene.objects()) {
+        this->drawObject(object, object.id == scene.selectedId(), state.wireframe);
+    }
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    if (const SceneObject* selected = scene.selectedObject()) {
+        if (ui.mode == TransformMode::Translate || ui.mode == TransformMode::Rotate) {
+            this->drawLocalGizmo(*selected, ui.mode, ui.axis);
+        }
+    }
+
+    this->drawCornerGizmo(state.camera, width, height);
+    glutSwapBuffers();
+}
+\end{lstlisting}
+
+Cada objeto aplica sus transformaciones locales antes de llamar a la primitiva GLUT correspondiente.
+
+\begin{lstlisting}
+void Renderer::drawObject(const SceneObject& object, bool selected, bool wireframe) const {
+    glPushMatrix();
+    glTranslatef(object.position.x, object.position.y, object.position.z);
+    glRotatef(object.rotation.x, 1.0f, 0.0f, 0.0f);
+    glRotatef(object.rotation.y, 0.0f, 1.0f, 0.0f);
+    glRotatef(object.rotation.z, 0.0f, 0.0f, 1.0f);
+    glScalef(object.scale.x, object.scale.y, object.scale.z);
+
+    switch (object.type) {
+        case ObjectType::Cube: glutSolidCube(1.0); break;
+        case ObjectType::Sphere: glutSolidSphere(0.55, 32, 16); break;
+        case ObjectType::Torus: glutSolidTorus(0.18, 0.45, 24, 36); break;
+        case ObjectType::Teapot: glutSolidTeapot(0.55); break;
+    }
+    glPopMatrix();
+
+    if (selected && !wireframe) {
+        this->drawSelectionOutline(object);
+    }
+}
+\end{lstlisting}
+
+\section{Persistencia de escenas}
+
+El editor guarda y carga escenas en texto plano con extensión \texttt{.f3d}. El archivo conserva el siguiente identificador disponible, el objeto seleccionado, cámara, proyección, modo alámbrico y todos los objetos con sus transformaciones y color.
+
+% Imagen: captura del archivo .f3d abierto en un editor de texto junto al editor 3D.
+
+\begin{lstlisting}
+bool SceneSerializer::save(const std::string& path,
+                           const Scene& scene,
+                           const EditorState& state) {
+    std::ofstream output(path);
+    if (!output) {
+        return false;
+    }
+
+    output << "# Editor3D scene v1\n";
+    output << "next_id " << scene.nextId() << "\n";
+    output << "selected " << scene.selectedId() << "\n";
+    output << "camera " << state.camera.yaw << ' ' << state.camera.pitch << ' '
+           << state.camera.distance << ' ' << state.camera.target.x << ' '
+           << state.camera.target.y << ' ' << state.camera.target.z << "\n";
+    output << "projection " << state.projection.fov << ' '
+           << state.projection.nearPlane << ' ' << state.projection.farPlane << "\n";
+    output << "wireframe " << (state.wireframe ? 1 : 0) << "\n";
+
+    for (const SceneObject& object : scene.objects()) {
+        output << "object " << object.id << ' ' << objectTypeToString(object.type) << ' '
+               << object.position.x << ' ' << object.position.y << ' ' << object.position.z << ' '
+               << object.rotation.x << ' ' << object.rotation.y << ' ' << object.rotation.z << ' '
+               << object.scale.x << ' ' << object.scale.y << ' ' << object.scale.z << ' '
+               << object.color.x << ' ' << object.color.y << ' ' << object.color.z << "\n";
+    }
+    return true;
+}
+\end{lstlisting}
+
+Al iniciar, si el archivo existe se carga la escena. Si no existe o no se puede cargar, se crea una escena inicial con un cubo y se guarda silenciosamente.
+
+\begin{lstlisting}
+void EditorApp::initializeSceneFile() {
+    if (std::filesystem::exists(this->scenePath_)) {
+        if (SceneSerializer::load(this->scenePath_, this->scene_, this->state_)) {
+            this->showSelectedObjectLog("loaded scene");
+            return;
+        }
+        this->showLog("Could not load scene. Creating a new one.");
+    }
+
+    this->createInitialScene();
+    this->saveScene(true);
+    this->showSelectedObjectLog("initial scene created");
+}
+\end{lstlisting}
+
+\section{Escena final y uso del editor}
+
+Para la demostración final se debe ejecutar el programa con un nombre de escena, crear varios objetos y aplicar transformaciones sobre distintos ejes. Un ejemplo de sesión es: crear un cubo, esfera, toroide y tetera; duplicar algunos objetos; seleccionar con \texttt{Tab}; cambiar entre traslación, rotación y escala; ajustar la cámara; y guardar con \texttt{Ctrl + s} o \texttt{F1}.
+
+% Imagen: captura de una escena final con varias primitivas 3D transformadas.
+
+\begin{lstlisting}
+./editor escena_final
+./editor escena_final.f3d
+\end{lstlisting}
+
+Controles principales:
+
+\begin{itemize}[leftmargin=*]
+    \item \texttt{1}, \texttt{2}, \texttt{3}, \texttt{4}: crear cubo, esfera, toroide y tetera.
+    \item \texttt{Tab}, \texttt{Shift + Tab}, \texttt{Home}, \texttt{End}: cambiar la selección.
+    \item \texttt{t}, \texttt{r}, \texttt{s}: seleccionar traslación, rotación o escala.
+    \item \texttt{x}, \texttt{y}, \texttt{z}: elegir el eje activo.
+    \item Arrastre izquierdo: transformar el objeto seleccionado.
+    \item Arrastre derecho, rueda, \texttt{+}, \texttt{-} y flechas: controlar la cámara.
+    \item \texttt{w}: alternar modo alámbrico.
+    \item \texttt{d}: duplicar; \texttt{Delete} o \texttt{Backspace}: eliminar.
+    \item \texttt{Ctrl + s}, \texttt{F1}: guardar; \texttt{Esc}: guardar y salir.
+\end{itemize}
+
+\newpage
+
+Código fuente: \url{https://github.com/fhuaquistoq/unsa/tree/main/computacion-grafica/laboratorio/07%20-%20Editor%203D}
+
+% Video demostrativo: agregar URL del video del Editor 3D cuando esté disponible.
+
+\end{document}

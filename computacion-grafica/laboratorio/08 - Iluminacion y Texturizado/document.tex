@@ -1,0 +1,284 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{geometry}
+
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{cppstyle}{
+  language=C++,
+  backgroundcolor=\color{backcolour},
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{codegreen},
+  stringstyle=\color{codepurple},
+  numberstyle=\tiny\color{codegray},
+  numbers=left,
+  numbersep=8pt,
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  tabsize=4
+}
+
+\lstset{style=cppstyle}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    {\bfseries\LARGE UNIVERSIDAD NACIONAL DE SAN AGUSTÍN DE AREQUIPA \par}
+    \vspace{0.2cm}
+    {\scshape\LARGE Ciencia de la Computación \par}
+    \vspace{1cm}
+    {\includegraphics[width=0.4\textwidth]{Escudo_UNSA.png}\par}
+    \vspace{1cm}
+    {\Large Computación Gráfica \par}
+    \vspace{0.25cm}
+    {\bfseries\scshape\LARGE Iluminación y Texturizado en OpenGL \par}
+    \vspace{0.25cm}
+    {\Large Presentado por: \par}
+    {\Large Fabricio Jesús Huaquisto Quispe \par}
+    \vfill
+    {\Large Docente: \par}
+    {\Large Percy Maldonado Quispe \par}
+    \vfill
+    {\bfseries\Large Perú, Arequipa 2026 \par}
+\end{titlepage}
+
+\section{Iluminación}
+
+La iluminación en computación gráfica es el conjunto de cálculos que determina cómo se ve una superficie cuando recibe luz. No basta con asignar un color a un objeto: el color indica una propiedad del material, mientras que la iluminación decide cuánto de ese color se percibe según la luz, la orientación de la superficie, la cámara y las propiedades del material.
+
+Un objeto sin iluminación suele verse plano porque todos sus fragmentos se dibujan con una intensidad similar. Sin variaciones de luz y sombra, el ojo no recibe pistas de profundidad, curvatura o volumen. En cambio, cuando se calcula iluminación, las zonas orientadas hacia la fuente de luz se ven más claras, las zonas de espaldas se oscurecen y los brillos especulares ayudan a identificar materiales pulidos o metálicos.
+
+\subsection{Color e iluminación}
+
+El color describe la respuesta base del material. Por ejemplo, una esfera roja mantiene una componente roja dominante. La iluminación describe la energía de luz que llega a la superficie y cómo esa energía se refleja hacia la cámara. Por eso un mismo objeto rojo puede verse rojo intenso bajo una luz blanca fuerte, oscuro en penumbra o alterado bajo una luz azul.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{0.28\textwidth}|p{0.62\textwidth}|}
+\hline
+\textbf{Concepto} & \textbf{Rol en la escena} \\
+\hline
+Color & Propiedad del material o textura que indica la tonalidad base del objeto. \\
+\hline
+Iluminación & Cálculo que modifica la apariencia final según luces, normales, posición del observador y modelo de reflexión. \\
+\hline
+\end{tabular}
+\caption{Diferencia entre color e iluminación.}
+\end{table}
+
+\subsection{Componentes del modelo clásico de iluminación}
+
+El modelo clásico usado en OpenGL separa la iluminación en tres componentes principales: ambiente, difusa y especular. Esta separación simplifica el cálculo y permite controlar de forma intuitiva la apariencia de una superficie.
+
+\subsubsection{Luz ambiente}
+
+\textbf{Definición.} La luz ambiente representa una iluminación indirecta y uniforme presente en toda la escena. No depende de la posición de la luz ni de la orientación de la superficie.
+
+\textbf{Función.} Evita que las zonas no iluminadas directamente se vean completamente negras. Simula, de forma aproximada, la luz que rebota en paredes, objetos y superficies cercanas.
+
+\textbf{Ejemplo visual.} En una esfera con solo luz ambiente, toda la superficie mantiene una intensidad uniforme. Se reconoce el color del objeto, pero casi no se percibe volumen.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{image.png}
+\end{figure}
+
+\begin{lstlisting}
+double ambient = lightAmbient * materialAmbient;
+double result = ambient;
+\end{lstlisting}
+
+\subsubsection{Luz difusa}
+
+\textbf{Definición.} La luz difusa representa la reflexión de una superficie mate. Depende del ángulo entre el vector normal de la superficie y la dirección hacia la luz.
+
+\textbf{Función.} Genera la sensación principal de volumen. Las zonas que miran hacia la luz se ven más claras y las zonas inclinadas o de espaldas se ven más oscuras.
+
+\textbf{Ejemplo visual.} En una esfera con luz difusa, aparece un gradiente suave: el lado cercano a la fuente de luz es brillante y el lado opuesto queda oscuro.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{image2.png}
+\end{figure}
+
+\begin{lstlisting}
+double ndotl = std::max(0.0, dot(normal, lightDirection));
+double diffuse = lightDiffuse * materialDiffuse * ndotl;
+\end{lstlisting}
+
+\subsubsection{Luz especular}
+
+\textbf{Definición.} La luz especular representa el brillo concentrado que aparece cuando una superficie refleja la luz en dirección cercana al observador.
+
+\textbf{Función.} Comunica el tipo de material. Un exponente especular alto produce un brillo pequeño y definido, típico de superficies pulidas. Un exponente bajo produce un brillo amplio y suave.
+
+\textbf{Ejemplo visual.} En una esfera brillante, la luz especular aparece como un punto blanco o claro sobre la zona iluminada, similar al reflejo en plástico, metal o cerámica.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{image3.png}
+\end{figure}
+
+\begin{lstlisting}
+double rdotv = std::max(0.0, dot(reflectionDirection, viewDirection));
+double specular = lightSpecular * materialSpecular * std::pow(rdotv, shininess);
+\end{lstlisting}
+
+\subsection{Normales en una superficie}
+
+Una normal es un vector perpendicular a una superficie. En iluminación es fundamental porque indica hacia dónde apunta la superficie. El producto punto entre la normal y la dirección de la luz determina cuánta luz difusa recibe cada punto.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{0.28\textwidth}|p{0.62\textwidth}|}
+\hline
+\textbf{Tipo de normal} & \textbf{Explicación} \\
+\hline
+Vector normal & Vector perpendicular a una superficie o fragmento. Se usa para calcular la orientación frente a la luz. \\
+\hline
+Normal por vértice & Normal asociada a cada vértice. Al interpolarse entre vértices produce iluminación suave. Es común en modelos orgánicos o superficies curvas. \\
+\hline
+Normal por cara & Normal única para toda una cara del polígono. Produce apariencia facetada, útil en objetos con aristas planas o estilo low-poly. \\
+\hline
+\end{tabular}
+\caption{Tipos de normales usados en iluminación.}
+\end{table}
+
+Cuando las normales están mal definidas, la iluminación se calcula con una orientación falsa. Visualmente pueden aparecer caras oscuras cuando deberían estar iluminadas, brillos en lugares incorrectos, cortes bruscos entre polígonos, superficies invertidas o un objeto que parece deformado aunque su geometría esté bien construida.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{image4.png}
+\end{figure}
+
+\begin{lstlisting}
+#include <algorithm>
+
+struct Vec3 { double x, y, z; };
+
+double dot(Vec3 a, Vec3 b) {
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+Vec3 light = {0.0, 0.0, 1.0};
+double correct = std::max(dot({0.0, 0.0, 1.0}, light), 0.0);  // 1.0
+double inverted = std::max(dot({0.0, 0.0, -1.0}, light), 0.0); // 0.0
+\end{lstlisting}
+
+\subsection{Tipos de luces disponibles en OpenGL}
+
+En el modelo clásico de OpenGL, una luz puede comportarse de distintas formas según su posición y parámetros. Aunque en OpenGL moderno se implementan en shaders, los conceptos siguen siendo los mismos.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{0.25\textwidth}|p{0.65\textwidth}|}
+\hline
+\textbf{Tipo de luz} & \textbf{Descripción} \\
+\hline
+Direccional & Simula una fuente muy lejana, como el sol. Todos los rayos llegan con la misma dirección y no hay atenuación por distancia. \\
+\hline
+Puntual & Emite luz desde una posición en todas las direcciones, como una bombilla. Su intensidad puede disminuir con la distancia. \\
+\hline
+Foco o spotlight & Emite luz desde una posición, pero limitada a un cono de dirección. Permite simular linternas, reflectores o lámparas dirigidas. \\
+\hline
+Ambiente global & No es una luz con posición propia, sino un parámetro del modelo clásico que aporta una intensidad base uniforme a toda la escena para evitar zonas completamente negras. \\
+\hline
+\end{tabular}
+\caption{Tipos de luces usados en OpenGL y en modelos equivalentes con shaders.}
+\end{table}
+
+\section{Texturización}
+
+La texturización permite agregar detalle visual a una superficie sin aumentar necesariamente la cantidad de geometría. En lugar de modelar cada grieta, color, patrón o variación del material con polígonos, se aplica una imagen sobre el objeto mediante coordenadas de textura.
+
+\subsection{Textura, mapeo y coordenadas UV}
+
+Una \textbf{textura} es una imagen o conjunto de datos usado para modificar la apariencia de una superficie. Puede contener color, transparencia, rugosidad, normales simuladas, altura u otros atributos.
+
+El \textbf{mapeo de texturas} es el proceso de asociar puntos de una imagen con puntos de una superficie 3D. Esta relación indica qué parte de la imagen debe verse en cada zona del modelo.
+
+Las \textbf{coordenadas UV} son pares de valores normalmente expresados entre 0 y 1. La coordenada \texttt{U} recorre horizontalmente la imagen y la coordenada \texttt{V} recorre verticalmente. Por ejemplo, \texttt{(0,0)} suele representar una esquina de la textura y \texttt{(1,1)} la esquina opuesta.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{image5.png}
+\end{figure}
+
+\begin{lstlisting}
+struct Vertex {
+    float x, y, z; // position
+    float u, v;    // texture coordinates
+};
+
+Vertex quad[] = {
+    {-1.0f, -1.0f, 0.0f, 0.0f, 0.0f},
+    { 1.0f, -1.0f, 0.0f, 1.0f, 0.0f},
+    { 1.0f,  1.0f, 0.0f, 1.0f, 1.0f},
+    {-1.0f,  1.0f, 0.0f, 0.0f, 1.0f}
+};
+\end{lstlisting}
+
+\subsection{Proceso completo de texturizado}
+
+El proceso completo puede entenderse como una cadena: \textbf{Imagen} $\rightarrow$ \textbf{Coordenadas UV} $\rightarrow$ \textbf{Superficie 3D}.
+
+\begin{enumerate}[label=\arabic*.]
+    \item \textbf{Imagen.} Se carga una imagen desde disco o se genera proceduralmente. Esta imagen contiene texeles, que son los elementos de color de la textura.
+    \item \textbf{Coordenadas UV.} Cada vértice del modelo recibe coordenadas UV. Durante el rasterizado, esas coordenadas se interpolan para cada fragmento.
+    \item \textbf{Muestreo.} La etapa de texturizado, o el shader en OpenGL moderno, usa las coordenadas UV interpoladas para consultar el color correspondiente en la textura.
+    \item \textbf{Superficie 3D.} El color muestreado se combina con iluminación y propiedades del material para obtener el color final del fragmento.
+\end{enumerate}
+
+\begin{lstlisting}
+Color sampleTexture(double u, double v) {
+    if (u < 0.0) u = 0.0;
+    if (u > 1.0) u = 1.0;
+    if (v < 0.0) v = 0.0;
+    if (v > 1.0) v = 1.0;
+
+    int x = static_cast<int>(u * (textureWidth - 1));
+    int y = static_cast<int>(v * (textureHeight - 1));
+    return texture[y][x];
+}
+\end{lstlisting}
+
+\subsection{Formatos de imagen para texturas}
+
+Los formatos más usados para texturas dependen del equilibrio entre calidad, transparencia, peso del archivo y velocidad de carga. En prácticas de OpenGL se suelen usar PNG, JPG y BMP por su disponibilidad y facilidad de lectura con bibliotecas comunes.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{0.18\textwidth}|p{0.24\textwidth}|p{0.24\textwidth}|p{0.24\textwidth}|}
+\hline
+\textbf{Formato} & \textbf{Ventajas} & \textbf{Desventajas} & \textbf{Uso recomendado} \\
+\hline
+PNG & Compresión sin pérdida y soporte de canal alfa. & Archivos más grandes que JPG en fotografías. & Interfaces, sprites, texturas con transparencia o bordes definidos. \\
+\hline
+JPG & Tamaño reducido y buena compresión para fotografías. & Compresión con pérdida y sin transparencia real. Puede generar artefactos. & Texturas fotográficas opacas donde el peso del archivo importa. \\
+\hline
+BMP & Estructura simple y fácil de leer. & Archivos grandes y poca eficiencia de almacenamiento. & Pruebas educativas o ejemplos simples donde importa más la simplicidad que el tamaño. \\
+\hline
+\end{tabular}
+\caption{Comparación de formatos comunes para texturas.}
+\end{table}
+
+En una escena realista, la textura no reemplaza a la iluminación. Ambas trabajan juntas: la textura aporta detalle local y la iluminación aporta volumen, profundidad y coherencia con la escena.
+
+\end{document}

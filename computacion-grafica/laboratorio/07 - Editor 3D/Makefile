@@ -1,25 +1,20 @@
 CXX := g++
+CXXFLAGS := -std=c++17 -Wall -Wextra -pedantic -Iinclude
+LDFLAGS := -lGL -lGLU -lglut
 
-CPP_SOURCES := $(wildcard *.cpp)
-TARGETS := $(CPP_SOURCES:.cpp=)
+TARGET := editor
+SRC := $(wildcard src/core/*.cpp src/io/*.cpp src/render/*.cpp src/app/*.cpp) main.cpp
+OBJ := $(SRC:.cpp=.o)
 
-CXXFLAGS := -std=c++17 -Wall -Wextra -O2
-INCLUDES := -I. -Iinclude $(shell pkg-config --cflags glut 2>/dev/null)
+.PHONY: all clean
 
-LIBS := $(shell pkg-config --libs glut 2>/dev/null) -lGL -lGLU -ldl -lpthread
+all: $(TARGET)
 
-all: $(TARGETS)
+$(TARGET): $(OBJ)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-%: %.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $< -o $@ $(LIBS)
-
-run: $(firstword $(TARGETS))
-	./$(firstword $(TARGETS))
-
-run-%: %
-	./$<
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(TARGETS) *.o
-
-.PHONY: all run run-% clean
+	rm -f $(OBJ) $(TARGET)

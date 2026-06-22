@@ -1,4 +1,3 @@
-*
-!*.cpp
-!Makefile
-!.gitignore
+.atl
+*.f3d
+editor
