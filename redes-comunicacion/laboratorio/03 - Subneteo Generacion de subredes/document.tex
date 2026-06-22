@@ -1,0 +1,494 @@
+\documentclass[a4paper,12pt]{article}
+% ==========================================
+% PAQUETES Y CONFIGURACIÓN
+% ==========================================
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+% ==========================================
+% PAQUETES Y CONFIGURACIÓN
+% ==========================================
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{multirow} % OBLIGATORIO para la tabla
+\usepackage{geometry}
+\usepackage{subcaption}
+\usepackage{csvsimple}
+
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+
+% Configuración de colores para código
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstset{
+  language=SQL,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  showstringspaces=false,
+  breaklines=true,
+  frame=single
+}
+
+% Formato para direcciones IP y prefijos CIDR.
+% \mbox permite usar este comando también dentro de expresiones matemáticas.
+\newcommand{\ip}[1]{\mbox{\texttt{#1}}}
+
+\bibliographystyle{ieeetr} % Estilo IEEE (puedes usar 'apa')
+% ==========================================
+% DOCUMENTO
+% ==========================================
+\begin{document}
+
+%-------------------------------------------------------------------------------
+% Portada
+%-------------------------------------------------------------------------------
+\begin{titlepage}
+    \centering
+    {\bfseries\LARGE UNIVERSIDAD NACIONAL DE SAN AGUSTÍN DE AREQUIPA \par}
+    \vspace{0.2cm}
+    {\scshape\LARGE Ciencia de la Computación \par}
+    \vspace{1cm}
+    {\includegraphics[width=0.4\textwidth]{Escudo_UNSA.png}\par}
+    \vspace{1cm}
+    %\vspace{3cm}
+    {\Large Redes y Comunicación \par}
+    \vspace{0.25cm}
+    
+    {\bfseries\scshape\LARGE Subneteo Generación de subredes \par}
+    \vspace{0.25cm}
+    {\Large Presentado por: \par}
+    
+    {\Large Fabricio Jesús Huaquisto Quispe \par}
+    
+    \vfill
+    {\Large Docente: \par}
+    {\Large Pedro Alex Rodrigue Gonzalez \par}
+    \vfill
+    {\bfseries\Large Perú, Arequipa 2026 \par}
+\end{titlepage}
+
+\section{Cuestionario Previo}
+
+\subsection{Indique la función del protocolo IP}
+
+El protocolo IP, Internet Protocol, cumple la función de direccionamiento lógico y entrega de paquetes entre equipos de una misma red o de redes diferentes. Cada host se identifica mediante una dirección IP y los paquetes se envían desde una dirección origen hacia una dirección destino. IP permite que los routers decidan por dónde reenviar los paquetes, aunque no garantiza por sí mismo entrega, orden ni corrección de errores; esas funciones pueden ser asumidas por protocolos superiores como TCP.
+
+\subsection{¿Cuál es la función de una calculadora IP?}
+
+Una calculadora IP permite verificar los datos principales de una red o subred: máscara decimal, prefijo CIDR, dirección de red, dirección de broadcast, rango de hosts válidos, número de hosts disponibles y cantidad de subredes generadas. Es una herramienta útil para comprobar los cálculos manuales de subneteo y evitar asignar direcciones de red, broadcast o direcciones fuera del rango correspondiente.
+
+\subsection{¿Cuál es la función de la máscara en IPv4?}
+
+La máscara en IPv4 separa la porción de red y la porción de host de una dirección IP. Los bits en 1 identifican la red y los bits en 0 identifican al host. Mediante una operación AND entre la dirección IP y la máscara se obtiene la dirección de red; con ese resultado un host determina si el destino está en su misma subred o si necesita un router para comunicarse.
+
+\section{Actividades}
+
+\subsection{Subneteo básico}
+
+\subsubsection{Red básica clase C con switch y cuatro hosts}
+
+Se construye una red clase C usando la red \ip{192.168.150.0} con máscara por defecto \ip{255.255.255.0}, equivalente a \ip{/24}. Una asignación válida para los cuatro hosts es la siguiente:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+Host & Dirección IP & Máscara & Red \\
+\hline
+PC0 & \ip{192.168.150.10} & \ip{255.255.255.0} & \ip{192.168.150.0/24} \\
+PC1 & \ip{192.168.150.11} & \ip{255.255.255.0} & \ip{192.168.150.0/24} \\
+PC2 & \ip{192.168.150.12} & \ip{255.255.255.0} & \ip{192.168.150.0/24} \\
+PC3 & \ip{192.168.150.13} & \ip{255.255.255.0} & \ip{192.168.150.0/24} \\
+\hline
+\end{tabular}
+\caption{Direccionamiento de la red básica.}
+\end{table}
+
+Desde PC0, los pings hacia PC1, PC2 y PC3 deben ser exitosos porque todos pertenecen a la misma red \ip{192.168.150.0/24}. En la simulación primero circulan paquetes ARP para descubrir la dirección MAC del destino. Luego circulan paquetes ICMP Echo Request y Echo Reply, que corresponden a la prueba de ping.
+
+% TODO: Insertar captura de Packet Tracer con la topología de 4 PCs conectadas a un switch.
+% TODO: Insertar captura del ping exitoso desde PC0 hacia PC1, PC2 y PC3.
+
+\subsubsection{Red y tamaño usando máscara de 25 bits}
+
+Con una máscara de 25 bits, la máscara decimal es \ip{255.255.255.128}. La red \ip{192.168.150.0/24} se divide en dos subredes de 128 direcciones totales cada una. En cada subred se pueden usar 126 hosts, porque se reservan la dirección de red y la dirección de broadcast.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+Red & Hosts válidos & Broadcast & Tamaño \\
+\hline
+\ip{192.168.150.0/25} & \ip{192.168.150.1--126} & \ip{192.168.150.127} & 126 hosts \\
+\ip{192.168.150.128/25} & \ip{192.168.150.129--254} & \ip{192.168.150.255} & 126 hosts \\
+\hline
+\end{tabular}
+\caption{División de la red con máscara /25.}
+\end{table}
+
+\subsubsection{Subneteo con 2 bits en la red 192.168.150.0}
+
+Al tomar 2 bits de la porción de host se obtiene el prefijo \ip{/26}, cuya máscara es \ip{255.255.255.192}. Cada subred tiene 64 direcciones totales y 62 hosts válidos.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Subred & Rango total & Hosts válidos & Máscara & Prefijo & Condición \\
+\hline
+1 & .0 a .63 & .1 a .62 & \ip{255.255.255.192} & /26 & No válida \\
+2 & .64 a .127 & .65 a .126 & \ip{255.255.255.192} & /26 & Válida \\
+3 & .128 a .191 & .129 a .190 & \ip{255.255.255.192} & /26 & Válida \\
+4 & .192 a .255 & .193 a .254 & \ip{255.255.255.192} & /26 & No válida \\
+\hline
+\end{tabular}
+\caption{Tabla 1: subneteo usando 2 bits.}
+\end{table}
+
+Para ubicar PC0 y PC2 en la subred 2, y PC1 y PC3 en la subred 3, se puede usar la siguiente configuración:
+
+\begin{table}[H]
+\centering
+\scriptsize
+\begin{tabular}{|c|c|c|c|c|c|p{3.8cm}|}
+\hline
+PC & Subred & IP & Máscara & Prefijo & Hosts & Conectividad esperada \\
+\hline
+PC0 & 2 & \ip{192.168.150.65} & \ip{255.255.255.192} & /26 & 62 & PC2 exitosa; PC1 y PC3 fallida \\
+PC1 & 3 & \ip{192.168.150.129} & \ip{255.255.255.192} & /26 & 62 & PC3 exitosa; PC0 y PC2 fallida \\
+PC2 & 2 & \ip{192.168.150.66} & \ip{255.255.255.192} & /26 & 62 & PC0 exitosa; PC1 y PC3 fallida \\
+PC3 & 3 & \ip{192.168.150.130} & \ip{255.255.255.192} & /26 & 62 & PC1 exitosa; PC0 y PC2 fallida \\
+\hline
+\end{tabular}
+\caption{Conectividad esperada con switch usando subredes 2 y 3.}
+\end{table}
+
+Los hosts de subredes distintas no se comunican directamente porque no existe un router que interconecte las subredes. El switch trabaja en capa 2 y reenvía tramas según direcciones MAC, pero no enruta paquetes IP. Si se usara un hub en lugar de un switch, la conectividad IP sería la misma; la diferencia es que el hub replica las tramas a todos los puertos y genera un único dominio de colisión, mientras que el switch separa los dominios de colisión por puerto.
+
+% TODO: Insertar captura de Packet Tracer con PC0 y PC2 en la subred 2, PC1 y PC3 en la subred 3.
+% TODO: Insertar captura de pings exitosos dentro de la misma subred y fallidos entre subredes.
+
+
+\subsubsection{Hosts adicionales en la subred 1}
+
+Se agregan dos hosts en la subred 1, por ejemplo PC4 con \ip{192.168.150.10/26} y PC5 con \ip{192.168.150.11/26}. Desde PC0, ubicado en la subred 2, el ping hacia estos hosts será fallido si no existe router. PC0 pertenece a \ip{192.168.150.64/26}, mientras que PC4 y PC5 pertenecen a \ip{192.168.150.0/26}.
+
+En la práctica no es conveniente usar esta subred porque la tabla la marca como no válida según el criterio tradicional de subneteo classful. En redes modernas con CIDR puede utilizarse, pero para esta práctica se respeta la regla de no usar la primera ni la última subred.
+
+% TODO: Insertar captura con PC4 y PC5 en la subred 1 y ping desde PC0.
+
+
+\subsubsection{Operación AND entre 192.168.150.10 y 192.168.150.12}
+
+Con máscara \ip{/25}, ambas direcciones pertenecen a \ip{192.168.150.0/25}:
+
+\[
+\ip{192.168.150.10} \; AND \; \ip{255.255.255.128} = \ip{192.168.150.0}
+\]
+\[
+\ip{192.168.150.12} \; AND \; \ip{255.255.255.128} = \ip{192.168.150.0}
+\]
+
+Con máscara \ip{/26}, ambas direcciones también pertenecen a \ip{192.168.150.0/26}:
+
+\[
+\ip{192.168.150.10} \; AND \; \ip{255.255.255.192} = \ip{192.168.150.0}
+\]
+\[
+\ip{192.168.150.12} \; AND \; \ip{255.255.255.192} = \ip{192.168.150.0}
+\]
+
+Por lo tanto, pueden conectarse con máscara de 25 o 26 bits, siempre que estén en el mismo medio físico y no exista una restricción adicional.
+
+\subsubsection{Operación AND entre 192.168.150.10 y 192.168.150.200}
+
+Con máscara \ip{/25}, los resultados son diferentes:
+
+\[
+\ip{192.168.150.10} \; AND \; \ip{255.255.255.128} = \ip{192.168.150.0}
+\]
+\[
+\ip{192.168.150.200} \; AND \; \ip{255.255.255.128} = \ip{192.168.150.128}
+\]
+
+No pueden conectarse directamente porque pertenecen a subredes distintas. En cambio, con máscara \ip{/24}, ambas direcciones pertenecen a la red \ip{192.168.150.0/24}:
+
+\[
+\ip{192.168.150.10} \; AND \; \ip{255.255.255.0} = \ip{192.168.150.0}
+\]
+\[
+\ip{192.168.150.200} \; AND \; \ip{255.255.255.0} = \ip{192.168.150.0}
+\]
+
+Por eso, con \ip{/24} sí pueden comunicarse directamente.
+
+\subsubsection{Tabla de subneteo usando 3 bits}
+
+Al tomar 3 bits para el subneteo se obtiene el prefijo \ip{/27}, con máscara \ip{255.255.255.224}. Se generan 8 subredes de 32 direcciones totales y 30 hosts utilizables.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Subred & Rango total & Hosts válidos & Máscara & Prefijo & Condición \\
+\hline
+1 & .0 a .31 & .1 a .30 & \ip{255.255.255.224} & /27 & No válida \\
+2 & .32 a .63 & .33 a .62 & \ip{255.255.255.224} & /27 & Válida \\
+3 & .64 a .95 & .65 a .94 & \ip{255.255.255.224} & /27 & Válida \\
+4 & .96 a .127 & .97 a .126 & \ip{255.255.255.224} & /27 & Válida \\
+5 & .128 a .159 & .129 a .158 & \ip{255.255.255.224} & /27 & Válida \\
+6 & .160 a .191 & .161 a .190 & \ip{255.255.255.224} & /27 & Válida \\
+7 & .192 a .223 & .193 a .222 & \ip{255.255.255.224} & /27 & Válida \\
+8 & .224 a .255 & .225 a .254 & \ip{255.255.255.224} & /27 & No válida \\
+\hline
+\end{tabular}
+\caption{Tabla 2: subneteo usando 3 bits.}
+\end{table}
+
+\subsubsection{Verificación con calculadora IP}
+
+Para \ip{192.168.150.0/24} con 3 bits de subneteo se obtiene \ip{/27}. El máximo número de subredes es $2^3 = 8$ y cada subred tiene $2^5 - 2 = 30$ hosts válidos.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|c|c|c|c|}
+\hline
+Subnet ID & Hosts válidos & Broadcast & Prefijo \\
+\hline
+\ip{192.168.150.0} & \ip{.1--.30} & \ip{192.168.150.31} & /27 \\
+\ip{192.168.150.32} & \ip{.33--.62} & \ip{192.168.150.63} & /27 \\
+\ip{192.168.150.64} & \ip{.65--.94} & \ip{192.168.150.95} & /27 \\
+\ip{192.168.150.96} & \ip{.97--.126} & \ip{192.168.150.127} & /27 \\
+\ip{192.168.150.128} & \ip{.129--.158} & \ip{192.168.150.159} & /27 \\
+\ip{192.168.150.160} & \ip{.161--.190} & \ip{192.168.150.191} & /27 \\
+\ip{192.168.150.192} & \ip{.193--.222} & \ip{192.168.150.223} & /27 \\
+\ip{192.168.150.224} & \ip{.225--.254} & \ip{192.168.150.255} & /27 \\
+\hline
+\end{tabular}
+\caption{Resultados esperados en la calculadora IP.}
+\end{table}
+
+% TODO: Insertar capturas de la calculadora IP mostrando bits de subneteo, subredes, rangos, Subnet ID y Broadcast.
+
+
+\subsection{Subredes de tamaño fijo}
+
+\subsubsection{Direccionamiento de la red 192.168.120.0}
+
+Para segmentar \ip{192.168.120.0/24} con subredes de tamaño fijo se usa una misma máscara en cada caso. Para 8 PCs por subred se necesita \ip{/28}, porque $2^4 - 2 = 14$ hosts. Para 5 PCs o 4 PCs por subred se necesita \ip{/29}, porque $2^3 - 2 = 6$ hosts.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Caso & Subred & Rango total & Hosts válidos & Máscara \\
+\hline
+2 subredes de 8 PCs & 1 & \ip{192.168.120.0--15} & \ip{.1--.14} & /28 \\
+2 subredes de 8 PCs & 2 & \ip{192.168.120.16--31} & \ip{.17--.30} & /28 \\
+3 subredes de 5 PCs & 1 & \ip{192.168.120.0--7} & \ip{.1--.6} & /29 \\
+3 subredes de 5 PCs & 2 & \ip{192.168.120.8--15} & \ip{.9--.14} & /29 \\
+3 subredes de 5 PCs & 3 & \ip{192.168.120.16--23} & \ip{.17--.22} & /29 \\
+4 subredes de 4 PCs & 1 & \ip{192.168.120.0--7} & \ip{.1--.6} & /29 \\
+4 subredes de 4 PCs & 2 & \ip{192.168.120.8--15} & \ip{.9--.14} & /29 \\
+4 subredes de 4 PCs & 3 & \ip{192.168.120.16--23} & \ip{.17--.22} & /29 \\
+4 subredes de 4 PCs & 4 & \ip{192.168.120.24--31} & \ip{.25--.30} & /29 \\
+\hline
+\end{tabular}
+\caption{Direccionamiento para subredes de tamaño fijo.}
+\end{table}
+
+\subsubsection{Pruebas de conectividad}
+
+Los hosts dentro de una misma subred deben tener conectividad directa. Los hosts ubicados en subredes diferentes no tendrán conectividad directa si solo se usan switches, porque se requiere un router o un equipo de capa 3.
+
+Para evitar que la tabla se salga del documento, se presenta el caso de 2 subredes de 8 PCs de forma resumida:
+
+\begin{table}[H]
+\centering
+\scriptsize
+\begin{tabular}{|c|c|c|c|c|p{3.3cm}|}
+\hline
+Hosts & Red & Rango de hosts & Máscara & Prefijo & Conectividad habilitada \\
+\hline
+PC0--PC7 & \ip{192.168.120.0} & \ip{192.168.120.1--14} & \ip{255.255.255.240} & /28 & Entre PC0, PC1, PC2, PC3, PC4, PC5, PC6 y PC7 \\
+PC8--PC15 & \ip{192.168.120.16} & \ip{192.168.120.17--30} & \ip{255.255.255.240} & /28 & Entre PC8, PC9, PC10, PC11, PC12, PC13, PC14 y PC15 \\
+\hline
+\end{tabular}
+\caption{Conectividad resumida para 2 subredes de 8 PCs.}
+\end{table}
+
+Una asignación posible es PC0--PC7 con las IPs \ip{192.168.120.1} a \ip{192.168.120.8}, y PC8--PC15 con las IPs \ip{192.168.120.17} a \ip{192.168.120.24}. Los pings dentro de cada grupo serán exitosos; los pings entre grupos serán fallidos si no se configura enrutamiento.
+
+% TODO: Insertar captura de la red 192.168.120.0 con 2 switches y 16 PCs.
+% TODO: Insertar capturas de ping dentro de la misma subred y ping fallido entre subredes.
+
+\subsection{Subredes de tamaño variable}
+
+\subsubsection{Red 192.168.200.0 con subred 3 desdoblada}
+
+La tabla propuesta mezcla subredes \ip{/26} y \ip{/27}. La subred 3 original, que ocupaba el rango \ip{192.168.200.128--191}, se desdobla en dos subredes más pequeñas.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Subred & Rango total & Hosts válidos & Máscara & Prefijo & Condición \\
+\hline
+1 & .0 a .63 & .1 a .62 & \ip{255.255.255.192} & /26 & No válida \\
+2 & .64 a .127 & .65 a .126 & \ip{255.255.255.192} & /26 & Válida \\
+3.1 & .128 a .159 & .129 a .158 & \ip{255.255.255.224} & /27 & Válida \\
+3.2 & .160 a .191 & .161 a .190 & \ip{255.255.255.224} & /27 & Válida \\
+4 & .192 a .255 & .193 a .254 & \ip{255.255.255.192} & /26 & No válida \\
+\hline
+\end{tabular}
+\caption{Tabla 3: subneteo variable de 192.168.200.0.}
+\end{table}
+
+Una asignación mínima con dos PCs por subred válida es: \ip{192.168.200.65} y \ip{192.168.200.66} para la subred 2; \ip{192.168.200.129} y \ip{192.168.200.130} para la subred 3.1; \ip{192.168.200.161} y \ip{192.168.200.162} para la subred 3.2. Sin router, la conectividad solo funciona entre hosts de la misma subred.
+
+% TODO: Insertar captura de la red 192.168.200.0 con al menos dos PCs en cada subred válida.
+% TODO: Insertar capturas de pings exitosos dentro de cada subred y fallidos entre subredes distintas.
+
+\subsubsection{Desdoblamiento de la subred 4 en tres subredes}
+
+La subred 4 original cubre \ip{192.168.200.192--255}, equivalente a \ip{192.168.200.192/26}. Para generar al menos tres subredes internas se toman 2 bits adicionales, obteniendo cuatro bloques \ip{/28}. Se pueden usar tres bloques y dejar uno reservado.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Subred & Rango total & Hosts válidos & Máscara & Prefijo \\
+\hline
+4.1 & .192 a .207 & .193 a .206 & \ip{255.255.255.240} & /28 \\
+4.2 & .208 a .223 & .209 a .222 & \ip{255.255.255.240} & /28 \\
+4.3 & .224 a .239 & .225 a .238 & \ip{255.255.255.240} & /28 \\
+4.4 & .240 a .255 & .241 a .254 & \ip{255.255.255.240} & /28 \\
+\hline
+\end{tabular}
+\caption{Desdoblamiento de la subred 4 en bloques /28.}
+\end{table}
+
+Para probarlo se pueden colocar dos PCs en cada subred: \ip{192.168.200.193} y \ip{192.168.200.194} en 4.1; \ip{192.168.200.209} y \ip{192.168.200.210} en 4.2; \ip{192.168.200.225} y \ip{192.168.200.226} en 4.3. Si se asigna una IP fuera de rango, por ejemplo \ip{192.168.200.230} intentando ubicarla en 4.2, la comunicación con 4.2 falla porque realmente pertenece a 4.3 bajo máscara \ip{/28}.
+
+% TODO: Insertar capturas de las subredes 4.1, 4.2 y 4.3 con dos PCs cada una.
+% TODO: Insertar capturas con una IP fuera de rango y el ping fallido correspondiente.
+
+
+\subsubsection{Desdoblamiento de la subred 3.1 en cuatro subredes}
+
+La subred 3.1 cubre \ip{192.168.200.128--159}, equivalente a \ip{192.168.200.128/27}. Para generar cuatro subredes se toman 2 bits adicionales, obteniendo subredes \ip{/29}. Cada bloque tiene 8 direcciones totales y 6 hosts válidos.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Subred & Rango total & Hosts válidos & Máscara & Prefijo \\
+\hline
+3.1.1 & .128 a .135 & .129 a .134 & \ip{255.255.255.248} & /29 \\
+3.1.2 & .136 a .143 & .137 a .142 & \ip{255.255.255.248} & /29 \\
+3.1.3 & .144 a .151 & .145 a .150 & \ip{255.255.255.248} & /29 \\
+3.1.4 & .152 a .159 & .153 a .158 & \ip{255.255.255.248} & /29 \\
+\hline
+\end{tabular}
+\caption{Desdoblamiento de la subred 3.1 en cuatro subredes /29.}
+\end{table}
+
+Si se configura \ip{192.168.200.129} y \ip{192.168.200.130} en 3.1.1, el ping debe ser exitoso. Si se configura \ip{192.168.200.136} como host de 3.1.1, el resultado será incorrecto porque \ip{192.168.200.136} es la dirección de red de 3.1.2 y no puede asignarse a un host.
+
+% TODO: Insertar capturas de las cuatro subredes /29 derivadas de 3.1.
+% TODO: Insertar capturas de pruebas con IP válida e IP fuera de rango.
+
+
+\section{Cuestionario Final}
+
+\subsection{¿A qué se denomina dominio de colisión y dominio de broadcast y cómo se soluciona?}
+
+Un dominio de colisión es el conjunto de dispositivos que comparten un mismo medio físico donde dos transmisiones simultáneas pueden interferir. Se reduce usando switches, porque cada puerto del switch crea un dominio de colisión separado. Un dominio de broadcast es el conjunto de equipos que reciben tramas broadcast de capa 2. Se reduce mediante subredes, VLANs y routers o equipos de capa 3.
+
+\subsection{¿Por qué las subredes 1 y 4 de la Tabla 1 están consignadas como no válidas?}
+
+Según el enfoque tradicional de subneteo classful, no se usa la primera subred porque puede confundirse con la red base, ni la última porque puede confundirse con el broadcast del bloque principal. Por eso, al tomar 2 bits se generan 4 subredes, pero se consideran válidas solamente $2^2 - 2 = 2$: la subred 2 y la subred 3. En redes modernas con CIDR muchos equipos permiten usar también la primera y la última, pero la práctica utiliza el criterio clásico.
+
+\subsection{¿Cómo se implementan subredes utilizando direcciones IP de clase A y B? Muestre un ejemplo}
+
+En clase A la máscara por defecto es \ip{/8}; se toman bits de la porción de host para formar subredes. Por ejemplo, la red privada \ip{10.0.0.0/8} puede dividirse en subredes \ip{/16}: \ip{10.1.0.0/16}, \ip{10.2.0.0/16} y \ip{10.3.0.0/16}.
+
+En clase B la máscara por defecto es \ip{/16}. Por ejemplo, \ip{172.16.0.0/16} puede dividirse en subredes \ip{/24}: \ip{172.16.1.0/24}, \ip{172.16.2.0/24} y \ip{172.16.3.0/24}. El procedimiento es el mismo: aumentar el prefijo para crear más subredes y reducir el número de hosts por subred.
+
+\subsection{Análisis para subredes con IPs de clase C robando 4 y 5 bits}
+
+Una red clase C tiene máscara por defecto \ip{/24}. Si se toman 4 bits, el prefijo resultante es \ip{/28}, con máscara \ip{255.255.255.240}. Se generan $2^4 = 16$ subredes, tradicionalmente 14 válidas, y cada una tiene $2^4 - 2 = 14$ hosts útiles.
+
+Si se toman 5 bits, el prefijo resultante es \ip{/29}, con máscara \ip{255.255.255.248}. Se generan $2^5 = 32$ subredes, tradicionalmente 30 válidas, y cada una tiene $2^3 - 2 = 6$ hosts útiles.
+
+\subsection{¿Por qué no se pueden crear subredes con IPs de clase C robando 1 bit o 7 bits?}
+
+Si se toma 1 bit, se generan $2^1 = 2$ subredes, pero con la regla tradicional de subredes válidas se obtiene $2^1 - 2 = 0$ subredes utilizables. Si se toman 7 bits, queda solo 1 bit para hosts; por lo tanto, cada subred tendría $2^1 - 2 = 0$ hosts válidos. En ambos casos, el resultado no es útil para crear subredes funcionales bajo el criterio clásico.
+
+\subsection{Diseñar una red de clase B para cuatro subredes válidas}
+
+Se puede usar VLSM sobre la red privada clase B \ip{172.16.0.0/16}. Se asignan primero las subredes más grandes para evitar desperdicio y solapamiento.
+
+\begin{table}[H]
+\centering
+\scriptsize
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Subred & Requerimiento & Prefijo & Máscara & Hosts útiles & Rango de hosts \\
+\hline
+1 & 500 & /23 & \ip{255.255.254.0} & 510 & \ip{172.16.0.1--172.16.1.254} \\
+2 & 300 & /23 & \ip{255.255.254.0} & 510 & \ip{172.16.2.1--172.16.3.254} \\
+3 & 200 & /24 & \ip{255.255.255.0} & 254 & \ip{172.16.4.1--172.16.4.254} \\
+4 & 100 & /25 & \ip{255.255.255.128} & 126 & \ip{172.16.5.1--172.16.5.126} \\
+\hline
+\end{tabular}
+\caption{Diseño VLSM para una red clase B.}
+\end{table}
+
+Las direcciones de red son \ip{172.16.0.0/23}, \ip{172.16.2.0/23}, \ip{172.16.4.0/24} y \ip{172.16.5.0/25}. Sus broadcasts son \ip{172.16.1.255}, \ip{172.16.3.255}, \ip{172.16.4.255} y \ip{172.16.5.127}, respectivamente.
+
+\subsection{¿Por qué se dice que IPv4 es fullclass?}
+
+El término más usado es direccionamiento \textit{classful}. IPv4 originalmente se organizaba en clases A, B y C, donde la máscara por defecto se deducía por el primer octeto de la dirección: clase A \ip{/8}, clase B \ip{/16} y clase C \ip{/24}. Posteriormente se adoptó CIDR, que permite usar prefijos variables como \ip{/27}, \ip{/29} o \ip{/23}, sin depender estrictamente de la clase original.
+
+\subsection{Describa el concepto de superneteo, dé un ejemplo}
+
+El superneteo consiste en agrupar varias redes contiguas en una red mayor usando un prefijo más corto. Se emplea para resumir rutas y reducir el tamaño de las tablas de enrutamiento. Por ejemplo, las redes \ip{192.168.0.0/24}, \ip{192.168.1.0/24}, \ip{192.168.2.0/24} y \ip{192.168.3.0/24} pueden resumirse como \ip{192.168.0.0/22}. Esta superred cubre desde \ip{192.168.0.0} hasta \ip{192.168.3.255}.
+
+\section{Conclusiones}
+
+\begin{enumerate}
+    \item El subneteo permite dividir una red grande en redes más pequeñas y administrables.
+    \item La máscara de subred define qué bits pertenecen a la red y qué bits pertenecen al host.
+    \item La operación AND entre IP y máscara permite determinar si dos hosts pertenecen a la misma subred.
+    \item Los switches no enrutan entre subredes; para comunicar subredes distintas se requiere un router o un equipo de capa 3.
+    \item Al aumentar los bits de subred, aumenta el número de subredes, pero disminuye la cantidad de hosts disponibles por subred.
+    \item En el enfoque tradicional classful se evita usar la primera y la última subred, aunque CIDR moderno puede permitirlo.
+    \item VLSM aprovecha mejor el espacio IPv4 porque permite crear subredes de distinto tamaño según la necesidad real de hosts.
+    \item No se deben asignar a hosts las direcciones de red ni de broadcast.
+    \item Los dominios de broadcast se controlan mediante segmentación lógica, como subredes o VLANs.
+    \item El superneteo realiza el proceso inverso al subneteo: agrupa redes contiguas para simplificar el enrutamiento.
+\end{enumerate}
+
+\end{document}
