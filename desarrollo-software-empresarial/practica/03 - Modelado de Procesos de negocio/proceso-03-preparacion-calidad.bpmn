@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" id="Definitions_Proceso_03" targetNamespace="http://unsa.edu.pe/bpmn/little-caesars">
+  <bpmn:process id="Process_Preparacion_Calidad" name="Preparación y control de calidad del pedido" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_Preparacion_Calidad">
+      <bpmn:lane id="Lane_Sistema_Cocina_03" name="Sistema de cocina">
+        <bpmn:flowNodeRef>Start_Orden_Confirmada</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Recibir_Comanda</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Priorizar_Comanda</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Modalidad_Entrega_03</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Actualizar_Listo_Recojo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Actualizar_Listo_Delivery</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Descontar_Insumos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Pedido_Listo</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Cocina_03" name="Cocina">
+        <bpmn:flowNodeRef>Task_Preparar_Pedido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Empacar_Pedido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Corregir_Observacion</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Control_Calidad_03" name="Control de calidad / Encargado de turno">
+        <bpmn:flowNodeRef>Task_Verificar_Calidad</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Cumple_Calidad</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Despacho_03" name="Despacho">
+        <bpmn:flowNodeRef>Task_Recibir_Pedido_Listo</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start_Orden_Confirmada" name="Orden confirmada recibida" />
+    <bpmn:serviceTask id="Task_Recibir_Comanda" name="Recibir comanda" />
+    <bpmn:serviceTask id="Task_Priorizar_Comanda" name="Priorizar comanda" />
+    <bpmn:userTask id="Task_Preparar_Pedido" name="Preparar pedido" />
+    <bpmn:userTask id="Task_Empacar_Pedido" name="Empacar pedido" />
+    <bpmn:userTask id="Task_Verificar_Calidad" name="Verificar calidad y completitud" />
+    <bpmn:exclusiveGateway id="Gateway_Cumple_Calidad" name="¿Cumple calidad?" />
+    <bpmn:userTask id="Task_Corregir_Observacion" name="Corregir observación" />
+    <bpmn:exclusiveGateway id="Gateway_Modalidad_Entrega_03" name="¿Recojo o delivery?" />
+    <bpmn:serviceTask id="Task_Actualizar_Listo_Recojo" name="Marcar listo para recojo" />
+    <bpmn:serviceTask id="Task_Actualizar_Listo_Delivery" name="Marcar listo para delivery" />
+    <bpmn:serviceTask id="Task_Descontar_Insumos" name="Descontar insumos" />
+    <bpmn:userTask id="Task_Recibir_Pedido_Listo" name="Recibir pedido listo en despacho" />
+    <bpmn:endEvent id="End_Pedido_Listo" name="Pedido listo para entrega" />
+    <bpmn:sequenceFlow id="Flow_01" sourceRef="Start_Orden_Confirmada" targetRef="Task_Recibir_Comanda" />
+    <bpmn:sequenceFlow id="Flow_02" sourceRef="Task_Recibir_Comanda" targetRef="Task_Priorizar_Comanda" />
+    <bpmn:sequenceFlow id="Flow_03" sourceRef="Task_Priorizar_Comanda" targetRef="Task_Preparar_Pedido" />
+    <bpmn:sequenceFlow id="Flow_04" sourceRef="Task_Preparar_Pedido" targetRef="Task_Empacar_Pedido" />
+    <bpmn:sequenceFlow id="Flow_05" sourceRef="Task_Empacar_Pedido" targetRef="Task_Verificar_Calidad" />
+    <bpmn:sequenceFlow id="Flow_06" sourceRef="Task_Verificar_Calidad" targetRef="Gateway_Cumple_Calidad" />
+    <bpmn:sequenceFlow id="Flow_07" name="No" sourceRef="Gateway_Cumple_Calidad" targetRef="Task_Corregir_Observacion" />
+    <bpmn:sequenceFlow id="Flow_08" sourceRef="Task_Corregir_Observacion" targetRef="Task_Verificar_Calidad" />
+    <bpmn:sequenceFlow id="Flow_09" name="Sí" sourceRef="Gateway_Cumple_Calidad" targetRef="Gateway_Modalidad_Entrega_03" />
+    <bpmn:sequenceFlow id="Flow_10" name="Recojo" sourceRef="Gateway_Modalidad_Entrega_03" targetRef="Task_Actualizar_Listo_Recojo" />
+    <bpmn:sequenceFlow id="Flow_11" name="Delivery" sourceRef="Gateway_Modalidad_Entrega_03" targetRef="Task_Actualizar_Listo_Delivery" />
+    <bpmn:sequenceFlow id="Flow_12" sourceRef="Task_Actualizar_Listo_Recojo" targetRef="Task_Descontar_Insumos" />
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_Actualizar_Listo_Delivery" targetRef="Task_Descontar_Insumos" />
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="Task_Descontar_Insumos" targetRef="Task_Recibir_Pedido_Listo" />
+    <bpmn:sequenceFlow id="Flow_15" sourceRef="Task_Recibir_Pedido_Listo" targetRef="End_Pedido_Listo" />
+  </bpmn:process>
+</bpmn:definitions>

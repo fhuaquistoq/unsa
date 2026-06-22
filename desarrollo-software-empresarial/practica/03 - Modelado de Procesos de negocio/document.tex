@@ -1,0 +1,1023 @@
+\documentclass[a4paper,12pt]{article}
+% ==========================================
+% PAQUETES Y CONFIGURACIÓN
+% ==========================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{multirow}
+\usepackage{geometry}
+\usepackage{subcaption}
+\usepackage{csvsimple}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage[obeyspaces]{url}
+
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+% Configuración de colores para código
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color{backcolour},
+  numbers=left,
+  numberstyle=\tiny\color{codegray}
+}
+
+\bibliographystyle{ieeetr}
+
+% ==========================================
+% DOCUMENTO
+% ==========================================
+\begin{document}
+
+%-------------------------------------------------------------------------------
+% Portada
+%-------------------------------------------------------------------------------
+\begin{titlepage}
+    \centering
+    {\bfseries\LARGE UNIVERSIDAD NACIONAL DE SAN AGUSTÍN DE AREQUIPA \par}
+    \vspace{0.2cm}
+    {\scshape\LARGE Ciencia de la Computación \par}
+    \vspace{1cm}
+    {\includegraphics[width=0.4\textwidth]{Escudo_UNSA.png}\par}
+    \vspace{1cm}
+    {\Large Desarrollo de Software Empresarial \par}
+    \vspace{0.25cm}
+    {\bfseries\scshape\LARGE Modelado de Procesos de negocio \par}
+    \vspace{0.25cm}
+    {\Large Presentado por: \par}
+    
+    {\Large Fabricio Jesús Huaquisto Quispe \par}
+    {\Large Jose Carlos Paredes Malaga \par}
+    {\Large Fabricio Villantoy Apaza \par}
+    
+    \vfill
+    {\Large Docente: \par}
+    {\Large Marcela Quispe Cruz \par}
+    \vfill
+    {\bfseries\Large Perú, Arequipa 2026 \par}
+\end{titlepage}
+
+%-------------------------------------------------------------------------------
+% Contenido del documento
+%-------------------------------------------------------------------------------
+
+\section*{Introducción}
+
+El presente reporte tiene como objetivo documentar procesos de negocio operacionales de Little Caesars usando criterios de la notación BPMN. Para cada proceso se identifican los interesados, las tareas manuales, las tareas realizadas por sistemas, las oportunidades de mejora, los responsables, la secuencia del flujo y los elementos de información necesarios.
+
+La propuesta organiza la operación en siete procesos independientes pero conectables mediante eventos, mensajes o actividades de llamada. Esta separación evita diagramas excesivamente grandes y permite analizar con mayor claridad las responsabilidades de tienda, cocina, sistemas, inventario, delivery y postventa.
+
+\section*{Empresa seleccionada}
+
+\subsection*{Nombre de la empresa}
+
+La empresa seleccionada para el análisis es \textbf{Little Caesars}, una cadena internacional de pizzerías dedicada a la preparación y venta de pizzas, complementos y bebidas.
+
+\subsection*{Página web}
+
+\url{https://littlecaesars.com}
+
+\subsection*{Objetivos de la empresa}
+
+Little Caesars tiene como objetivo principal ofrecer pizzas de manera rápida, accesible y estandarizada, manteniendo una atención eficiente al cliente y una adecuada gestión de sus operaciones internas. Entre sus objetivos se encuentran:
+
+\begin{itemize}
+    \item Atender pedidos de clientes en tienda, delivery o recojo.
+    \item Preparar pizzas de forma rápida y siguiendo estándares de calidad.
+    \item Mantener disponibilidad de productos e insumos.
+    \item Reducir tiempos de espera en la atención al cliente.
+    \item Gestionar correctamente pagos, pedidos, inventario y entregas.
+\end{itemize}
+
+\section*{Procesos de negocio según Notación BPMN}
+
+Para el análisis se seleccionaron siete procesos de negocio primarios de Little Caesars. Los procesos se separan por responsabilidad operacional para que cada diagrama sea comprensible y pueda conectarse con otros mediante actividades de llamada o flujos de mensaje cuando corresponda.
+
+\begin{enumerate}
+    \item Gestión de pedido presencial en tienda.
+    \item Registro y validación de pedido digital.
+    \item Preparación y control de calidad del pedido.
+    \item Entrega de pedido para recojo en tienda.
+    \item Entrega de pedido por delivery.
+    \item Reposición de insumos e inventario.
+    \item Gestión postventa de reclamos, devoluciones y compensaciones.
+\end{enumerate}
+
+Cada proceso se documenta hasta el paso 7 solicitado por la práctica. El diseño BPMN correspondiente se entrega como archivo independiente en formato \texttt{.bpmn}, permitiendo importación o refinamiento posterior en una herramienta de modelado como BonitaSoft.
+
+%-------------------------------------------------------------------------------
+\subsection*{Proceso 1: Gestión de pedido presencial en tienda}
+
+\subsubsection*{Descripción del proceso}
+
+El proceso inicia cuando un cliente solicita productos en el local. El cajero confirma disponibilidad, registra el pedido, gestiona el pago y genera la orden para que el pedido continúe hacia preparación y entrega.
+
+\subsubsection*{1. Interesados o involucrados en el proceso}
+
+\begin{longtable}{P{5cm} P{9cm}}
+\toprule
+\textbf{Interesado o involucrado} & \textbf{Participación en el proceso} \\
+\midrule
+Cliente & Solicita productos, confirma el pedido y realiza el pago. \\
+Cajero / Atención en tienda & Atiende al cliente, valida disponibilidad, registra el pedido y entrega el comprobante. \\
+Sistema de ventas & Calcula importes, registra el pago, genera comprobante y deja la orden disponible para preparación. \\
+Administrador de tienda & Resuelve incidencias de disponibilidad, precio o pago cuando el flujo normal no puede continuar. \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{2. Actividades realizadas manualmente por personas}
+
+\begin{itemize}
+    \item El cliente solicita productos en caja.
+    \item El cajero confirma el pedido y consulta disponibilidad.
+    \item El cliente confirma el monto y realiza el pago.
+    \item El cajero entrega el comprobante y número de pedido.
+    \item El administrador autoriza cambios o cancelaciones excepcionales.
+\end{itemize}
+
+\subsubsection*{3. Actividades realizadas por sistemas de información o servicios web}
+
+\begin{itemize}
+    \item El sistema de ventas registra el detalle del pedido.
+    \item El sistema calcula subtotal, impuestos, promociones y monto total.
+    \item El sistema valida el pago en efectivo, tarjeta o billetera digital.
+    \item El sistema genera comprobante y número de pedido.
+    \item El sistema publica la orden para el proceso de preparación.
+\end{itemize}
+
+\subsubsection*{4. Revisión de actividades y posibles mejoras}
+
+\begin{longtable}{P{5cm} P{4cm} P{5cm}}
+\toprule
+\textbf{Actividad} & \textbf{Situación identificada} & \textbf{Mejora propuesta} \\
+\midrule
+Confirmación verbal del pedido & Puede generar errores de captura. & Mostrar el resumen del pedido antes del pago. \\
+Consulta manual de disponibilidad & Puede retrasar la atención. & Integrar disponibilidad del POS con inventario operativo. \\
+Registro manual de promociones & Puede aplicar descuentos incorrectos. & Parametrizar promociones en el sistema de ventas. \\
+Escalamiento informal de incidencias & Dificulta la trazabilidad. & Registrar autorizaciones del administrador en el POS. \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{5. Responsables de cada actividad}
+
+\begin{longtable}{P{7cm} P{7cm}}
+\toprule
+\textbf{Actividad} & \textbf{Responsable} \\
+\midrule
+Solicitar productos & Cliente \\
+Confirmar disponibilidad & Cajero / Atención en tienda \\
+Registrar pedido & Cajero / Sistema de ventas \\
+Calcular monto total & Sistema de ventas \\
+Realizar pago & Cliente \\
+Validar y registrar pago & Sistema de ventas \\
+Emitir comprobante & Sistema de ventas \\
+Resolver excepción & Administrador de tienda \\
+Publicar orden para preparación & Sistema de ventas \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{6. Secuencia de actividades}
+
+\paragraph{Eventos}
+
+\begin{itemize}
+    \item \textbf{Evento de inicio:} El cliente solicita atención en caja.
+    \item \textbf{Evento intermedio:} El pago es aprobado o rechazado.
+    \item \textbf{Evento final:} La orden presencial queda registrada y disponible para preparación.
+\end{itemize}
+
+\paragraph{Sub-procesos, actividades, tareas y flujos}
+
+\begin{enumerate}
+    \item El cliente solicita los productos al cajero.
+    \item El cajero consulta disponibilidad en el sistema.
+    \item Si el producto no está disponible, el cajero ofrece una alternativa o cancela la atención.
+    \item Si el producto está disponible, el cajero registra el pedido.
+    \item El sistema calcula el monto total.
+    \item El cliente realiza el pago.
+    \item El sistema valida el pago.
+    \item Si el pago es rechazado, el cliente puede intentar otro medio o cancelar.
+    \item Si el pago es aprobado, el sistema genera comprobante y número de pedido.
+    \item El sistema publica la orden para el proceso de preparación y control de calidad.
+\end{enumerate}
+
+\paragraph{Gateways}
+
+\begin{itemize}
+    \item \textbf{Gateway exclusivo:} ¿El producto está disponible?
+    \item \textbf{Gateway exclusivo:} ¿El pago fue aprobado?
+\end{itemize}
+
+\paragraph{Swimlanes}
+
+\begin{itemize}
+    \item \textbf{Pool externo:} Cliente.
+    \item \textbf{Pool:} Little Caesars.
+    \item \textbf{Lanes:} Cajero / Atención en tienda, Sistema de ventas y Administrador de tienda.
+\end{itemize}
+
+\subsubsection*{7. Elementos de información necesarios}
+
+\begin{longtable}{P{5cm} P{5cm} P{4cm}}
+\toprule
+\textbf{Elemento de información} & \textbf{Tipo} & \textbf{Uso en el proceso} \\
+\midrule
+Detalle del pedido & Dato & Registrar productos, cantidades y observaciones. \\
+Disponibilidad de producto & Dato & Determinar si el pedido puede aceptarse. \\
+Monto total & Dato & Informar el importe a pagar. \\
+Método de pago & Dato & Registrar el medio usado por el cliente. \\
+Número de pedido & Dato & Identificar la orden en preparación y entrega. \\
+Comprobante de venta & Dato & Sustentar la transacción. \\
+Base de datos de ventas & Almacén de datos & Guardar operaciones registradas en tienda. \\
+Registro de pedidos & Almacén de datos & Consultar el estado posterior de la orden. \\
+\bottomrule
+\end{longtable}
+
+%-------------------------------------------------------------------------------
+\subsection*{Proceso 2: Registro y validación de pedido digital}
+
+\subsubsection*{Descripción del proceso}
+
+El proceso inicia cuando un cliente ingresa a un canal digital para seleccionar productos. El sistema valida datos, cobertura, disponibilidad y pago antes de confirmar el pedido para preparación.
+
+\subsubsection*{1. Interesados o involucrados en el proceso}
+
+\begin{longtable}{P{5cm} P{9cm}}
+\toprule
+\textbf{Interesado o involucrado} & \textbf{Participación en el proceso} \\
+\midrule
+Cliente & Selecciona productos, registra datos, elige modalidad y confirma el pago. \\
+Sistema de pedidos digitales & Valida carrito, datos del cliente, cobertura, monto y estado del pedido. \\
+Pasarela de pago & Servicio externo que autoriza o rechaza pagos digitales. \\
+Tienda & Recibe la orden confirmada y atiende incidencias operativas. \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{2. Actividades realizadas manualmente por personas}
+
+\begin{itemize}
+    \item El cliente selecciona productos y modalidad de atención.
+    \item El cliente ingresa datos de contacto y, si corresponde, dirección de entrega.
+    \item El cliente confirma el resumen del pedido.
+    \item El personal de tienda revisa excepciones cuando el sistema no puede validar la orden.
+\end{itemize}
+
+\subsubsection*{3. Actividades realizadas por sistemas de información o servicios web}
+
+\begin{itemize}
+    \item El sistema valida disponibilidad de productos.
+    \item El sistema valida cobertura de delivery o tienda de recojo.
+    \item El sistema calcula monto total, promociones y costo de envío.
+    \item La pasarela de pago procesa la transacción.
+    \item El sistema confirma el pedido y notifica al cliente.
+    \item El sistema invoca la preparación del pedido mediante una actividad de llamada.
+\end{itemize}
+
+\subsubsection*{4. Revisión de actividades y posibles mejoras}
+
+\begin{longtable}{P{5cm} P{4cm} P{5cm}}
+\toprule
+\textbf{Actividad} & \textbf{Situación identificada} & \textbf{Mejora propuesta} \\
+\midrule
+Ingreso manual de dirección & Puede generar direcciones incompletas. & Validar dirección con geolocalización y mapas. \\
+Consulta manual de cobertura & Retrasa la confirmación. & Calcular cobertura automáticamente por tienda. \\
+Notificación tardía al cliente & Genera incertidumbre. & Enviar notificaciones por cada cambio de estado. \\
+Validación aislada de pagos & Puede duplicar pedidos fallidos. & Usar tokens de transacción e idempotencia. \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{5. Responsables de cada actividad}
+
+\begin{longtable}{P{7cm} P{7cm}}
+\toprule
+\textbf{Actividad} & \textbf{Responsable} \\
+\midrule
+Seleccionar productos & Cliente \\
+Validar disponibilidad & Sistema de pedidos digitales \\
+Validar datos y cobertura & Sistema de pedidos digitales \\
+Procesar pago & Pasarela de pago \\
+Confirmar pedido & Sistema de pedidos digitales \\
+Atender excepción & Tienda \\
+Notificar confirmación & Sistema de pedidos digitales \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{6. Secuencia de actividades}
+
+\paragraph{Eventos}
+
+\begin{itemize}
+    \item \textbf{Evento de inicio:} El cliente inicia un pedido en app, web o canal digital.
+    \item \textbf{Evento intermedio:} La pasarela devuelve autorización o rechazo del pago.
+    \item \textbf{Evento final:} El pedido digital queda confirmado o cancelado.
+\end{itemize}
+
+\paragraph{Sub-procesos, actividades, tareas y flujos}
+
+\begin{enumerate}
+    \item El cliente selecciona productos.
+    \item El sistema valida disponibilidad.
+    \item El cliente elige recojo o delivery.
+    \item El sistema valida tienda, dirección o cobertura según la modalidad.
+    \item El sistema calcula el total.
+    \item El cliente confirma y paga.
+    \item La pasarela valida el pago.
+    \item Si el pago es rechazado, el sistema notifica el rechazo y cancela la orden.
+    \item Si el pago es aprobado, el sistema registra el pedido y notifica al cliente.
+    \item El sistema invoca el proceso de preparación y control de calidad.
+\end{enumerate}
+
+\paragraph{Gateways}
+
+\begin{itemize}
+    \item \textbf{Gateway exclusivo:} ¿Productos disponibles?
+    \item \textbf{Gateway exclusivo:} ¿Modalidad delivery o recojo?
+    \item \textbf{Gateway exclusivo:} ¿Pago aprobado?
+\end{itemize}
+
+\paragraph{Swimlanes}
+
+\begin{itemize}
+    \item \textbf{Pool externo:} Cliente.
+    \item \textbf{Pool externo:} Pasarela de pago.
+    \item \textbf{Pool:} Little Caesars.
+    \item \textbf{Lanes:} Sistema de pedidos digitales y Tienda.
+\end{itemize}
+
+\subsubsection*{7. Elementos de información necesarios}
+
+\begin{longtable}{P{5cm} P{5cm} P{4cm}}
+\toprule
+\textbf{Elemento de información} & \textbf{Tipo} & \textbf{Uso en el proceso} \\
+\midrule
+Datos del cliente & Dato & Identificar y contactar al cliente. \\
+Carrito de compra & Dato & Registrar productos seleccionados. \\
+Dirección de entrega & Dato & Validar cobertura de delivery. \\
+Modalidad de atención & Dato & Definir recojo o delivery. \\
+Token de pago & Dato & Relacionar la autorización de la pasarela. \\
+Estado del pedido & Dato & Informar avance y resultado. \\
+Base de datos de pedidos & Almacén de datos & Persistir pedidos digitales. \\
+Registro de pagos & Almacén de datos & Consultar transacciones aprobadas o rechazadas. \\
+\bottomrule
+\end{longtable}
+
+%-------------------------------------------------------------------------------
+\subsection*{Proceso 3: Preparación y control de calidad del pedido}
+
+\subsubsection*{Descripción del proceso}
+
+El proceso inicia cuando cocina recibe una orden confirmada. El equipo prepara la pizza o complementos, verifica estándares de calidad, corrige observaciones y marca el pedido como listo para la modalidad de entrega correspondiente.
+
+\subsubsection*{1. Interesados o involucrados en el proceso}
+
+\begin{longtable}{P{5cm} P{9cm}}
+\toprule
+\textbf{Interesado o involucrado} & \textbf{Participación en el proceso} \\
+\midrule
+Cocina & Prepara productos siguiendo receta y prioridad operativa. \\
+Control de calidad / Encargado de turno & Verifica presentación, cantidad, temperatura y completitud. \\
+Sistema de cocina & Muestra comandas, tiempos, prioridades y estados. \\
+Tienda / Despacho & Recibe el pedido listo para recojo o delivery. \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{2. Actividades realizadas manualmente por personas}
+
+\begin{itemize}
+    \item Cocina revisa la comanda y prepara el pedido.
+    \item Cocina empaca productos y complementos.
+    \item El encargado verifica calidad y completitud.
+    \item Cocina corrige el pedido si no cumple el estándar.
+    \item Despacho recibe el pedido listo.
+\end{itemize}
+
+\subsubsection*{3. Actividades realizadas por sistemas de información o servicios web}
+
+\begin{itemize}
+    \item El sistema de cocina recibe la orden desde ventas o pedidos digitales.
+    \item El sistema prioriza la comanda por hora y modalidad.
+    \item El sistema registra inicio y fin de preparación.
+    \item El sistema actualiza el estado a listo para recojo o listo para delivery.
+    \item El sistema descuenta insumos usados del inventario operativo.
+\end{itemize}
+
+\subsubsection*{4. Revisión de actividades y posibles mejoras}
+
+\begin{longtable}{P{5cm} P{4cm} P{5cm}}
+\toprule
+\textbf{Actividad} & \textbf{Situación identificada} & \textbf{Mejora propuesta} \\
+\midrule
+Lectura manual de comandas & Puede ocasionar omisiones. & Usar pantalla KDS con prioridad y detalle completo. \\
+Control visual informal & Puede variar entre turnos. & Aplicar checklist digital de calidad. \\
+Correcciones sin registro & Ocultan causas de reproceso. & Registrar motivo de corrección. \\
+Descuento tardío de insumos & Afecta inventario. & Descontar insumos al cerrar preparación. \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{5. Responsables de cada actividad}
+
+\begin{longtable}{P{7cm} P{7cm}}
+\toprule
+\textbf{Actividad} & \textbf{Responsable} \\
+\midrule
+Recibir comanda & Sistema de cocina \\
+Preparar pedido & Cocina \\
+Empacar pedido & Cocina \\
+Verificar calidad & Control de calidad / Encargado de turno \\
+Corregir pedido & Cocina \\
+Actualizar estado & Sistema de cocina \\
+Entregar a despacho & Cocina / Despacho \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{6. Secuencia de actividades}
+
+\paragraph{Eventos}
+
+\begin{itemize}
+    \item \textbf{Evento de inicio:} Cocina recibe una orden confirmada.
+    \item \textbf{Evento intermedio:} El encargado aprueba o rechaza el control de calidad.
+    \item \textbf{Evento final:} El pedido queda listo para recojo o delivery.
+\end{itemize}
+
+\paragraph{Sub-procesos, actividades, tareas y flujos}
+
+\begin{enumerate}
+    \item El sistema de cocina recibe la comanda.
+    \item Cocina inicia preparación.
+    \item Cocina arma, hornea y empaca el pedido.
+    \item El encargado realiza control de calidad.
+    \item Si el pedido no cumple el estándar, cocina corrige la observación.
+    \item Si el pedido cumple el estándar, el sistema actualiza el estado.
+    \item El sistema descuenta insumos.
+    \item Despacho recibe el pedido listo para la modalidad correspondiente.
+\end{enumerate}
+
+\paragraph{Gateways}
+
+\begin{itemize}
+    \item \textbf{Gateway exclusivo:} ¿El pedido cumple calidad?
+    \item \textbf{Gateway exclusivo:} ¿La modalidad es recojo o delivery?
+\end{itemize}
+
+\paragraph{Swimlanes}
+
+\begin{itemize}
+    \item \textbf{Pool:} Little Caesars.
+    \item \textbf{Lanes:} Sistema de cocina, Cocina, Control de calidad / Encargado de turno y Despacho.
+\end{itemize}
+
+\subsubsection*{7. Elementos de información necesarios}
+
+\begin{longtable}{P{5cm} P{5cm} P{4cm}}
+\toprule
+\textbf{Elemento de información} & \textbf{Tipo} & \textbf{Uso en el proceso} \\
+\midrule
+Comanda & Dato & Indicar productos, cantidades y observaciones. \\
+Receta estándar & Dato & Guiar preparación consistente. \\
+Checklist de calidad & Dato & Validar completitud y presentación. \\
+Estado de preparación & Dato & Informar avance del pedido. \\
+Motivo de corrección & Dato & Registrar reprocesos. \\
+Inventario operativo & Almacén de datos & Descontar insumos consumidos. \\
+Registro de producción & Almacén de datos & Medir tiempos y calidad. \\
+\bottomrule
+\end{longtable}
+
+%-------------------------------------------------------------------------------
+\subsection*{Proceso 4: Entrega de pedido para recojo en tienda}
+
+\subsubsection*{Descripción del proceso}
+
+El proceso inicia cuando un pedido queda listo para recojo. Atención en tienda notifica o llama al cliente, verifica el número de pedido y entrega el producto.
+
+\subsubsection*{1. Interesados o involucrados en el proceso}
+
+\begin{longtable}{P{5cm} P{9cm}}
+\toprule
+\textbf{Interesado o involucrado} & \textbf{Participación en el proceso} \\
+\midrule
+Cliente & Presenta número de pedido y recibe el producto. \\
+Atención en tienda / Despacho & Custodia pedidos listos, verifica identidad y entrega el pedido. \\
+Sistema de pedidos & Notifica estado, registra entrega y actualiza cierre. \\
+Cocina & Corrige faltantes detectados antes de la entrega. \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{2. Actividades realizadas manualmente por personas}
+
+\begin{itemize}
+    \item Atención en tienda organiza pedidos listos.
+    \item El cliente presenta número o comprobante.
+    \item Atención verifica el pedido y lo entrega.
+    \item Cocina completa faltantes si se detecta una diferencia.
+\end{itemize}
+
+\subsubsection*{3. Actividades realizadas por sistemas de información o servicios web}
+
+\begin{itemize}
+    \item El sistema notifica al cliente que el pedido está listo.
+    \item El sistema permite consultar pedido por número.
+    \item El sistema registra la entrega en tienda.
+    \item El sistema cierra el pedido y guarda hora de entrega.
+\end{itemize}
+
+\subsubsection*{4. Revisión de actividades y posibles mejoras}
+
+\begin{longtable}{P{5cm} P{4cm} P{5cm}}
+\toprule
+\textbf{Actividad} & \textbf{Situación identificada} & \textbf{Mejora propuesta} \\
+\midrule
+Llamado verbal del pedido & Puede no ser escuchado. & Usar pantalla de pedidos listos y notificación digital. \\
+Verificación solo verbal & Riesgo de entregar pedido equivocado. & Validar número, nombre o código QR. \\
+Registro manual de entrega & Puede omitirse en hora punta. & Cerrar entrega desde POS o app interna. \\
+Gestión de pedidos no recogidos & Puede generar desperdicio. & Registrar tiempo máximo de espera y alerta. \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{5. Responsables de cada actividad}
+
+\begin{longtable}{P{7cm} P{7cm}}
+\toprule
+\textbf{Actividad} & \textbf{Responsable} \\
+\midrule
+Notificar pedido listo & Sistema de pedidos \\
+Organizar pedido en zona de recojo & Atención en tienda / Despacho \\
+Presentar número de pedido & Cliente \\
+Verificar identidad del pedido & Atención en tienda / Despacho \\
+Completar faltante & Cocina \\
+Registrar entrega & Sistema de pedidos \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{6. Secuencia de actividades}
+
+\paragraph{Eventos}
+
+\begin{itemize}
+    \item \textbf{Evento de inicio:} El pedido queda listo para recojo.
+    \item \textbf{Evento intermedio:} El cliente presenta número de pedido.
+    \item \textbf{Evento final:} El pedido queda entregado y cerrado.
+\end{itemize}
+
+\paragraph{Sub-procesos, actividades, tareas y flujos}
+
+\begin{enumerate}
+    \item El sistema marca el pedido como listo para recojo.
+    \item El sistema notifica al cliente.
+    \item Atención organiza el pedido en zona de recojo.
+    \item El cliente llega y presenta su número de pedido.
+    \item Atención verifica identidad y contenido.
+    \item Si hay faltantes, cocina completa el pedido.
+    \item Si el pedido es correcto, atención entrega el producto.
+    \item El sistema registra hora de entrega y cierra el pedido.
+\end{enumerate}
+
+\paragraph{Gateways}
+
+\begin{itemize}
+    \item \textbf{Gateway exclusivo:} ¿El cliente acredita el pedido?
+    \item \textbf{Gateway exclusivo:} ¿El pedido está completo?
+\end{itemize}
+
+\paragraph{Swimlanes}
+
+\begin{itemize}
+    \item \textbf{Pool externo:} Cliente.
+    \item \textbf{Pool:} Little Caesars.
+    \item \textbf{Lanes:} Sistema de pedidos, Atención en tienda / Despacho y Cocina.
+\end{itemize}
+
+\subsubsection*{7. Elementos de información necesarios}
+
+\begin{longtable}{P{5cm} P{5cm} P{4cm}}
+\toprule
+\textbf{Elemento de información} & \textbf{Tipo} & \textbf{Uso en el proceso} \\
+\midrule
+Número de pedido & Dato & Identificar la orden a entregar. \\
+Comprobante o código QR & Dato & Validar titularidad del pedido. \\
+Estado de entrega & Dato & Registrar si está listo, entregado o pendiente. \\
+Hora de entrega & Dato & Medir cumplimiento y trazabilidad. \\
+Registro de pedidos & Almacén de datos & Consultar y cerrar pedidos. \\
+Bitácora de entrega & Almacén de datos & Guardar evidencia operativa de recojo. \\
+\bottomrule
+\end{longtable}
+
+%-------------------------------------------------------------------------------
+\subsection*{Proceso 5: Entrega de pedido por delivery}
+
+\subsubsection*{Descripción del proceso}
+
+El proceso inicia cuando un pedido queda listo para delivery. El sistema asigna repartidor, se realiza el recojo en tienda, se entrega al cliente y se confirma el cierre logístico.
+
+\subsubsection*{1. Interesados o involucrados en el proceso}
+
+\begin{longtable}{P{5cm} P{9cm}}
+\toprule
+\textbf{Interesado o involucrado} & \textbf{Participación en el proceso} \\
+\midrule
+Cliente & Recibe el pedido en la dirección indicada y confirma recepción. \\
+Sistema de pedidos / delivery & Asigna repartidor, calcula ruta, notifica estados y registra entrega. \\
+Despacho de tienda & Entrega físicamente el pedido al repartidor. \\
+Repartidor & Recoge, transporta y entrega el pedido. \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{2. Actividades realizadas manualmente por personas}
+
+\begin{itemize}
+    \item Despacho verifica pedido antes de entregarlo al repartidor.
+    \item El repartidor recoge el pedido en tienda.
+    \item El repartidor se desplaza a la dirección del cliente.
+    \item El cliente recibe el pedido.
+    \item El repartidor reporta incidencias de dirección o contacto.
+\end{itemize}
+
+\subsubsection*{3. Actividades realizadas por sistemas de información o servicios web}
+
+\begin{itemize}
+    \item El sistema busca repartidor disponible.
+    \item El sistema asigna ruta y tiempos estimados.
+    \item El sistema notifica al cliente la salida del pedido.
+    \item El sistema registra ubicación y estado de entrega.
+    \item El sistema cierra o marca incidencia logística.
+\end{itemize}
+
+\subsubsection*{4. Revisión de actividades y posibles mejoras}
+
+\begin{longtable}{P{5cm} P{4cm} P{5cm}}
+\toprule
+\textbf{Actividad} & \textbf{Situación identificada} & \textbf{Mejora propuesta} \\
+\midrule
+Asignación manual de repartidor & Puede generar demoras. & Asignar por disponibilidad, distancia y carga. \\
+Comunicación telefónica repetida & Aumenta carga operativa. & Enviar seguimiento automático al cliente. \\
+Dirección ambigua & Puede producir entregas fallidas. & Validar ubicación antes de confirmar pedido. \\
+Incidencias sin evidencia & Dificultan reclamos posteriores. & Registrar motivo, hora y evidencia de entrega fallida. \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{5. Responsables de cada actividad}
+
+\begin{longtable}{P{7cm} P{7cm}}
+\toprule
+\textbf{Actividad} & \textbf{Responsable} \\
+\midrule
+Asignar repartidor & Sistema de pedidos / delivery \\
+Entregar pedido al repartidor & Despacho de tienda \\
+Recoger pedido & Repartidor \\
+Notificar salida & Sistema de pedidos / delivery \\
+Transportar pedido & Repartidor \\
+Recibir pedido & Cliente \\
+Confirmar entrega & Repartidor / Sistema de pedidos \\
+Gestionar incidencia & Repartidor / Despacho de tienda \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{6. Secuencia de actividades}
+
+\paragraph{Eventos}
+
+\begin{itemize}
+    \item \textbf{Evento de inicio:} El pedido queda listo para delivery.
+    \item \textbf{Evento intermedio:} El repartidor confirma recojo en tienda.
+    \item \textbf{Evento final:} El pedido queda entregado o registrado con incidencia.
+\end{itemize}
+
+\paragraph{Sub-procesos, actividades, tareas y flujos}
+
+\begin{enumerate}
+    \item El sistema identifica pedido listo para delivery.
+    \item El sistema busca repartidor disponible.
+    \item Si no hay repartidor, notifica demora y mantiene la búsqueda.
+    \item Si hay repartidor, asigna ruta y pedido.
+    \item Despacho entrega el pedido al repartidor.
+    \item El repartidor confirma recojo y sale a ruta.
+    \item El sistema notifica al cliente.
+    \item El repartidor llega a la dirección.
+    \item Si contacta al cliente, entrega el pedido y confirma recepción.
+    \item Si no contacta al cliente, registra incidencia logística.
+\end{enumerate}
+
+\paragraph{Gateways}
+
+\begin{itemize}
+    \item \textbf{Gateway exclusivo:} ¿Hay repartidor disponible?
+    \item \textbf{Gateway exclusivo:} ¿Cliente ubicable en dirección?
+\end{itemize}
+
+\paragraph{Swimlanes}
+
+\begin{itemize}
+    \item \textbf{Pool externo:} Cliente.
+    \item \textbf{Pool:} Little Caesars.
+    \item \textbf{Lanes:} Sistema de pedidos / delivery, Despacho de tienda y Repartidor.
+\end{itemize}
+
+\subsubsection*{7. Elementos de información necesarios}
+
+\begin{longtable}{P{5cm} P{5cm} P{4cm}}
+\toprule
+\textbf{Elemento de información} & \textbf{Tipo} & \textbf{Uso en el proceso} \\
+\midrule
+Dirección de entrega & Dato & Guiar la ruta del repartidor. \\
+Datos de contacto & Dato & Coordinar entrega con el cliente. \\
+ID del repartidor & Dato & Registrar responsable logístico. \\
+Ruta estimada & Dato & Calcular tiempo de entrega. \\
+Estado de delivery & Dato & Informar recojo, ruta, entrega o incidencia. \\
+Evidencia de entrega & Dato & Sustentar cierre o incidencia. \\
+Registro de entregas & Almacén de datos & Guardar trazabilidad logística. \\
+\bottomrule
+\end{longtable}
+
+%-------------------------------------------------------------------------------
+\subsection*{Proceso 6: Reposición de insumos e inventario}
+
+\subsubsection*{Descripción del proceso}
+
+El proceso inicia cuando el sistema o almacén detecta bajo stock. Se verifica el inventario físico, se solicita reposición, se aprueba la compra o traslado, se reciben insumos y se actualiza el inventario.
+
+\subsubsection*{1. Interesados o involucrados en el proceso}
+
+\begin{longtable}{P{5cm} P{9cm}}
+\toprule
+\textbf{Interesado o involucrado} & \textbf{Participación en el proceso} \\
+\midrule
+Sistema de inventario & Monitorea stock, genera alertas y actualiza existencias. \\
+Tienda / Almacén & Verifica existencias físicas, recibe y revisa insumos. \\
+Administración / Compras & Aprueba solicitudes y coordina abastecimiento. \\
+Proveedor o almacén central & Participante externo que entrega insumos solicitados. \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{2. Actividades realizadas manualmente por personas}
+
+\begin{itemize}
+    \item Tienda / almacén revisa alertas y existencias físicas.
+    \item Administración / compras aprueba o rechaza la solicitud.
+    \item Administración / compras coordina con proveedor o almacén central.
+    \item Tienda / almacén recibe y verifica insumos.
+    \item Tienda / almacén reporta diferencias o productos dañados.
+\end{itemize}
+
+\subsubsection*{3. Actividades realizadas por sistemas de información o servicios web}
+
+\begin{itemize}
+    \item El sistema monitorea stock mínimo.
+    \item El sistema genera alerta de reposición.
+    \item El sistema registra solicitud y aprobación.
+    \item El sistema genera orden de compra o traslado.
+    \item El sistema registra recepción y actualiza inventario.
+\end{itemize}
+
+\subsubsection*{4. Revisión de actividades y posibles mejoras}
+
+\begin{longtable}{P{5cm} P{4cm} P{5cm}}
+\toprule
+\textbf{Actividad} & \textbf{Situación identificada} & \textbf{Mejora propuesta} \\
+\midrule
+Revisión manual constante & Consume tiempo operativo. & Generar alertas por stock mínimo. \\
+Solicitud por medios informales & Puede perder trazabilidad. & Registrar solicitud en el sistema. \\
+Aprobación sin criterios visibles & Riesgo de compras innecesarias. & Parametrizar niveles mínimos y máximos. \\
+Recepción sin contraste documental & Puede aceptar cantidades incorrectas. & Comparar recepción contra orden aprobada. \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{5. Responsables de cada actividad}
+
+\begin{longtable}{P{7cm} P{7cm}}
+\toprule
+\textbf{Actividad} & \textbf{Responsable} \\
+\midrule
+Monitorear stock & Sistema de inventario \\
+Verificar existencias físicas & Tienda / Almacén \\
+Registrar solicitud & Sistema de inventario \\
+Aprobar solicitud & Administración / Compras \\
+Generar orden de compra o traslado & Sistema de inventario \\
+Entregar insumos & Proveedor o almacén central \\
+Recibir y verificar insumos & Tienda / Almacén \\
+Actualizar inventario & Sistema de inventario \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{6. Secuencia de actividades}
+
+\paragraph{Eventos}
+
+\begin{itemize}
+    \item \textbf{Evento de inicio:} El stock cae por debajo del mínimo.
+    \item \textbf{Evento intermedio:} La solicitud es aprobada o rechazada.
+    \item \textbf{Evento final:} El inventario queda actualizado o la solicitud cerrada.
+\end{itemize}
+
+\paragraph{Sub-procesos, actividades, tareas y flujos}
+
+\begin{enumerate}
+    \item El sistema monitorea stock.
+    \item El sistema genera alerta por bajo inventario.
+    \item Tienda / almacén verifica existencias físicas.
+    \item Si no se requiere reposición, se cierra la alerta.
+    \item Si se requiere reposición, el sistema registra solicitud.
+    \item Administración / compras evalúa la solicitud.
+    \item Si se rechaza, se registra el motivo y se cierra.
+    \item Si se aprueba, se genera orden de compra o traslado.
+    \item Proveedor o almacén central entrega insumos.
+    \item Tienda / almacén verifica cantidad y estado.
+    \item Si hay diferencias, se reporta incidencia.
+    \item Si todo es correcto, el sistema actualiza inventario.
+\end{enumerate}
+
+\paragraph{Gateways}
+
+\begin{itemize}
+    \item \textbf{Gateway exclusivo:} ¿Se requiere reposición?
+    \item \textbf{Gateway exclusivo:} ¿Solicitud aprobada?
+    \item \textbf{Gateway exclusivo:} ¿Insumos recibidos correctos?
+\end{itemize}
+
+\paragraph{Swimlanes}
+
+\begin{itemize}
+    \item \textbf{Pool externo:} Proveedor o almacén central.
+    \item \textbf{Pool:} Little Caesars.
+    \item \textbf{Lanes:} Sistema de inventario, Tienda / Almacén y Administración / Compras.
+\end{itemize}
+
+\subsubsection*{7. Elementos de información necesarios}
+
+\begin{longtable}{P{5cm} P{5cm} P{4cm}}
+\toprule
+\textbf{Elemento de información} & \textbf{Tipo} & \textbf{Uso en el proceso} \\
+\midrule
+Código de insumo & Dato & Identificar el insumo requerido. \\
+Stock actual & Dato & Conocer existencias disponibles. \\
+Stock mínimo & Dato & Activar alerta de reposición. \\
+Solicitud de reposición & Dato & Formalizar la necesidad. \\
+Orden de compra o traslado & Dato & Solicitar abastecimiento. \\
+Guía o comprobante de entrega & Dato & Contrastar recepción. \\
+Inventario de insumos & Almacén de datos & Controlar existencias. \\
+Registro de compras o traslados & Almacén de datos & Guardar trazabilidad de abastecimiento. \\
+\bottomrule
+\end{longtable}
+
+%-------------------------------------------------------------------------------
+\subsection*{Proceso 7: Gestión postventa de reclamos, devoluciones y compensaciones}
+
+\subsubsection*{Descripción del proceso}
+
+El proceso inicia cuando un cliente reporta una incidencia después de la compra. Servicio al cliente registra el caso, valida evidencia y políticas, solicita aprobación cuando corresponde y ejecuta la resolución: reentrega, reembolso, cupón o rechazo justificado.
+
+\subsubsection*{1. Interesados o involucrados en el proceso}
+
+\begin{longtable}{P{5cm} P{9cm}}
+\toprule
+\textbf{Interesado o involucrado} & \textbf{Participación en el proceso} \\
+\midrule
+Cliente & Reporta incidencia, aporta evidencia y recibe resolución. \\
+Servicio al cliente / Tienda & Registra ticket, valida elegibilidad y comunica resultado. \\
+Supervisor / Administración & Aprueba reembolsos o compensaciones excepcionales. \\
+Sistema de pedidos / POS & Consulta pedido, registra trazabilidad, genera cupón o reentrega. \\
+Pasarela de pago & Servicio externo que procesa reembolsos monetarios. \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{2. Actividades realizadas manualmente por personas}
+
+\begin{itemize}
+    \item El cliente reporta la incidencia y adjunta evidencia.
+    \item Servicio al cliente revisa evidencia y política aplicable.
+    \item El supervisor evalúa casos excepcionales o reembolsos.
+    \item Servicio al cliente comunica la resolución.
+    \item La tienda coordina reentrega cuando corresponde.
+\end{itemize}
+
+\subsubsection*{3. Actividades realizadas por sistemas de información o servicios web}
+
+\begin{itemize}
+    \item El sistema registra el ticket de reclamo.
+    \item El sistema consulta historial del pedido y pago.
+    \item El sistema clasifica tipo de incidencia.
+    \item El sistema genera cupón, orden de reentrega o solicitud de reembolso.
+    \item La pasarela procesa reversión de fondos cuando corresponde.
+    \item El sistema notifica estados y cierra el caso.
+\end{itemize}
+
+\subsubsection*{4. Revisión de actividades y posibles mejoras}
+
+\begin{longtable}{P{5cm} P{4cm} P{5cm}}
+\toprule
+\textbf{Actividad} & \textbf{Situación identificada} & \textbf{Mejora propuesta} \\
+\midrule
+Clasificación libre del reclamo & Produce criterios inconsistentes. & Usar catálogo de incidencias y reglas de elegibilidad. \\
+Búsqueda manual del pedido & Demora la atención. & Integrar consulta automática al POS. \\
+Aprobación informal de reembolsos & Riesgo financiero. & Exigir aprobación del supervisor en el sistema. \\
+Comunicación manual del cierre & Puede generar reclamos repetidos. & Enviar notificaciones automáticas. \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{5. Responsables de cada actividad}
+
+\begin{longtable}{P{7cm} P{7cm}}
+\toprule
+\textbf{Actividad} & \textbf{Responsable} \\
+\midrule
+Reportar incidencia & Cliente \\
+Registrar ticket & Servicio al cliente / Sistema de pedidos \\
+Consultar pedido y pago & Sistema de pedidos / POS \\
+Validar elegibilidad & Servicio al cliente / Tienda \\
+Aprobar excepción & Supervisor / Administración \\
+Procesar reembolso & Pasarela de pago \\
+Generar cupón o reentrega & Sistema de pedidos / POS \\
+Comunicar resolución & Servicio al cliente / Sistema de pedidos \\
+Cerrar ticket & Sistema de pedidos / POS \\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{6. Secuencia de actividades}
+
+\paragraph{Eventos}
+
+\begin{itemize}
+    \item \textbf{Evento de inicio:} El cliente presenta un reclamo postventa.
+    \item \textbf{Evento intermedio:} El supervisor aprueba o rechaza una excepción.
+    \item \textbf{Evento final:} El ticket queda cerrado con resolución registrada.
+\end{itemize}
+
+\paragraph{Sub-procesos, actividades, tareas y flujos}
+
+\begin{enumerate}
+    \item El cliente reporta incidencia y adjunta evidencia.
+    \item El sistema registra ticket y consulta el pedido original.
+    \item Servicio al cliente revisa evidencia y política.
+    \item Si el reclamo no es elegible, se notifica rechazo y se cierra el caso.
+    \item Si es elegible, se determina si requiere aprobación.
+    \item El supervisor aprueba o rechaza excepciones.
+    \item Si se rechaza la excepción, se notifica el motivo y se cierra el caso.
+    \item Si procede, se define resolución: reentrega, reembolso o cupón.
+    \item Para reentrega, el sistema genera una orden de reposición conectable con preparación y delivery.
+    \item Para reembolso, la pasarela procesa reversión y el sistema actualiza pago.
+    \item Para cupón, el sistema genera código de compensación.
+    \item El sistema notifica la resolución y cierra el ticket.
+\end{enumerate}
+
+\paragraph{Gateways}
+
+\begin{itemize}
+    \item \textbf{Gateway exclusivo:} ¿El reclamo es elegible?
+    \item \textbf{Gateway exclusivo:} ¿Requiere aprobación del supervisor?
+    \item \textbf{Gateway exclusivo:} ¿Qué resolución aplica?
+\end{itemize}
+
+\paragraph{Swimlanes}
+
+\begin{itemize}
+    \item \textbf{Pool externo:} Cliente.
+    \item \textbf{Pool externo:} Pasarela de pago.
+    \item \textbf{Pool:} Little Caesars.
+    \item \textbf{Lanes:} Servicio al cliente / Tienda, Supervisor / Administración y Sistema de pedidos / POS.
+\end{itemize}
+
+\subsubsection*{7. Elementos de información necesarios}
+
+\begin{longtable}{P{5cm} P{5cm} P{4cm}}
+\toprule
+\textbf{Elemento de información} & \textbf{Tipo} & \textbf{Uso en el proceso} \\
+\midrule
+ID del pedido & Dato & Relacionar reclamo con compra original. \\
+Datos del cliente & Dato & Contactar e identificar al reclamante. \\
+Tipo de incidencia & Dato & Clasificar el reclamo. \\
+Evidencia del reclamo & Dato & Sustentar elegibilidad. \\
+Estado del reclamo & Dato & Controlar avance del ticket. \\
+Tipo de resolución & Dato & Determinar acción final. \\
+Monto de reembolso & Dato & Procesar devolución monetaria. \\
+Código de cupón & Dato & Registrar compensación no monetaria. \\
+Base de datos de pedidos & Almacén de datos & Consultar compra original. \\
+Registro de pagos & Almacén de datos & Verificar y actualizar transacciones. \\
+Bitácora de incidencias & Almacén de datos & Guardar trazabilidad del caso. \\
+\bottomrule
+\end{longtable}
+
+
+
+
+\end{document}

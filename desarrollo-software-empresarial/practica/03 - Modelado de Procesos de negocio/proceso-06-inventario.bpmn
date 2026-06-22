@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" id="Definitions_Proceso_06" targetNamespace="http://unsa.edu.pe/bpmn/little-caesars">
+  <bpmn:collaboration id="Collaboration_Proceso_06">
+    <bpmn:participant id="Participant_Proveedor_06" name="Proveedor o almacén central" />
+    <bpmn:participant id="Participant_LittleCaesars_06" name="Little Caesars" processRef="Process_Inventario" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_Inventario" name="Reposición de insumos e inventario" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_Inventario">
+      <bpmn:lane id="Lane_Sistema_Inventario_06" name="Sistema de inventario">
+        <bpmn:flowNodeRef>Start_Bajo_Stock</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Monitorear_Stock</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Generar_Alerta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Registrar_Solicitud</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Generar_Orden</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Registrar_Recepcion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Actualizar_Inventario</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Inventario_Actualizado</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Tienda_Almacen_06" name="Tienda / Almacén">
+        <bpmn:flowNodeRef>Task_Verificar_Existencias</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Requiere_Reposicion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Recibir_Insumos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Verificar_Insumos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Insumos_Correctos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Reportar_Incidencia_Insumos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Alerta_Cerrada</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Compras_06" name="Administración / Compras">
+        <bpmn:flowNodeRef>Task_Evaluar_Solicitud</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Solicitud_Aprobada</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Coordinar_Entrega</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Solicitud_Rechazada</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start_Bajo_Stock" name="Stock por debajo del mínimo" />
+    <bpmn:serviceTask id="Task_Monitorear_Stock" name="Monitorear stock" />
+    <bpmn:serviceTask id="Task_Generar_Alerta" name="Generar alerta de reposición" />
+    <bpmn:userTask id="Task_Verificar_Existencias" name="Verificar existencias físicas" />
+    <bpmn:exclusiveGateway id="Gateway_Requiere_Reposicion" name="¿Requiere reposición?" />
+    <bpmn:serviceTask id="Task_Registrar_Solicitud" name="Registrar solicitud de reposición" />
+    <bpmn:userTask id="Task_Evaluar_Solicitud" name="Evaluar solicitud" />
+    <bpmn:exclusiveGateway id="Gateway_Solicitud_Aprobada" name="¿Solicitud aprobada?" />
+    <bpmn:serviceTask id="Task_Generar_Orden" name="Generar orden de compra o traslado" />
+    <bpmn:userTask id="Task_Coordinar_Entrega" name="Coordinar entrega con proveedor" />
+    <bpmn:userTask id="Task_Recibir_Insumos" name="Recibir insumos" />
+    <bpmn:userTask id="Task_Verificar_Insumos" name="Verificar cantidad y estado" />
+    <bpmn:exclusiveGateway id="Gateway_Insumos_Correctos" name="¿Insumos correctos?" />
+    <bpmn:userTask id="Task_Reportar_Incidencia_Insumos" name="Reportar incidencia de recepción" />
+    <bpmn:serviceTask id="Task_Registrar_Recepcion" name="Registrar recepción" />
+    <bpmn:serviceTask id="Task_Actualizar_Inventario" name="Actualizar inventario" />
+    <bpmn:endEvent id="End_Inventario_Actualizado" name="Inventario actualizado" />
+    <bpmn:endEvent id="End_Alerta_Cerrada" name="Alerta cerrada sin reposición" />
+    <bpmn:endEvent id="End_Solicitud_Rechazada" name="Solicitud rechazada" />
+    <bpmn:sequenceFlow id="Flow_01" sourceRef="Start_Bajo_Stock" targetRef="Task_Monitorear_Stock" />
+    <bpmn:sequenceFlow id="Flow_02" sourceRef="Task_Monitorear_Stock" targetRef="Task_Generar_Alerta" />
+    <bpmn:sequenceFlow id="Flow_03" sourceRef="Task_Generar_Alerta" targetRef="Task_Verificar_Existencias" />
+    <bpmn:sequenceFlow id="Flow_04" sourceRef="Task_Verificar_Existencias" targetRef="Gateway_Requiere_Reposicion" />
+    <bpmn:sequenceFlow id="Flow_05" name="No" sourceRef="Gateway_Requiere_Reposicion" targetRef="End_Alerta_Cerrada" />
+    <bpmn:sequenceFlow id="Flow_06" name="Sí" sourceRef="Gateway_Requiere_Reposicion" targetRef="Task_Registrar_Solicitud" />
+    <bpmn:sequenceFlow id="Flow_07" sourceRef="Task_Registrar_Solicitud" targetRef="Task_Evaluar_Solicitud" />
+    <bpmn:sequenceFlow id="Flow_08" sourceRef="Task_Evaluar_Solicitud" targetRef="Gateway_Solicitud_Aprobada" />
+    <bpmn:sequenceFlow id="Flow_09" name="No" sourceRef="Gateway_Solicitud_Aprobada" targetRef="End_Solicitud_Rechazada" />
+    <bpmn:sequenceFlow id="Flow_10" name="Sí" sourceRef="Gateway_Solicitud_Aprobada" targetRef="Task_Generar_Orden" />
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="Task_Generar_Orden" targetRef="Task_Coordinar_Entrega" />
+    <bpmn:sequenceFlow id="Flow_12" sourceRef="Task_Coordinar_Entrega" targetRef="Task_Recibir_Insumos" />
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_Recibir_Insumos" targetRef="Task_Verificar_Insumos" />
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="Task_Verificar_Insumos" targetRef="Gateway_Insumos_Correctos" />
+    <bpmn:sequenceFlow id="Flow_15" name="No" sourceRef="Gateway_Insumos_Correctos" targetRef="Task_Reportar_Incidencia_Insumos" />
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="Task_Reportar_Incidencia_Insumos" targetRef="End_Alerta_Cerrada" />
+    <bpmn:sequenceFlow id="Flow_17" name="Sí" sourceRef="Gateway_Insumos_Correctos" targetRef="Task_Registrar_Recepcion" />
+    <bpmn:sequenceFlow id="Flow_18" sourceRef="Task_Registrar_Recepcion" targetRef="Task_Actualizar_Inventario" />
+    <bpmn:sequenceFlow id="Flow_19" sourceRef="Task_Actualizar_Inventario" targetRef="End_Inventario_Actualizado" />
+  </bpmn:process>
+</bpmn:definitions>

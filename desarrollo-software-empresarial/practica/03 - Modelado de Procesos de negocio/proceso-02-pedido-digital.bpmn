@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" id="Definitions_Proceso_02" targetNamespace="http://unsa.edu.pe/bpmn/little-caesars">
+  <bpmn:collaboration id="Collaboration_Proceso_02">
+    <bpmn:participant id="Participant_Cliente_02" name="Cliente" />
+    <bpmn:participant id="Participant_Pasarela_02" name="Pasarela de pago" />
+    <bpmn:participant id="Participant_LittleCaesars_02" name="Little Caesars" processRef="Process_Pedido_Digital" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_Pedido_Digital" name="Registro y validación de pedido digital" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_Pedido_Digital">
+      <bpmn:lane id="Lane_Sistema_Digital_02" name="Sistema de pedidos digitales">
+        <bpmn:flowNodeRef>Start_Pedido_Digital</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Registrar_Carrito</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Validar_Disponibilidad_Digital</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Productos_Disponibles</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Validar_Modalidad</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Modalidad</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Validar_Cobertura</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Calcular_Total_Digital</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Procesar_Pago_Digital</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Pago_Digital</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Confirmar_Pedido_Digital</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Call_Preparacion_Desde_Digital</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Pedido_Digital_Confirmado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Pedido_Digital_Cancelado</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Tienda_02" name="Tienda">
+        <bpmn:flowNodeRef>Task_Revisar_Excepcion_Digital</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start_Pedido_Digital" name="Cliente inicia pedido digital" />
+    <bpmn:userTask id="Task_Registrar_Carrito" name="Registrar carrito y datos del cliente" />
+    <bpmn:serviceTask id="Task_Validar_Disponibilidad_Digital" name="Validar disponibilidad" />
+    <bpmn:exclusiveGateway id="Gateway_Productos_Disponibles" name="¿Productos disponibles?" />
+    <bpmn:userTask id="Task_Revisar_Excepcion_Digital" name="Revisar excepción operativa" />
+    <bpmn:serviceTask id="Task_Validar_Modalidad" name="Validar datos de modalidad" />
+    <bpmn:exclusiveGateway id="Gateway_Modalidad" name="¿Delivery o recojo?" />
+    <bpmn:serviceTask id="Task_Validar_Cobertura" name="Validar cobertura de delivery" />
+    <bpmn:serviceTask id="Task_Calcular_Total_Digital" name="Calcular total y costo de envío" />
+    <bpmn:serviceTask id="Task_Procesar_Pago_Digital" name="Procesar pago en pasarela" />
+    <bpmn:exclusiveGateway id="Gateway_Pago_Digital" name="¿Pago aprobado?" />
+    <bpmn:serviceTask id="Task_Confirmar_Pedido_Digital" name="Confirmar pedido y notificar" />
+    <bpmn:callActivity id="Call_Preparacion_Desde_Digital" name="Llamar preparación y control de calidad" calledElement="Process_Preparacion_Calidad" />
+    <bpmn:endEvent id="End_Pedido_Digital_Confirmado" name="Pedido digital confirmado" />
+    <bpmn:endEvent id="End_Pedido_Digital_Cancelado" name="Pedido digital cancelado" />
+    <bpmn:sequenceFlow id="Flow_01" sourceRef="Start_Pedido_Digital" targetRef="Task_Registrar_Carrito" />
+    <bpmn:sequenceFlow id="Flow_02" sourceRef="Task_Registrar_Carrito" targetRef="Task_Validar_Disponibilidad_Digital" />
+    <bpmn:sequenceFlow id="Flow_03" sourceRef="Task_Validar_Disponibilidad_Digital" targetRef="Gateway_Productos_Disponibles" />
+    <bpmn:sequenceFlow id="Flow_04" name="No" sourceRef="Gateway_Productos_Disponibles" targetRef="Task_Revisar_Excepcion_Digital" />
+    <bpmn:sequenceFlow id="Flow_05" sourceRef="Task_Revisar_Excepcion_Digital" targetRef="End_Pedido_Digital_Cancelado" />
+    <bpmn:sequenceFlow id="Flow_06" name="Sí" sourceRef="Gateway_Productos_Disponibles" targetRef="Task_Validar_Modalidad" />
+    <bpmn:sequenceFlow id="Flow_07" sourceRef="Task_Validar_Modalidad" targetRef="Gateway_Modalidad" />
+    <bpmn:sequenceFlow id="Flow_08" name="Delivery" sourceRef="Gateway_Modalidad" targetRef="Task_Validar_Cobertura" />
+    <bpmn:sequenceFlow id="Flow_09" name="Recojo" sourceRef="Gateway_Modalidad" targetRef="Task_Calcular_Total_Digital" />
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_Validar_Cobertura" targetRef="Task_Calcular_Total_Digital" />
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="Task_Calcular_Total_Digital" targetRef="Task_Procesar_Pago_Digital" />
+    <bpmn:sequenceFlow id="Flow_12" sourceRef="Task_Procesar_Pago_Digital" targetRef="Gateway_Pago_Digital" />
+    <bpmn:sequenceFlow id="Flow_13" name="No" sourceRef="Gateway_Pago_Digital" targetRef="End_Pedido_Digital_Cancelado" />
+    <bpmn:sequenceFlow id="Flow_14" name="Sí" sourceRef="Gateway_Pago_Digital" targetRef="Task_Confirmar_Pedido_Digital" />
+    <bpmn:sequenceFlow id="Flow_15" sourceRef="Task_Confirmar_Pedido_Digital" targetRef="Call_Preparacion_Desde_Digital" />
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="Call_Preparacion_Desde_Digital" targetRef="End_Pedido_Digital_Confirmado" />
+  </bpmn:process>
+</bpmn:definitions>

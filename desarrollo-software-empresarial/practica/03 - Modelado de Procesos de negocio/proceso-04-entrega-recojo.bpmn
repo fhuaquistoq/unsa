@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" id="Definitions_Proceso_04" targetNamespace="http://unsa.edu.pe/bpmn/little-caesars">
+  <bpmn:collaboration id="Collaboration_Proceso_04">
+    <bpmn:participant id="Participant_Cliente_04" name="Cliente" />
+    <bpmn:participant id="Participant_LittleCaesars_04" name="Little Caesars" processRef="Process_Entrega_Recojo" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_Entrega_Recojo" name="Entrega de pedido para recojo en tienda" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_Entrega_Recojo">
+      <bpmn:lane id="Lane_Sistema_Pedidos_04" name="Sistema de pedidos">
+        <bpmn:flowNodeRef>Start_Listo_Recojo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Notificar_Listo_Recojo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Consultar_Pedido_Recojo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Registrar_Entrega_Recojo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Recojo_Entregado</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Atencion_04" name="Atención en tienda / Despacho">
+        <bpmn:flowNodeRef>Task_Organizar_Zona_Recojo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Verificar_Numero_Pedido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Cliente_Acredita</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Verificar_Contenido_Recojo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Pedido_Completo_Recojo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Entregar_Pedido_Recojo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Recojo_No_Acreditado</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Cocina_04" name="Cocina">
+        <bpmn:flowNodeRef>Task_Completar_Faltante_Recojo</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start_Listo_Recojo" name="Pedido listo para recojo" />
+    <bpmn:serviceTask id="Task_Notificar_Listo_Recojo" name="Notificar pedido listo" />
+    <bpmn:userTask id="Task_Organizar_Zona_Recojo" name="Organizar pedido en zona de recojo" />
+    <bpmn:serviceTask id="Task_Consultar_Pedido_Recojo" name="Consultar pedido por número" />
+    <bpmn:userTask id="Task_Verificar_Numero_Pedido" name="Verificar número o comprobante" />
+    <bpmn:exclusiveGateway id="Gateway_Cliente_Acredita" name="¿Cliente acredita pedido?" />
+    <bpmn:userTask id="Task_Verificar_Contenido_Recojo" name="Verificar contenido antes de entrega" />
+    <bpmn:exclusiveGateway id="Gateway_Pedido_Completo_Recojo" name="¿Pedido completo?" />
+    <bpmn:userTask id="Task_Completar_Faltante_Recojo" name="Completar faltante" />
+    <bpmn:userTask id="Task_Entregar_Pedido_Recojo" name="Entregar pedido al cliente" />
+    <bpmn:serviceTask id="Task_Registrar_Entrega_Recojo" name="Registrar entrega y hora de cierre" />
+    <bpmn:endEvent id="End_Recojo_Entregado" name="Pedido entregado en tienda" />
+    <bpmn:endEvent id="End_Recojo_No_Acreditado" name="Entrega no realizada" />
+    <bpmn:sequenceFlow id="Flow_01" sourceRef="Start_Listo_Recojo" targetRef="Task_Notificar_Listo_Recojo" />
+    <bpmn:sequenceFlow id="Flow_02" sourceRef="Task_Notificar_Listo_Recojo" targetRef="Task_Organizar_Zona_Recojo" />
+    <bpmn:sequenceFlow id="Flow_03" sourceRef="Task_Organizar_Zona_Recojo" targetRef="Task_Consultar_Pedido_Recojo" />
+    <bpmn:sequenceFlow id="Flow_04" sourceRef="Task_Consultar_Pedido_Recojo" targetRef="Task_Verificar_Numero_Pedido" />
+    <bpmn:sequenceFlow id="Flow_05" sourceRef="Task_Verificar_Numero_Pedido" targetRef="Gateway_Cliente_Acredita" />
+    <bpmn:sequenceFlow id="Flow_06" name="No" sourceRef="Gateway_Cliente_Acredita" targetRef="End_Recojo_No_Acreditado" />
+    <bpmn:sequenceFlow id="Flow_07" name="Sí" sourceRef="Gateway_Cliente_Acredita" targetRef="Task_Verificar_Contenido_Recojo" />
+    <bpmn:sequenceFlow id="Flow_08" sourceRef="Task_Verificar_Contenido_Recojo" targetRef="Gateway_Pedido_Completo_Recojo" />
+    <bpmn:sequenceFlow id="Flow_09" name="No" sourceRef="Gateway_Pedido_Completo_Recojo" targetRef="Task_Completar_Faltante_Recojo" />
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_Completar_Faltante_Recojo" targetRef="Task_Verificar_Contenido_Recojo" />
+    <bpmn:sequenceFlow id="Flow_11" name="Sí" sourceRef="Gateway_Pedido_Completo_Recojo" targetRef="Task_Entregar_Pedido_Recojo" />
+    <bpmn:sequenceFlow id="Flow_12" sourceRef="Task_Entregar_Pedido_Recojo" targetRef="Task_Registrar_Entrega_Recojo" />
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_Registrar_Entrega_Recojo" targetRef="End_Recojo_Entregado" />
+  </bpmn:process>
+</bpmn:definitions>

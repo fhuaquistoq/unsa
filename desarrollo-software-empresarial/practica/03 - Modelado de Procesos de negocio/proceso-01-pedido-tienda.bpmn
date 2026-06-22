@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_Proceso_01" targetNamespace="http://unsa.edu.pe/bpmn/little-caesars">
+  <bpmn:collaboration id="Collaboration_Proceso_01">
+    <bpmn:participant id="Participant_Cliente_01" name="Cliente" />
+    <bpmn:participant id="Participant_LittleCaesars_01" name="Little Caesars" processRef="Process_Pedido_Tienda" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_Pedido_Tienda" name="Gestión de pedido presencial en tienda" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_Pedido_Tienda">
+      <bpmn:lane id="Lane_Cajero_01" name="Cajero / Atención en tienda">
+        <bpmn:flowNodeRef>Start_Pedido_Tienda</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Recibir_Solicitud</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Consultar_Disponibilidad</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Disponible</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Ofrecer_Alternativa</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Entregar_Comprobante</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Sistema_Ventas_01" name="Sistema de ventas">
+        <bpmn:flowNodeRef>Task_Registrar_Pedido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Calcular_Monto</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Validar_Pago</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Pago_Aprobado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Generar_Comprobante</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Call_Preparacion_Desde_Tienda</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Orden_Publicada</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Administrador_01" name="Administrador de tienda">
+        <bpmn:flowNodeRef>Task_Resolver_Excepcion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Pedido_Cancelado</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start_Pedido_Tienda" name="Cliente solicita atención" />
+    <bpmn:userTask id="Task_Recibir_Solicitud" name="Recibir solicitud del cliente" />
+    <bpmn:userTask id="Task_Consultar_Disponibilidad" name="Consultar disponibilidad" />
+    <bpmn:exclusiveGateway id="Gateway_Disponible" name="¿Producto disponible?" />
+    <bpmn:userTask id="Task_Ofrecer_Alternativa" name="Ofrecer alternativa o cancelar" />
+    <bpmn:userTask id="Task_Resolver_Excepcion" name="Resolver excepción de pedido" />
+    <bpmn:userTask id="Task_Registrar_Pedido" name="Registrar pedido" />
+    <bpmn:serviceTask id="Task_Calcular_Monto" name="Calcular monto total" />
+    <bpmn:serviceTask id="Task_Validar_Pago" name="Validar y registrar pago" />
+    <bpmn:exclusiveGateway id="Gateway_Pago_Aprobado" name="¿Pago aprobado?" />
+    <bpmn:serviceTask id="Task_Generar_Comprobante" name="Generar comprobante y número de pedido" />
+    <bpmn:userTask id="Task_Entregar_Comprobante" name="Entregar comprobante al cliente" />
+    <bpmn:callActivity id="Call_Preparacion_Desde_Tienda" name="Llamar preparación y control de calidad" calledElement="Process_Preparacion_Calidad" />
+    <bpmn:endEvent id="End_Orden_Publicada" name="Orden disponible para preparación" />
+    <bpmn:endEvent id="End_Pedido_Cancelado" name="Pedido cancelado" />
+    <bpmn:sequenceFlow id="Flow_01" sourceRef="Start_Pedido_Tienda" targetRef="Task_Recibir_Solicitud" />
+    <bpmn:sequenceFlow id="Flow_02" sourceRef="Task_Recibir_Solicitud" targetRef="Task_Consultar_Disponibilidad" />
+    <bpmn:sequenceFlow id="Flow_03" sourceRef="Task_Consultar_Disponibilidad" targetRef="Gateway_Disponible" />
+    <bpmn:sequenceFlow id="Flow_04" name="No" sourceRef="Gateway_Disponible" targetRef="Task_Ofrecer_Alternativa" />
+    <bpmn:sequenceFlow id="Flow_05" sourceRef="Task_Ofrecer_Alternativa" targetRef="Task_Resolver_Excepcion" />
+    <bpmn:sequenceFlow id="Flow_06" sourceRef="Task_Resolver_Excepcion" targetRef="End_Pedido_Cancelado" />
+    <bpmn:sequenceFlow id="Flow_07" name="Sí" sourceRef="Gateway_Disponible" targetRef="Task_Registrar_Pedido" />
+    <bpmn:sequenceFlow id="Flow_08" sourceRef="Task_Registrar_Pedido" targetRef="Task_Calcular_Monto" />
+    <bpmn:sequenceFlow id="Flow_09" sourceRef="Task_Calcular_Monto" targetRef="Task_Validar_Pago" />
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_Validar_Pago" targetRef="Gateway_Pago_Aprobado" />
+    <bpmn:sequenceFlow id="Flow_11" name="No" sourceRef="Gateway_Pago_Aprobado" targetRef="Task_Resolver_Excepcion" />
+    <bpmn:sequenceFlow id="Flow_12" name="Sí" sourceRef="Gateway_Pago_Aprobado" targetRef="Task_Generar_Comprobante" />
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_Generar_Comprobante" targetRef="Task_Entregar_Comprobante" />
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="Task_Entregar_Comprobante" targetRef="Call_Preparacion_Desde_Tienda" />
+    <bpmn:sequenceFlow id="Flow_15" sourceRef="Call_Preparacion_Desde_Tienda" targetRef="End_Orden_Publicada" />
+  </bpmn:process>
+</bpmn:definitions>

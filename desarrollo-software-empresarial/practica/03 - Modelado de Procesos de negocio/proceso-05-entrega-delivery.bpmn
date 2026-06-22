@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" id="Definitions_Proceso_05" targetNamespace="http://unsa.edu.pe/bpmn/little-caesars">
+  <bpmn:collaboration id="Collaboration_Proceso_05">
+    <bpmn:participant id="Participant_Cliente_05" name="Cliente" />
+    <bpmn:participant id="Participant_LittleCaesars_05" name="Little Caesars" processRef="Process_Entrega_Delivery" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_Entrega_Delivery" name="Entrega de pedido por delivery" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_Entrega_Delivery">
+      <bpmn:lane id="Lane_Sistema_Delivery_05" name="Sistema de pedidos / delivery">
+        <bpmn:flowNodeRef>Start_Listo_Delivery</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Buscar_Repartidor</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Repartidor_Disponible</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Notificar_Demora</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Asignar_Ruta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Notificar_Salida</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Registrar_Cierre_Delivery</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Delivery_Entregado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Delivery_Incidencia</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Despacho_05" name="Despacho de tienda">
+        <bpmn:flowNodeRef>Task_Verificar_Pedido_Delivery</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Entregar_A_Repartidor</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Repartidor_05" name="Repartidor">
+        <bpmn:flowNodeRef>Task_Confirmar_Recojo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Transportar_Pedido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Cliente_Ubicable</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Entregar_Delivery</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Registrar_Incidencia_Delivery</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start_Listo_Delivery" name="Pedido listo para delivery" />
+    <bpmn:serviceTask id="Task_Buscar_Repartidor" name="Buscar repartidor disponible" />
+    <bpmn:exclusiveGateway id="Gateway_Repartidor_Disponible" name="¿Hay repartidor disponible?" />
+    <bpmn:serviceTask id="Task_Notificar_Demora" name="Notificar demora al cliente" />
+    <bpmn:serviceTask id="Task_Asignar_Ruta" name="Asignar repartidor y ruta" />
+    <bpmn:userTask id="Task_Verificar_Pedido_Delivery" name="Verificar pedido para salida" />
+    <bpmn:userTask id="Task_Entregar_A_Repartidor" name="Entregar pedido al repartidor" />
+    <bpmn:userTask id="Task_Confirmar_Recojo" name="Confirmar recojo en tienda" />
+    <bpmn:serviceTask id="Task_Notificar_Salida" name="Notificar salida a ruta" />
+    <bpmn:userTask id="Task_Transportar_Pedido" name="Transportar pedido al domicilio" />
+    <bpmn:exclusiveGateway id="Gateway_Cliente_Ubicable" name="¿Cliente ubicable?" />
+    <bpmn:userTask id="Task_Entregar_Delivery" name="Entregar pedido al cliente" />
+    <bpmn:userTask id="Task_Registrar_Incidencia_Delivery" name="Registrar incidencia logística" />
+    <bpmn:serviceTask id="Task_Registrar_Cierre_Delivery" name="Registrar cierre de delivery" />
+    <bpmn:endEvent id="End_Delivery_Entregado" name="Delivery entregado" />
+    <bpmn:endEvent id="End_Delivery_Incidencia" name="Delivery con incidencia" />
+    <bpmn:sequenceFlow id="Flow_01" sourceRef="Start_Listo_Delivery" targetRef="Task_Buscar_Repartidor" />
+    <bpmn:sequenceFlow id="Flow_02" sourceRef="Task_Buscar_Repartidor" targetRef="Gateway_Repartidor_Disponible" />
+    <bpmn:sequenceFlow id="Flow_03" name="No" sourceRef="Gateway_Repartidor_Disponible" targetRef="Task_Notificar_Demora" />
+    <bpmn:sequenceFlow id="Flow_04" sourceRef="Task_Notificar_Demora" targetRef="Task_Buscar_Repartidor" />
+    <bpmn:sequenceFlow id="Flow_05" name="Sí" sourceRef="Gateway_Repartidor_Disponible" targetRef="Task_Asignar_Ruta" />
+    <bpmn:sequenceFlow id="Flow_06" sourceRef="Task_Asignar_Ruta" targetRef="Task_Verificar_Pedido_Delivery" />
+    <bpmn:sequenceFlow id="Flow_07" sourceRef="Task_Verificar_Pedido_Delivery" targetRef="Task_Entregar_A_Repartidor" />
+    <bpmn:sequenceFlow id="Flow_08" sourceRef="Task_Entregar_A_Repartidor" targetRef="Task_Confirmar_Recojo" />
+    <bpmn:sequenceFlow id="Flow_09" sourceRef="Task_Confirmar_Recojo" targetRef="Task_Notificar_Salida" />
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_Notificar_Salida" targetRef="Task_Transportar_Pedido" />
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="Task_Transportar_Pedido" targetRef="Gateway_Cliente_Ubicable" />
+    <bpmn:sequenceFlow id="Flow_12" name="Sí" sourceRef="Gateway_Cliente_Ubicable" targetRef="Task_Entregar_Delivery" />
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_Entregar_Delivery" targetRef="Task_Registrar_Cierre_Delivery" />
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="Task_Registrar_Cierre_Delivery" targetRef="End_Delivery_Entregado" />
+    <bpmn:sequenceFlow id="Flow_15" name="No" sourceRef="Gateway_Cliente_Ubicable" targetRef="Task_Registrar_Incidencia_Delivery" />
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="Task_Registrar_Incidencia_Delivery" targetRef="End_Delivery_Incidencia" />
+  </bpmn:process>
+</bpmn:definitions>

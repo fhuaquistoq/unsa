@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" id="Definitions_Proceso_07" targetNamespace="http://unsa.edu.pe/bpmn/little-caesars">
+  <bpmn:collaboration id="Collaboration_Proceso_07">
+    <bpmn:participant id="Participant_Cliente_07" name="Cliente" />
+    <bpmn:participant id="Participant_Pasarela_07" name="Pasarela de pago" />
+    <bpmn:participant id="Participant_LittleCaesars_07" name="Little Caesars" processRef="Process_Postventa" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_Postventa" name="Gestión postventa de reclamos, devoluciones y compensaciones" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_Postventa">
+      <bpmn:lane id="Lane_Servicio_Cliente_07" name="Servicio al cliente / Tienda">
+        <bpmn:flowNodeRef>Start_Reclamo_Postventa</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Recibir_Reclamo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Revisar_Evidencia</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Reclamo_Elegible</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Requiere_Aprobacion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Definir_Resolucion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Tipo_Resolucion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Notificar_Rechazo</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Supervisor_07" name="Supervisor / Administración">
+        <bpmn:flowNodeRef>Task_Evaluar_Excepcion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Excepcion_Aprobada</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Sistema_POS_07" name="Sistema de pedidos / POS">
+        <bpmn:flowNodeRef>Task_Registrar_Ticket</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Consultar_Pedido_Original</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Call_Reentrega_Postventa</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Procesar_Reembolso</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Generar_Cupon</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Actualizar_Pago_Reembolso</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Notificar_Cierre</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Reclamo_Cerrado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Reclamo_Rechazado</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start_Reclamo_Postventa" name="Cliente presenta reclamo" />
+    <bpmn:userTask id="Task_Recibir_Reclamo" name="Recibir reclamo y evidencia" />
+    <bpmn:serviceTask id="Task_Registrar_Ticket" name="Registrar ticket de reclamo" />
+    <bpmn:serviceTask id="Task_Consultar_Pedido_Original" name="Consultar pedido y pago original" />
+    <bpmn:userTask id="Task_Revisar_Evidencia" name="Revisar evidencia y política" />
+    <bpmn:exclusiveGateway id="Gateway_Reclamo_Elegible" name="¿Reclamo elegible?" />
+    <bpmn:exclusiveGateway id="Gateway_Requiere_Aprobacion" name="¿Requiere aprobación?" />
+    <bpmn:userTask id="Task_Evaluar_Excepcion" name="Evaluar excepción o reembolso" />
+    <bpmn:exclusiveGateway id="Gateway_Excepcion_Aprobada" name="¿Excepción aprobada?" />
+    <bpmn:userTask id="Task_Definir_Resolucion" name="Definir resolución" />
+    <bpmn:exclusiveGateway id="Gateway_Tipo_Resolucion" name="¿Qué resolución aplica?" />
+    <bpmn:callActivity id="Call_Reentrega_Postventa" name="Generar reentrega" calledElement="Process_Preparacion_Calidad" />
+    <bpmn:serviceTask id="Task_Procesar_Reembolso" name="Procesar reembolso en pasarela" />
+    <bpmn:serviceTask id="Task_Actualizar_Pago_Reembolso" name="Actualizar pago reembolsado" />
+    <bpmn:serviceTask id="Task_Generar_Cupon" name="Generar cupón de compensación" />
+    <bpmn:serviceTask id="Task_Notificar_Cierre" name="Notificar resolución y cerrar ticket" />
+    <bpmn:serviceTask id="Task_Notificar_Rechazo" name="Notificar rechazo justificado" />
+    <bpmn:endEvent id="End_Reclamo_Cerrado" name="Ticket cerrado con resolución" />
+    <bpmn:endEvent id="End_Reclamo_Rechazado" name="Ticket cerrado por rechazo" />
+    <bpmn:sequenceFlow id="Flow_01" sourceRef="Start_Reclamo_Postventa" targetRef="Task_Recibir_Reclamo" />
+    <bpmn:sequenceFlow id="Flow_02" sourceRef="Task_Recibir_Reclamo" targetRef="Task_Registrar_Ticket" />
+    <bpmn:sequenceFlow id="Flow_03" sourceRef="Task_Registrar_Ticket" targetRef="Task_Consultar_Pedido_Original" />
+    <bpmn:sequenceFlow id="Flow_04" sourceRef="Task_Consultar_Pedido_Original" targetRef="Task_Revisar_Evidencia" />
+    <bpmn:sequenceFlow id="Flow_05" sourceRef="Task_Revisar_Evidencia" targetRef="Gateway_Reclamo_Elegible" />
+    <bpmn:sequenceFlow id="Flow_06" name="No" sourceRef="Gateway_Reclamo_Elegible" targetRef="Task_Notificar_Rechazo" />
+    <bpmn:sequenceFlow id="Flow_07" sourceRef="Task_Notificar_Rechazo" targetRef="End_Reclamo_Rechazado" />
+    <bpmn:sequenceFlow id="Flow_08" name="Sí" sourceRef="Gateway_Reclamo_Elegible" targetRef="Gateway_Requiere_Aprobacion" />
+    <bpmn:sequenceFlow id="Flow_09" name="Sí" sourceRef="Gateway_Requiere_Aprobacion" targetRef="Task_Evaluar_Excepcion" />
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_Evaluar_Excepcion" targetRef="Gateway_Excepcion_Aprobada" />
+    <bpmn:sequenceFlow id="Flow_11" name="No" sourceRef="Gateway_Excepcion_Aprobada" targetRef="Task_Notificar_Rechazo" />
+    <bpmn:sequenceFlow id="Flow_12" name="Sí" sourceRef="Gateway_Excepcion_Aprobada" targetRef="Task_Definir_Resolucion" />
+    <bpmn:sequenceFlow id="Flow_13" name="No" sourceRef="Gateway_Requiere_Aprobacion" targetRef="Task_Definir_Resolucion" />
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="Task_Definir_Resolucion" targetRef="Gateway_Tipo_Resolucion" />
+    <bpmn:sequenceFlow id="Flow_15" name="Reentrega" sourceRef="Gateway_Tipo_Resolucion" targetRef="Call_Reentrega_Postventa" />
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="Call_Reentrega_Postventa" targetRef="Task_Notificar_Cierre" />
+    <bpmn:sequenceFlow id="Flow_17" name="Reembolso" sourceRef="Gateway_Tipo_Resolucion" targetRef="Task_Procesar_Reembolso" />
+    <bpmn:sequenceFlow id="Flow_18" sourceRef="Task_Procesar_Reembolso" targetRef="Task_Actualizar_Pago_Reembolso" />
+    <bpmn:sequenceFlow id="Flow_19" sourceRef="Task_Actualizar_Pago_Reembolso" targetRef="Task_Notificar_Cierre" />
+    <bpmn:sequenceFlow id="Flow_20" name="Cupón" sourceRef="Gateway_Tipo_Resolucion" targetRef="Task_Generar_Cupon" />
+    <bpmn:sequenceFlow id="Flow_21" sourceRef="Task_Generar_Cupon" targetRef="Task_Notificar_Cierre" />
+    <bpmn:sequenceFlow id="Flow_22" sourceRef="Task_Notificar_Cierre" targetRef="End_Reclamo_Cerrado" />
+  </bpmn:process>
+</bpmn:definitions>
