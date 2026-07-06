@@ -1,0 +1,46 @@
+\begin{table}[t]
+\setlength{\tabcolsep}{1.5mm}
+% \renewcommand{\arraystretch}{1.1}
+\centering
+\caption{
+\textbf{Video question-answering offline en cuatro benchmarks de formato largo.}
+``Acc.'' denota accuracy, y
+``Score'' es la calificación de respuestas abiertas realizada por \texttt{gpt-3.5-turbo-0613} en una escala de 1 a 5.
+}
+\label{tab:sota}
+\footnotesize
+\resizebox{\linewidth}{!}{
+\begin{tabu}{l l l l ll}
+    \toprule
+    \multirow{2}{*}{Method} & MLVU & \textsc{QaEgo4D} & EgoSchema  & \multicolumn{2}{l}{ActivityNet-QA} \\
+    \cmidrule{2-6}
+     & dev Acc. & test Acc. & Acc. & Acc. & Score \\
+    \midrule   
+    \rowcolor[RGB]{235,235,235}
+    GPT-4V~\citep{gpt4v}             & 49.2 & - & -    & 57.0 & -    \\
+    \rowcolor[RGB]{235,235,235}
+    GPT-4o~\citep{gpt4o}          
+    & 64.6 & - & -    & -    & -    \\
+    \rowcolor[RGB]{235,235,235}
+    Gemini-1.5-Flash~\citep{gemini}  & -    & - & 65.7 & 55.3 & -    \\
+    \rowcolor[RGB]{235,235,235}
+    Gemini-1.5-Pro~\citep{gemini}    & -    & - & 72.2 & 57.5 & -    \\
+    \hdashline
+    
+    Video-ChatGPT-7B~\citep{video_chatgpt} & 31.3 & -    & -    & - & - \\
+    LLaMA-VID-7B~\citep{llamavid}    & 33.2 & -    & -    & 47.4 & 3.30 \\
+    MiniGPT4-Video-7B~\citep{minigpt4_video} & 44.5 & - & - & 44.3 & 3.35 \\
+    Video-LLaVA-7B~\citep{video_llava}   & 47.3 & -    & -    & - & - \\
+    LongVA-7B~\citep{longva}         & 56.3 & - & -    & 50.0 & -    \\
+    VideoStreaming~\citep{videostreaming} & - & - & 44.1 & - & - \\
+    Flash-VStream-7B~\citep{flashvstream} & 50.2 & 38.2 & 38.1 & 51.9 & 3.40 \\
+    \hdashline
+    
+    LLaVA-OV-0.5B~\citep{llava_onevision}     & 53.2 & 42.6 & 29.6 & 50.5 & 3.02 \\
+    \quad\textbf{+\ourmethod} \scriptsize(\retrieve{0.5}{64})              & \textbf{56.1}\plusvalue{2.9} & \textbf{50.0}\plusvalue{7.4} & \textbf{31.0}\plusvalue{1.4} & \textbf{52.1}\plusvalue{1.6} & \textbf{3.15}\plusvalue{.13} \\
+    LLaVA-OV-7B~\citep{llava_onevision}       & 64.7 & 52.8 & 59.8 & 56.6 & 3.29 \\
+    \quad\textbf{+\ourmethod} \scriptsize(\retrieve{0.5}{64})              & \textbf{68.5}\plusvalue{3.8} & \textbf{56.0}\plusvalue{3.2} & \textbf{60.7}\plusvalue{0.9} & \textbf{60.4}\plusvalue{3.8} & \textbf{3.52}\plusvalue{.23} \\
+    \bottomrule
+\end{tabu}
+}
+\end{table}

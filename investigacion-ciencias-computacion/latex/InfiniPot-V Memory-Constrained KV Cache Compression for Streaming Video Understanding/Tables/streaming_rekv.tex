@@ -1,0 +1,21 @@
+\begin{table}[t]
+    \small
+  \centering
+  \begin{tabular}{l c c c c c c c c c}
+    \toprule
+    & \multicolumn{2}{c}{\textbf{RVS-Ego}} & \multicolumn{2}{c}{\textbf{RVS-Movie}} & \textbf{Execution Time }
+    & \multicolumn{2}{c}{\textbf{Total Memory Usage}} \\ 
+    \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-6} \cmidrule(lr){7-8}
+       \textbf{LLaVA-OV-7B} & \textbf{Acc} & \textbf{Score} & \textbf{Acc} & \textbf{Score} & \textbf{Video Enc. (msec/Frame)} 
+      & \textbf{GPU} & \textbf{CPU} \\
+    \midrule
+    ReKV                   & 60.1 & 3.9 & 53.4 & 3.8  &  285.7  & 37.5 GB & + 18.8GB/h \\ \midrule
+    ReKV w/o off.       & 55.8 & 3.3 & 50.8 & 3.4  & 74.6  & 27.2 GB     & 0          \\
+    InfiniPot-V                   & \textbf{57.9} & \textbf{3.5} & \textbf{51.4} & \textbf{3.5}  & 76.3  & 27.8 GB     & 0          \\
+    \bottomrule
+  \end{tabular}
+  \vspace{2mm}
+  \caption{Comparación en benchmark de streaming frente a un método de control de caché KV basado en offloading. (ReKV) Video Enc. muestra el tiempo de ejecución por frame, GPU indica el uso pico de memoria y CPU denota el tamaño de la video KV-Cache descargada a CPU por hora. Resultados basados en un video de 1 hora procesado con una tasa de muestreo de 0.5 fps en modo streaming. \texttt{Se usa LLaVA-OV-7B.}}
+  \vspace{-.2in}
+  \label{tab:rvs_ego_performance}
+\end{table}

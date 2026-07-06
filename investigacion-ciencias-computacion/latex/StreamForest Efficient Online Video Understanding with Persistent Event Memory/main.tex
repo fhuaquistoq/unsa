@@ -1,0 +1,197 @@
+\pdfoutput=1
+\pdfminorversion=7
+
+\documentclass{article}
+
+
+% if you need to pass options to natbib, use, e.g.:
+\PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2025
+
+
+% ready for submission
+% \usepackage{neurips_2025}
+% \usepackage[preprint]{neurips_2025}
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+
+
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+\usepackage[final]{neurips_2025}
+
+
+% to avoid loading the natbib package, add option nonatbib:
+   % \usepackage[nonatbib]{neurips_2025}
+
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+
+% \usepackage[table]{xcolor}         % colors
+\usepackage{amsmath}
+\usepackage{multirow}
+% \usepackage{subfig}
+\usepackage{tikz}
+\usepackage{color}
+\usepackage{pifont}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{xspace}
+
+\usepackage{graphicx}
+\usepackage{caption} 
+\usepackage{subcaption}
+\usepackage{wrapfig}
+\captionsetup[table]{skip=3pt}
+
+\newcommand{\todo}[1]{\textcolor{red}{#1}}
+\newcommand{\eg}{\textit{e.g.}} % for example
+\newcommand{\ie}{\textit{i.e.}} % in other words
+\newcommand{\yes}{\ding{51}}
+\newcommand{\gyes}{\textcolor{black!30}{\ding{51}}}
+\newcommand{\no}{\ding{55}}
+\newcommand{\gno}{\textcolor{black!30}{\ding{55}}}
+
+\newcommand{\etal}{\emph{et al.}}
+\newcommand{\revision}[1]{\textcolor{black}{#1}}
+\def\cf{\emph{c.f}\onedot} \def\Cf{\emph{C.f}\onedot}
+\def\etc{\emph{etc}\onedot} \def\vs{\emph{vs}\onedot}
+\def\wrt{w.r.t\onedot} \def\dof{d.o.f\onedot}
+% \def\etal{\emph{et al}\onedot}
+%
+% --- inline annotations
+%
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\TODO}[1]{\textbf{\color{red}[TODO: #1]}}
+% --- disable by uncommenting  
+% \renewcommand{\TODO}[1]{}
+% \renewcommand{\todo}[1]{#1}
+
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{adjustbox}
+\usepackage{multirow}
+\usepackage{arydshln}
+\usepackage{colortbl}
+% \usepackage{bookmark}
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{tipa}
+\usepackage[T1, OT1]{fontenc}
+\DeclareTextSymbolDefault{\dh}{T1}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{color, colortbl}
+% \usepackage{subcaption}
+\usepackage{pifont}
+\usepackage{makecell}
+% \usepackage{paralist}
+\usepackage{threeparttable}
+% \usepackage[shortlabels]{enumitem}
+\usepackage{xcolor}
+\usepackage{scalerel}
+\usepackage{makecell}
+\usepackage{tabu}
+% \usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{marvosym}
+\usepackage{xcolor} 
+
+\definecolor{Gray}{gray}{0.5}
+\definecolor{LGray}{gray}{0.9}
+\definecolor{darkblue}{RGB}{94,110,186}
+\definecolor{darkGreen}{RGB}{92, 148, 110}
+\definecolor{myblue}{RGB}{14, 121, 178}
+\definecolor{rightpath}{RGB}{248, 203, 173}
+\definecolor{wrongpath}{RGB}{89, 89, 89}
+
+
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+
+\newcommand{\darkGreen}[1]{\textcolor{darkGreen}{#1}}
+
+
+
+
+\usepackage{tabulary}
+\usepackage{tabulary,multirow,overpic,xcolor}
+\newcolumntype{x}[1]{>{\centering\arraybackslash}m{#1pt}}
+\newcolumntype{y}[1]{>{\arraybackslash}m{#1pt}}
+
+\newcommand{\tablestyle}[2]{\setlength{\tabcolsep}{#1}\renewcommand{\arraystretch}{#2}\centering\footnotesize}
+% \usepackage[colorlinks,linkcolor=black,bookmarks=false]{hyperref}
+
+
+\title{StreamForest: Efficient Online Video Understanding with Persistent Event Memory}
+
+
+\author{Xiangyu Zeng$^{*1}$, Kefan Qiu$^{*1}$, Qingyu Zhang$^{*1}$, Xinhao Li$^{1}$, Jing Wang$^{1}$, Jiaxin Li$^{1}$ \\
+\textbf{Ziang Yan$^{3,2}$, Kun Tian$^{4}$, Meng Tian$^{5}$, Xinhai Zhao$^{4}$, Yi Wang$^{2}$, Limin Wang$^{\dagger1}$} \\
+\small$^1$Nanjing University ~~~ 
+\small$^2$Shanghai AI Laboratory ~~~
+\small$^3$Zhejiang University ~~~  \\
+\small$^4$Noah's Ark Lab, Huawei ~~~
+\small$^5$Yinwang Intelligent Tech. ~~~ \\
+\\
+{\small \url{https://github.com/MCG-NJU/StreamForest}}
+}
+
+\begin{document}
+
+
+\maketitle
+
+\renewcommand{\thefootnote}{}
+\footnotetext{$^*$ Equal contribution.}
+\footnotetext{$^{\dagger}$ Corresponding author.}
+
+\begin{abstract}
+Los Multimodal Large Language Models (MLLMs) han logrado recientemente avances notables en comprensión de video. Sin embargo, su efectividad en escenarios de streaming en tiempo real sigue siendo limitada debido a las restricciones de almacenamiento de características visuales históricas y al razonamiento espaciotemporal insuficiente en tiempo real. Para abordar estos desafíos, proponemos \textbf{StreamForest}, una arquitectura novedosa diseñada específicamente para comprensión de streaming video. En el centro de StreamForest se encuentra el Persistent Event Memory Forest, un mecanismo de memoria que organiza adaptativamente los video frames en múltiples estructuras arbóreas a nivel de evento. Este proceso está guiado por funciones de penalización basadas en distancia temporal, similitud de contenido y frecuencia de merge, permitiendo una retención eficiente de memoria a largo plazo bajo recursos computacionales limitados. Para mejorar la percepción en tiempo real, introducimos una Fine-grained Spatiotemporal Window, que captura señales visuales detalladas de corto plazo para mejorar la percepción de la escena actual. Además, presentamos \textbf{OnlineIT}, un dataset de instruction-tuning adaptado a tareas de streaming video. OnlineIT incrementa significativamente el rendimiento de los MLLMs tanto en percepción en tiempo real como en predicción futura. Para evaluar la generalización en aplicaciones prácticas, introducimos \textbf{ODV-Bench}, un nuevo benchmark centrado en comprensión de streaming video en tiempo real en escenarios de conducción autónoma. Los resultados experimentales demuestran que StreamForest alcanza rendimiento de estado del arte, con exactitudes de 77.3\% en StreamingBench, 60.5\% en OVBench y 55.6\% en OVO-Bench. En particular, incluso bajo compresión extrema de visual tokens (limitada a 1024 tokens), el modelo conserva el 96.8\% de su exactitud promedio en ocho benchmarks respecto a la configuración por defecto. Estos resultados subrayan la robustez, eficiencia y capacidad de generalización de StreamForest para comprensión de streaming video.
+\end{abstract}
+
+
+\input{paragraphs/1_Introduction}
+\input{paragraphs/2_Related_work}
+\input{paragraphs/3_Methodology}
+\input{paragraphs/4_Benchmark}
+\input{paragraphs/5_Experiments}
+\input{paragraphs/6_Conclusions}
+
+
+\clearpage
+
+\section*{Acknowledgement}
+This work is supported by the National Key R$\&$D Program of China (No. 2022ZD0160900), the Natural Science Foundation of Jiangsu Province (No. BK20250009), and the Collaborative Innovation Center of Novel Software Technology and Industrialization.
+
+{
+\small
+\bibliographystyle{plainnat}
+\bibliography{reference}
+}
+
+\clearpage
+
+\appendix
+\input{paragraphs/7_Appendix}
+
+% \clearpage
+
+% \input{paragraphs/8_Checklist}
+
+
+\end{document}

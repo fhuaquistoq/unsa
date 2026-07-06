@@ -1,0 +1,35 @@
+\begin{table}[t]
+\small
+  \centering
+  \begin{tabular}{l c c c c c c c c}
+    \toprule
+    \textbf{MLVU}$_\text{dev} $& \multicolumn{2}{c}{\textbf{Holistic Reasoning}} 
+    & \multicolumn{3}{c}{\textbf{Single Detail}} 
+    & \multicolumn{2}{c}{\textbf{Multi Detail}} \\
+    \cmidrule(lr){2-3} \cmidrule(lr){4-6} \cmidrule(lr){7-8}
+    \textbf{Ablation Study} 
+      & \textbf{Topic}  & \textbf{Anomaly} 
+      & \textbf{Plot}   & \textbf{Needle} 
+      & \textbf{Ego}    & \textbf{AO} 
+      & \textbf{AC}     & \textbf{Avg} \\
+    \midrule
+    Full KV           & 85.2 & 67.5 & 72.7 & 83.9 & 65.1 & 54.1 & 32.5 & 65.9 \\ \midrule
+    Uniform Select    & 83.7 & 66.5 & 67.9 & 76.1 & 58.5 & 51.0 & 27.2 & 61.5 \\ \midrule
+    TaR Reverse       & 79.0 & 64.5 & 56.9 & 65.6 & 55.1 & 45.2 & 21.8 & 55.5 \\
+    TaR Frame         & 82.9 & 66.0 & 67.0 & 78.9 & 63.6 & 51.0 & 31.1 & 62.9 \\
+    TaR               & 85.9 & 66.5 & 71.8 & 78.0 & 62.2 & 51.7 & 35.4 & \textbf{64.5} \\ \midrule
+    VaN Reverse       & 78.3 & 66.5 & 56.2 & 66.8 & 53.4 & 46.3 & 17.5 & 55.0 \\ 
+    VaN               & 84.4 & 68.0 & 68.6 & 76.6 & 61.9 & 52.5 & 29.1 & 63.0  \\ 
+    VaN + Pool        & 85.2 & 68.0 & 71.4 & 77.5 & 63.1 & 52.1 & 31.5 & \textbf{64.1} \\ \midrule
+    % TaP + VaN         & 84.0 & 67.0 & 71.1 & 79.2 & 61.9 & 51.7 & 31.6 & 63.8 \\
+    % TaP + 1D-VaN      & 84.4 & 67.0 & 71.2 & \textbf{80.9} & 62.1 & 52.1 & 33.0 & 64.4 \\
+    % TaP + 2D-VaN      & 85.9 & 67.5 & \textbf{72.9} & 79.4 & 62.2 & 52.9 & \textbf{35.9} & 65.3 \\ 
+    TaR + VaN + Pool   & 86.3 & 68.0 & 72.7 & 80.3 & 63.9 & 54.1 & 35.4 & \textbf{65.8} \\
+    \bottomrule
+    \vspace{1mm}
+  \end{tabular}
+  \caption{Estudio de ablación de TaR, VaN y su combinación. Experimentos realizados en MLVU usando \texttt{Qwen-2-VL-7B} con un presupuesto de memoria de 6K.}
+    \vspace{-.2in}
+\label{tab:ablate}
+\end{table}
+ 

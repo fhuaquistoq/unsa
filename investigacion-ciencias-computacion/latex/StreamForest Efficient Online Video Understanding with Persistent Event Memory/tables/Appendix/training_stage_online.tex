@@ -1,0 +1,90 @@
+\begin{table}[ht]
+    \centering
+    \setlength{\tabcolsep}{12pt}
+    \renewcommand{\arraystretch}{1.15}
+    
+    % 
+    \caption{Parameter settings for the fourth stage online fine-tuning and fifth dirve fine-tuning.}
+    
+    \resizebox{0.8\textwidth}{!}{%
+            
+        \begin{tabular}{@{}ll|c|c@{}}
+        \toprule
+         &  & \textbf{Stage 4} & \textbf{Stage5} 
+         \\ \midrule
+         
+        \multirow{3}{*}{\rotatebox[origin=c]{90}{\footnotesize \textit{Data}}} & \multirow{2}{*}{\textbf{Dataset}} & Image \& & Image \& 
+        \\
+        
+         &  & (Short/Long/Online)-Video & (Short/Long/Online)-Video 
+         \\
+         
+         & \#Samples & 0.4M \& 1.3M & 0.2M \& 0.5M
+         \\ \midrule
+         
+        \multirow{2}{*}{\rotatebox[origin=c]{90}{\footnotesize \textit{Model}}} & \textbf{Trainable} & Projector \& LLM & Projector \& LLM
+        \\
+        
+         & \#parameters & 7632.60MB & 7632.60MB 
+         \\ \midrule
+         
+        \multirow{3}{*}{\rotatebox[origin=c]{90}{\footnotesize \textit{Vision}}} & \textbf{Resolution} & 384$\times$384 & 384$\times$384 
+        \\
+        
+         & \textbf{Frames} & 2$\sim$512  & 2$\sim$512 
+         \\
+         
+         & \textbf{FPS} & 1 & 1 
+         \\ \midrule
+         
+        \multirow{6}{*}{\rotatebox[origin=c]{90}{\footnotesize \textit{Memory}}} & \textbf{Real-time Perception Qouta} & 729 & 729
+        \\
+        
+         & \textbf{Spatiotemporal Memory Quota} & 128 $\times$ 18 & 128 $\times$ 18
+         \\
+         
+         & \textbf{Total Visual Token Limits} & 8192 & 8192 
+         \\
+         
+         & \textbf{Similarity Penalty Weight} & 0.4 & 0.4 
+         \\
+         
+         & \textbf{Merge Count Penalty Weight} & 0.4 & 0.4 
+         \\
+         
+         & \textbf{Temporal Distance Penalty Weight} & 0.2 & 0.2 
+         \\ \midrule
+         
+        \multirow{9}{*}{\rotatebox[origin=c]{90}{\footnotesize \textit{Training}}} & \textbf{Batch Size} & 256 & 256 
+        \\
+        
+         & \textbf{LR} & 1 $\times 10^{-5}$ & 1 $\times 10^{-5}$ 
+         \\
+         
+         & \textbf{Epoch} & 1 & 1 
+         \\
+         
+         & \textbf{Optimizer} & AdamW & AdamW
+         \\
+         
+         & \textbf{Weight Decay} & 0 & 0
+         \\
+         
+         & \textbf{Warmup Ratio} & 0.03 & 0.03 
+         \\
+         
+         & \textbf{LR Schedule} & cosine & cosine 
+         \\
+         
+         & \textbf{Vision Select Layer} & -2 & -2 
+         \\
+         
+         & \textbf{GPU Nums} & 32 & 32
+         \\ \bottomrule
+         
+        \end{tabular}
+        
+    }
+    
+    \label{app:tab:training_strategy_online}
+\end{table}

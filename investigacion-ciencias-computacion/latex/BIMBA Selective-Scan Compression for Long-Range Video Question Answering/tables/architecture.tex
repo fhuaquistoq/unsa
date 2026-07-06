@@ -1,0 +1,20 @@
+\begin{table}[t]
+% \vspace{-5mm}
+\resizebox{0.5\textwidth}{!}{%
+\begin{tabular}{lccccc}
+\toprule
+Query Type   & \multicolumn{1}{c}{Norm} & \multicolumn{1}{c}{Bidirectional} & Interleaved & LLaVA   & LLaMA   \\
+\toprule
+Learnable   &   &   &  & 67.67 & 68.91 \\
+Average   &   &  &  & 68.61 & 70.56 \\
+Average     &      \cmark    &   &   & 69.85 & 71.16 \\
+Average   &         \cmark         &        \cmark  &   & 71.68 & 73.23 \\
+Average   &     \cmark     &   \cmark  & \cmark & \textbf{73.57} & \textbf{75.57}\\
+\bottomrule
+\end{tabular}
+}
+\vspace{-3mm}
+\caption{Ablations showing the effects of our design choices on NExT-QA. Average pooling initialization of the queries, layer normalization before token selection, bidirectional selective scan, and query interleaving elevate significantly the accuracy of \model.}
+\label{tab:architecture}
+\vspace{-5mm}
+\end{table}

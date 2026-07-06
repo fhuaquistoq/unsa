@@ -1,0 +1,14 @@
+\begin{table}[]
+\centering
+\small
+\caption{Resultados del estudio de ablación del pretraining de modelos \model con un teacher LMM basado en Transformer y una distillation loss.}
+\setlength\tabcolsep{6.5 pt}
+\begin{tabular}{@{}lclcccc@{}}
+\toprule
+\multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}Model D\\ + Distill\end{tabular}} & \multicolumn{6}{c}{$\lambda$ value in Stage 1 Training}                                                                                                            \\ \cmidrule(l){2-7} 
+                                                                             & \multicolumn{1}{c}{0}     & \multicolumn{1}{l}{0.001} & \multicolumn{1}{c}{0.01}  & \multicolumn{1}{c}{0.5}   & \multicolumn{1}{c}{1}     & 2     \\ \midrule
+G-VEval                                                                      & \multicolumn{1}{c}{82.19} & \multicolumn{1}{l}{81.05} & \multicolumn{1}{c}{80.68} & \multicolumn{1}{c}{73.69} & \multicolumn{1}{c}{63.65} & 47.61 \\ \bottomrule
+\end{tabular}
+\label{tab:ablation_distill}
+\vspace{-1em}
+\end{table}

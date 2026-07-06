@@ -1,0 +1,10 @@
+\begin{figure}[t]
+\centerline{\includegraphics[width=\linewidth]{figures/src/teaser.pdf}}
+\caption{
+\textbf{Descripción general de la tarea StreamingVQA y de nuestro \ourmethod propuesto.}
+(a) StreamingVQA requiere que un modelo procese continuamente flujos de video y responda preguntas sobre contenido previamente observado en cualquier momento. 
+(b) Proponemos \ourmethod~para mejorar la eficiencia y la precisión en StreamingVQA.
+Probado con \texttt{LLaVA-OV-7B} sobre una GPU H800 (80GB), \ourmethod~mantiene una latencia estable y un uso estable de memoria GPU, evitando errores de out-of-memory (OOM) a medida que aumenta el número de frames. También mejora la precisión en siete benchmarks de VideoQA de formato largo en comparación con la línea base de uniform sampling. Se proporcionan más detalles en la Sección~\ref{sec:experiments}.
+}
+\label{fig:teaser} 
+\end{figure}

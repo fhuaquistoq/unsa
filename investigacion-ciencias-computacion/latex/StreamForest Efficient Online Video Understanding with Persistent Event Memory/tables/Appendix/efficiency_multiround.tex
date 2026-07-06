@@ -1,0 +1,22 @@
+\begin{table}[h]
+    \centering
+    \setlength{\tabcolsep}{7pt}
+    \renewcommand{\arraystretch}{1.2}
+    
+    % 
+    \caption{Comparison of multi-round inference speed.}
+    
+    \resizebox{0.5\textwidth}{!}{%
+    
+    \begin{tabular}{l|cc}
+    \toprule
+    Method & Resolution & FPS \\ \midrule
+    Qwen2.5-VL & 384 & OOM \\
+    VideoLLM-Online & 384 & 12.3 \\
+    StreamForest (1k) & 384 & 9.9 \\ \bottomrule
+    \end{tabular}
+        
+    }
+    
+    \label{app:tab:efficiency_multiround}
+\end{table}

@@ -1,0 +1,28 @@
+
+\begin{table}[t]
+\centering
+\caption{Ablation of TransV choices.
+``uni\_7\_0.5-attn\_39\_0.9'' denota aplicar TransV uniforme en la 7ma capa con una tasa de descarte de $p=50\%$ y TransV guiado por atención en la 39na capa con $p=90\%$.
+``TDuni'' denotes uniform token dropping. }
+\scalebox{0.7}{
+\begin{tabular}{c|lc|cccc}
+\toprule
+& Method   & max frame    & VideoMME & VDC & Charades  \\
+\midrule
+1 & none    & 5k    &  58.8 & 39.8 & 40.5 \\
+\midrule
+
+2 & TDuni\_7\_0.5                & 8k     & 57.3    & 39.0    & 26.1 \\
+
+3 & uni\_7\_0.5& 8k  & 56.7 & 38.9 & 38.1 \\
+4 & uni\_2\_0.5& 9k  & 56.1  & 39.7 & 38.2 \\
+
+5 &uni\_7\_0.9 &  $>$10k &  53.4 & 37.9 & 34.6 \\
+\midrule
+6 & uni\_7\_0.5-uni\_39\_0.9     & $>$10k & 56.2 & 39.4 & 37.9 \\
+7 & uni\_7\_0.5-attn\_39\_0.9    & $>$10k & 56.6 & 39.1 & 37.9 \\
+\bottomrule
+\end{tabular}
+}
+\label{tab:abl_TransV_module}
+\end{table}

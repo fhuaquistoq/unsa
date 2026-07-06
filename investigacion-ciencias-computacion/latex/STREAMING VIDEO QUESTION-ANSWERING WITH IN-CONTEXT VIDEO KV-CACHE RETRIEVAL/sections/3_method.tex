@@ -1,0 +1,110 @@
+
+\section{StreamingVQA: Task Definition and Discussion} 
+\label{sec:task}
+
+This paper considers the problem of streaming video question-answering (\textbf{StreamingVQA}), where a model continuously processes a video stream and can respond to questions about past visual content at any moment. 
+In this section, we formally define the task and outline the design principles for our proposed solution.
+
+Given a video stream $\mathcal{V}^T := [v_1, v_2, ..., v_T]$ consisting of $T$ frames and a set of $N$ questions $\mathcal{Q} := \{q_1, q_2, \dots, q_N\}$,
+StreamingVQA aims to answer a question $q_i$ at any time step $t~(1 \le t \le T)$, using only the frames seen up to that point, $\mathcal{V}^t := [v_1, v_2, ..., v_t]$.
+
+
+\noindent\textbf{Discussion-I: StreamingVQA {\em vs.}~OfflineVQA.} StreamingVQA involves continuously analyzing an incoming video stream and answering questions based on the observed visual content at any moment. 
+In contrast, conventional video question-answering models~\citep{frozen_bilm,video_chatgpt,llava_next_video,llava_onevision} operate in an offline mode, referred to as OfflineVQA.
+The two paradigms differ in that: 
+1) StreamingVQA processes a continuous video stream, while OfflineVQA handles a predefined video input, and 
+2) StreamingVQA allows questions to be asked at any point during the stream, whereas OfflineVQA processes questions only after the entire video has been viewed.
+Notably, OfflineVQA can be considered a special case of StreamingVQA, where all questions are posed after the video is fully processed. 
+
+
+Conventional approaches typically employ a visual encoder~\citep{clip,siglip,fang2023eva} and a projection module~\citep{llava_next_video,blip2} to process video frames~($\mathcal{V}^t$).
+The output is concatenated with the tokenized question to form a sequence $[\mathcal{V}_t, q_i]$~\footnote{We maintain the original notation for simplicity.}, which is then passed to an LLMs to predict an answer.
+However, this approach is impractical due to the high computational cost associated with processing a large number of frames ($T$).
+
+
+A common workaround is sparse frame sampling~\citep{video_chatgpt, llava_next_video, llava_onevision}, 
+but this introduces new problems:
+(i) loss of critical visual information, leading to incomplete or inaccurate responses, and
+(ii) the need to reprocess frames for different questions, since questions asked at different time points require distinct frame samples. This becomes increasingly inefficient as $T$ and $N$ grow.
+
+Given these challenges, current OfflineVQA methods fall short when applied to StreamingVQA scenarios. Therefore, designing a new approach optimized for StreamingVQA is crucial to handling video streams more efficiently, enabling real-time question answering and unlocking more interactive video analysis applications.
+
+
+\noindent\textbf{Discussion-II: Design Principles for Efficient StreamingVQA.} 
+To tackle the aforementioned challenges, we can exploit the causal nature of the LLM decoder to avoid redundant computations and strike a balance between accuracy and speed. 
+During attention calculations, causal masking prevents the model from accessing future tokens, ensuring that video tokens are encoded independently of the questions. This allows us to \textit{decouple video encoding from question-answering}.
+
+For video encoding, we leverage the KV-Cache optimization to accelerate inference.
+However, as number of frames grows large, handling the massive number of video tokens becomes increasingly inefficient and may exceed the model’s capacity~\citep{lm_infinite,streamingllm}.
+To address this, we adopt a sliding-window attention mechanism~\citep{lm_infinite}, which limits the attention scope to only the most recent frames.
+
+Regarding question-answering, Video KV-Caches are stored and can be reused as context to answer different questions. 
+However, long video sequences produce a substantial amount of KV-Caches, leading to excessive GPU memory consumption, computational overhead, and unnecessary distractions if all are used.
+To address this, we introduce an efficient retrieval method that selects the most relevant video key-value vectors from the video KV-Caches. These selected vectors then serve as context, enabling efficient and scalable StreamingVQA.
+
+
+
+
+\section{
+\ourmethod: \underline{Re}trieve In-context Video \underline{KV}-Cache
+}
+\label{sec:method}
+
+This section introduces \textbf{\ourmethod}, an approach that integrates seamlessly with a Video-LLM to enable efficient StreamingVQA without requiring additional training.
+Overall, \ourmethod~efficiently encodes the video stream, maintains its KV-Caches, retrieves relevant caches based on the given question, and uses them for accurate question-answering.
+
+\input{figures/framework}
+
+We aim to enable Video-LLMs, trained on limited frames, 
+to perform StreamingVQA \textbf{without additional training}.
+As shown in Figure~\ref{fig:framework}, 
+the proposed \ourmethod~has three components: 
+video stream encoding, video KV-Cache retrieval, and question-answering using the retrieved key-value vectors.
+
+\noindent\textbf{Video Stream Encoding with Sliding-window Attention.} 
+We encode the video stream $\mathcal{V}^T$ incrementally, processing it chunk by chunk.
+At each step, the inputs include past key-value vectors $\mathbf{P} = \{(\mathbf{k}_j, \mathbf{v}_j)\}_{j=1}^{l_P}$ and the current tokens $\mathbf{X}=\{\mathbf{t}_{i+l_P}\}_{i=1}^{l_X}$, 
+where $l_P$ denotes the lengths of past key-values, and $l_X$ refers to the chunk size.
+The local key-value vectors within a window $l_L$ can thus be derived as 
+$\mathbf{L} = \mathbf{P}_{[l_P - l_L + 1 : l_P]}$.
+The attention calculation is then formulated as:
+\begin{equation}
+    \mathbf{O} = \text{Attn}\left(\mathbf{W_Q}\mathbf{X}, [\mathbf{L}_k, \mathbf{W_K}\mathbf{X}], [\mathbf{L}_v, \mathbf{W_V}\mathbf{X}]\right),
+    \label{equ:video_encoding}
+\end{equation}
+where $\mathbf{W_Q}$, $\mathbf{W_K}$, and $\mathbf{W_V}$ are the attention layer parameters, $\mathbf{L}_k$ and $\mathbf{L}_v$ correspond to the key and value vectors in $\mathbf{L}$. All video KV-Caches are stored for future retrieval. For extremely long videos, we manage memory constraints by offloading KV-Caches to RAM or disk, as in~\citep{infllm}.
+
+\noindent\textbf{External Video KV-Cache Retrieval.} 
+Here, we utilize an external CLIP-like model~\citep{clip, siglip} to retrieve question-relevant video KV-Cache, primarily as a baseline to assess whether retrieval can enhance VideoQA performance, as demonstrated in Section~\ref{sec:experiments}. 
+Specifically, a CLIP-like model transformers each video frame into a vector $\mathbf{v} = f_v(v) \in \mathrm{R}^D$, where $f_v$ represents the visual encoder, $D$ denotes the vector dimension. Similarly, the question is encoded as $\mathbf{q} = f_t(q) \in \mathrm{R}^D$, where $f_t$ is the text encoder. We then compute the cosine similarity between the embeddings of frame and question: 
+\begin{equation}
+    \text{Sim}(\mathbf{v}, \mathbf{q}) = \frac{\mathbf{v} \cdot \mathbf{q}}{\tau~||\mathbf{v}||~||\mathbf{q}||}
+    \label{equ:retrieval}
+\end{equation} 
+where $\tau$ is a learnable temperature parameter. This similarity is calculated at the frame level, rather than at the token level. Alternatively, we can group $b$ consecutive frames into blocks by averaging their frame vectors and then compute block-level similarity scores. Finally, the $r$ most relevant video frames or $\lceil r/b \rceil$ video blocks are retrieved. The corresponding video KV-Cache, denoted as $\mathbf{R}$, is subsequently loaded onto the GPU for question-answering.
+
+\noindent\textbf{Internal Video KV-Cache Retrieval.} Building on recent advancements in handling long sequences with LLMs~\citep{infllm, quickllama, em_llm}, we further explore using self-attention layers within Video-LLMs for retrieval. Similar to external retrieval, internal retrieval is still performed at the level of video frames or blocks.
+
+During video modeling, the average of the key vectors of a frame is computed as its representative frame vector: $\mathbf{v} = \frac{1}{N_f} \sum_{j=1}^{N_f} \mathbf{k}_j \in \mathrm{R}^{D'}$, where $N_f$ is the number of tokens per frame, and $\mathbf{k}_j$ is the $j$-th key vector. 
+To reduce computational overhead, we do not differentiate between attention heads and instead concatenate them into a single vector, with $D'$ as the resultant dimension. Similarly, the question vector is computed as $\mathbf{q} = \frac{1}{N_q} \sum_{k=1}^{N_q} \mathbf{q}_{k} \in \mathrm{R}^{D'}$, where $N_q$ is the number of tokens in the question, 
+and $\mathbf{q}_{k}$ is its $k$-th query vector. The similarity computation and video KV-Cache retrieval are identical to that of external retrieval, except that $\tau$ is set to 1.
+
+Note that, internal retrieval offers several advantages over external retrieval. 
+First, it operates independently within each self-attention layer, allowing different layers to retrieve different video blocks.\footnote{For simplicity, we omit the layer index in the above explanation.}
+This allows for a broader capture of video context. 
+Additionally, internal retrieval reuses already computed hidden representations and does not introduce extra parameters, which reduces the computational overhead compared to external retrieval.
+
+\noindent\textbf{Question-Answering Using Retrieved KV.} The retrieved Video KV-Caches serve as the context for video question-answering. Formally, the attention calculation is formulated as:
+\begin{equation}
+    \mathbf{O} = \text{Attn}\left(\mathbf{W_Q}\mathbf{X}, [\mathbf{R}_k, \mathbf{W_K}\mathbf{X}], [\mathbf{R}_v, \mathbf{W_V}\mathbf{X}]\right),
+    \label{equ:answer_generation}
+\end{equation} 
+where $\mathbf{X}$ represents either the question tokens or the current token being decoded, and $\mathbf{R}_k$ and $\mathbf{R}_v$ are the key and value vectors from the context, which includes the retrieved video, question, and previously generated tokens. 
+
+\noindent\textbf{Positional Encoding.}
+Our baseline Video-LLMs employ Rotary Position Embeddings (RoPE)~\citep{su2024roformer}, a commonly used relative positional encoding method.
+Our video streaming encoding process follows LM-Infinite~\citep{lm_infinite}, where RoPE operates normally within the local window but is constrained by a ``distance ceiling'' for more distant tokens. 
+For question-answering, we do not account for the original positions of the retrieved KV-Caches, as handling unseen distances among tokens presents significant challenges~\citep{lm_infinite}.
+Instead, we treat these retrieved tokens as regular consecutive tokens. 
+We also experimented with a static variation from Inf-LLM~\citep{infllm}, where all retrieved tokens are assigned the same position. 
+Our results show that applying standard RoPE to retrieved video tokens leads to better performance, likely due to the importance of capturing temporal information in video comprehension.

@@ -1,0 +1,18 @@
+\begin{wraptable}{r}{0.5\columnwidth}
+\scriptsize
+\begin{tabular}{c|c|c|cc@{}}
+\toprule
+Case & \makecell{$x_t$ Attention \\ Scoring} & \makecell{Prefill \\ $|M|$} & \makecell{Gen. \\ $|M|$ = 3K} & \makecell{Gen. \\ $|M|$ = 6K} \\ 
+\midrule
+Full KV & n/a & 25K & \multicolumn{2}{c}{68.75 (↑)} \\ \midrule
+Case 1 & $\text{Attn}(q \rightarrow x_{t})$ & 25K & 68.01 & 68.40 \\ \midrule
+\multirow{3}{*}{Case 2} & $\text{Attn}(q' \rightarrow x_{t})$ & \multirow{3}{*}{25K} & 60.35 & 63.42 \\ 
+                        & $\text{Attn}(q'' \rightarrow x_{t})$ & & 60.60 & 63.50 \\ 
+                        & $\text{Attn}(q_v \rightarrow x_{t})$ & & 60.32 & 62.28 \\ \midrule
+\textbf{Case 3} & $\text{Attn}(q_v \rightarrow x_{t})$ & 3K/6K & 57.55 & 59.98 \\ 
+\bottomrule
+\end{tabular}
+\caption{\textbf{Case study of Attention Scoring}: conducted on MLVU benchmark with \texttt{LLaVA-Next-Video-7B}. Note that memory-constrained setting (Case 3) shares the same budget during prefill and generation stages.}\label{tab:case_study}
+\vspace{-.15in}
+
+\end{wraptable}

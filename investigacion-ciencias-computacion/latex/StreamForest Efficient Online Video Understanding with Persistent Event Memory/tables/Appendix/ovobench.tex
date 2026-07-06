@@ -1,0 +1,257 @@
+\begin{table*}[ht]
+    \centering
+    \renewcommand{\arraystretch}{1.1}  % Increase row spacing
+    
+        \caption{{Resultados detallados de evaluación en OVO-Bench.}}
+        
+    \resizebox{1.0\textwidth}{!}{%
+        \begin{tabular}{lccccccccccccccccc}
+            \midrule\midrule
+            \multicolumn{1}{c|}{} &
+              \multicolumn{1}{l|}{} &
+              \multicolumn{7}{c|}{{Real-Time Visual Perception}} &
+              \multicolumn{4}{c|}{{Backward Tracing}} &
+              \multicolumn{4}{c|}{{Forward Active Responding}} &
+             \\ \cmidrule{3-17} 
+            \multicolumn{1}{c|}{\multirow{-2}{*}{{Model}}} &
+              \multicolumn{1}{l|}{\multirow{-2}{*}{{\# Frames}}} &
+              OCR &
+              ACR &
+              ATR &
+              STU &
+              FPD &
+              \multicolumn{1}{c|}{OJR} &
+              \multicolumn{1}{c|}{Avg.} &
+              EPM &
+              ASI &
+              \multicolumn{1}{c|}{HLD} &
+              \multicolumn{1}{c|}{Avg.} &
+              REC &
+              SSR &
+              \multicolumn{1}{c|}{CRR} &
+              \multicolumn{1}{c|}{Avg.} &
+              \multirow{-2}{*}{Overall Avg.} \\ \midrule
+            \multicolumn{1}{l|}{Human} &
+              \multicolumn{1}{c|}{-} &
+              93.96 &
+              92.57 &
+              94.83 &
+              92.70 &
+              91.09 &
+              \multicolumn{1}{c|}{94.02} &
+              \multicolumn{1}{c|}{93.20} &
+              92.59 &
+              93.02 &
+              \multicolumn{1}{c|}{91.37} &
+              \multicolumn{1}{c|}{92.33} &
+              95.48 &
+              89.67 &
+              \multicolumn{1}{c|}{93.56} &
+              \multicolumn{1}{c|}{92.90} &
+              92.81 \\ \midrule
+            \multicolumn{18}{l}{\textit{Proprietary MLLMs}} \\ \midrule
+            \multicolumn{1}{l|}{Gemini 1.5 Pro \cite{team2024gemini}} &
+              \multicolumn{1}{c|}{1fps} &
+              {85.91} &
+              {66.97} &
+              {79.31} &
+              {58.43} &
+              63.37 &
+              \multicolumn{1}{c|}{{61.96}} &
+              \multicolumn{1}{c|}{{69.32}} &
+              {58.59} &
+              {76.35} &
+              \multicolumn{1}{c|}{{52.64}} &
+              \multicolumn{1}{c|}{{62.54}} &
+              {35.53} &
+              {74.24} &
+              \multicolumn{1}{c|}{{61.67}} &
+              \multicolumn{1}{c|}{{57.15}} &
+              {63.00} \\
+            \multicolumn{1}{l|}{GPT-4o \cite{openai2024gpt4o}} &
+              \multicolumn{1}{c|}{64} &
+              69.80 &
+              64.22 &
+              71.55 &
+              51.12 &
+              {70.30} &
+              \multicolumn{1}{c|}{59.78} &
+              \multicolumn{1}{c|}{64.46} &
+              57.91 &
+              75.68 &
+              \multicolumn{1}{c|}{48.66} &
+              \multicolumn{1}{c|}{60.75} &
+              27.58 &
+              73.21 &
+              \multicolumn{1}{c|}{59.40} &
+              \multicolumn{1}{c|}{53.40} &
+              59.54 \\ \midrule
+            \multicolumn{18}{l}{\textit{Open-source Offline Video MLLMs}} \\ \midrule
+            \multicolumn{1}{l|}{LLaVA-Video-7B \cite{zhang2024llavavideo}} &
+              \multicolumn{1}{c|}{64} &
+              69.80 &
+              59.63 &
+              66.38 &
+              50.56 &
+              72.28 &
+              \multicolumn{1}{c|}{61.41} &
+              \multicolumn{1}{c|}{63.34} &
+              51.18 &
+              64.19 &
+              \multicolumn{1}{c|}{9.68} &
+              \multicolumn{1}{c|}{41.68} &
+              34.10 &
+              {67.57} &
+              \multicolumn{1}{c|}{60.83} &
+              \multicolumn{1}{c|}{{54.17}} &
+              53.06 \\
+            \multicolumn{1}{l|}{LLaVA-OneVision-7B \cite{li2024llavaov}} &
+              \multicolumn{1}{c|}{64} &
+              67.11 &
+              58.72 &
+              69.83 &
+              49.44 &
+              71.29 &
+              \multicolumn{1}{c|}{60.33} &
+              \multicolumn{1}{c|}{62.79} &
+              52.53 &
+              58.78 &
+              \multicolumn{1}{c|}{23.66} &
+              \multicolumn{1}{c|}{44.99} &
+              24.79 &
+              66.93 &
+              \multicolumn{1}{c|}{60.83} &
+              \multicolumn{1}{c|}{50.85} &
+              52.88 \\
+            \multicolumn{1}{l|}{Qwen2-VL-7B \cite{qwen2vl}} &
+              \multicolumn{1}{c|}{64} &
+              69.13 &
+              53.21 &
+              63.79 &
+              50.56 &
+              66.34 &
+              \multicolumn{1}{c|}{60.87} &
+              \multicolumn{1}{c|}{60.65} &
+              44.44 &
+              66.89 &
+              \multicolumn{1}{c|}{34.41} &
+              \multicolumn{1}{c|}{48.58} &
+              30.09 &
+              65.66 &
+              \multicolumn{1}{c|}{50.83} &
+              \multicolumn{1}{c|}{48.86} &
+              52.70 \\
+            \multicolumn{1}{l|}{InternVL2-8B \cite{chen2024internvl2}} &
+              \multicolumn{1}{c|}{64} &
+              68.46 &
+              58.72 &
+              68.97 &
+              44.94 &
+              67.33 &
+              \multicolumn{1}{c|}{55.98} &
+              \multicolumn{1}{c|}{60.73} &
+              43.10 &
+              61.49 &
+              \multicolumn{1}{c|}{27.41} &
+              \multicolumn{1}{c|}{44.00} &
+              25.79 &
+              57.55 &
+              \multicolumn{1}{c|}{52.92} &
+              \multicolumn{1}{c|}{45.42} &
+              50.05 \\
+            \multicolumn{1}{l|}{LongVU-7B \cite{shen2024longvu}} &
+              \multicolumn{1}{c|}{1fps} &
+              55.70 &
+              49.54 &
+              59.48 &
+              48.31 &
+              68.32 &
+              \multicolumn{1}{c|}{63.04} &
+              \multicolumn{1}{c|}{57.40} &
+              43.10 &
+              66.22 &
+              \multicolumn{1}{c|}{9.14} &
+              \multicolumn{1}{c|}{39.49} &
+              16.62 &
+              69.00 &
+              \multicolumn{1}{c|}{{60.00}} &
+              \multicolumn{1}{c|}{48.54} &
+              48.48 \\ \midrule
+            \multicolumn{18}{l}{\textit{Open-source Online Video MLLMs}} \\ \midrule
+            \multicolumn{1}{l|}{VideoLLM-online-8B \cite{chen2024videollmonline}} &
+              \multicolumn{1}{c|}{2fps} &
+              8.05 &
+              23.85 &
+              12.07 &
+              14.04 &
+              45.54 &
+              \multicolumn{1}{c|}{21.20} &
+              \multicolumn{1}{c|}{20.79} &
+              22.22 &
+              18.80 &
+              \multicolumn{1}{c|}{{12.18}} &
+              \multicolumn{1}{c|}{17.73} &
+              - &
+              - &
+              \multicolumn{1}{c|}{-} &
+              \multicolumn{1}{c|}{-} &
+              12.84 \\ 
+            \multicolumn{1}{l|}{Flash-VStream-7B \cite{zhang2024flashvstream}} &
+              \multicolumn{1}{c|}{1fps} &
+              25.50 &
+              32.11 &
+              29.31 &
+              33.71 &
+              29.70 &
+              \multicolumn{1}{c|}{28.80} &
+              \multicolumn{1}{c|}{29.86} &
+              36.36 &
+              33.78 &
+              \multicolumn{1}{c|}{5.91} &
+              \multicolumn{1}{c|}{25.35} &
+              5.44 &
+              {67.25} &
+              \multicolumn{1}{c|}{{60.00}} &
+              \multicolumn{1}{c|}{{44.23}} &
+              33.15 \\
+            \multicolumn{1}{l|}{Dispider-7B \cite{qian2025dispider}} &
+              \multicolumn{1}{c|}{1fps} &
+              {57.72} &
+              {49.54} &
+              {62.07} &
+              {44.94} &
+              {61.39} &
+              \multicolumn{1}{c|}{{51.63}} &
+              \multicolumn{1}{c|}{{54.55}} &
+              {48.48} &
+              {55.41} &
+              \multicolumn{1}{c|}{4.30} &
+              \multicolumn{1}{c|}{{36.06}} &
+              {18.05} &
+              37.36 &
+              \multicolumn{1}{c|}{48.75} &
+              \multicolumn{1}{c|}{34.72} &
+              {41.78} \\ \midrule
+            \multicolumn{1}{l|}{\textbf{StreamForest-7B (Ours)}} &
+              \multicolumn{1}{c|}{1fps} &
+              {68.46} &
+              {53.21} &
+              {71.55} &
+              {47.75} &
+              {65.35} &
+              \multicolumn{1}{c|}{60.87} &
+              \multicolumn{1}{c|}{61.20} &
+              {58.92} &
+              {64.86} &
+              \multicolumn{1}{c|}{32.26} &
+              \multicolumn{1}{c|}{52.02} &
+              {32.81} &
+              70.59 &
+              \multicolumn{1}{c|}{57.08} &
+              \multicolumn{1}{c|}{53.49} &
+              {55.57} \\ 
+            \midrule\midrule
+        \end{tabular}
+        }
+    \label{app:tab:OVOBench}
+\end{table*}

@@ -1,0 +1,38 @@
+\section{Introducción}
+\label{sec:introduction}
+
+En la literatura, las tareas de video understanding, 
+como action recognition~\citep{activitynet,something,kinetics}, 
+visual object tracking~\citep{got_10k,trackingnet}, 
+y video question-answering~\citep{msrvtt_qa,jang2017tgifqa,next_qa,li2024mvbench}, 
+se han centrado principalmente en clips cortos que duran desde unos pocos segundos hasta minutos. 
+Sin embargo, a medida que los modelos de visión encuentran cada vez más aplicaciones en escenarios del mundo real como robótica, vigilancia y transmisiones en vivo, la investigación en la comunidad de visión ha ido desplazándose gradualmente hacia la comprensión de flujos de video continuos, donde los contextos de largo plazo y la interacción en tiempo real son cruciales.
+
+En este trabajo, consideramos el problema de \textbf{streaming video question-answering (StreamingVQA)}. Como se muestra en la Figura~\ref{fig:teaser}(a),
+consiste en procesar continuamente flujos de video largos y responder con rapidez consultas sobre el contenido visual en cualquier momento. Puede considerarse una generalización del VideoQA offline estándar, donde el modelo procesa simultáneamente el video completo y todas las preguntas. Por definición, esta tarea de StreamingVQA presenta tres desafíos centrales: 
+(i) \textbf{Codificación eficiente de video:}
+a diferencia del VideoQA offline tradicional, donde los modelos tienen acceso al clip de video completo, StreamingVQA exige análisis en tiempo real de flujos continuos. Los modelos deben procesar eficientemente los frames entrantes sin acceso a frames futuros ni revisitas frecuentes a frames muy lejanos del pasado. (ii) \textbf{Preservación del contexto de video:} 
+para responder con precisión preguntas planteadas más tarde en el flujo, los modelos deben preservar información relevante de frames anteriores, lo que convierte la retención de contexto de largo plazo en un desafío clave. 
+(iii) \textbf{Respuesta en tiempo real:} 
+el modelo debe proporcionar respuestas precisas con una demora mínima, lo que requiere retrieval eficiente del contexto de video y question-answering rápido.
+
+Los Video-LLMs actuales a menudo tienen dificultades para codificar flujos de video largos debido al gran volumen de video tokens, lo que obliga a la mayoría de los modelos a procesar solo un subconjunto disperso de frames~\citep{video_chatgpt, llava_next_video, llava_onevision}. 
+Esto da como resultado longitudes de video limitadas o una pérdida significativa de información visual de grano fino. Aunque técnicas como average pooling~\citep{llamavid} y memory compression~\citep{wu2022memvit,wang2023memory,he2024ma,flashvstream,videostreaming} reducen el volumen de tokens, lo hacen a costa de perder detalles, particularmente en características visuales temporales y de bajo nivel que son esenciales para el question answering complejo.
+
+\input{figures/teaser}
+
+Para abordar estos desafíos, proponemos \textbf{\ourmethod} (\textbf{Re}trieve In-context Video \textbf{KV}-Cache), un framework que se integra de forma transparente con los Video-LLMs existentes~\citep{video_chatgpt, llava_next_video, llava_onevision} sin entrenamiento adicional. 
+Nuestro método emplea dos estrategias para agregar información temporal tanto de corto como de largo plazo. 
+Para el \textbf{contexto temporal de corto plazo}, 
+el modelo adopta atención causal con un mecanismo de ventana deslizante~\citep{lm_infinite}, donde los tokens atienden solo a un conjunto limitado de tokens precedentes durante la codificación.  
+Para el \textbf{recuerdo de información de largo plazo}, 
+habilitamos acceso dinámico a cualquier punto dentro de la secuencia de video mediante retrieval. 
+Específicamente, nuestro método conserva y reutiliza cálculos pasados (KV-Cache) para evitar procesamiento redundante mientras mejora el razonamiento de largo plazo sin sacrificar detalle. Para videos extremadamente largos, las KV-Caches pueden descargarse a RAM o disco para evitar desbordamiento de memoria.
+
+Para garantizar respuestas precisas y en tiempo real, recuperamos un número fijo de KV-Caches relevantes para la pregunta actual. Este diseño logra un equilibrio entre eficiencia y precisión al evitar la necesidad de procesar todos los frames pasados, mientras sigue accediendo a la información más crítica. Experimentamos con dos métodos de retrieval: uno que utiliza modelos externos tipo CLIP~\citep{clip, siglip} para matching semántico, y otro que aprovecha pesos de atención internos para un retrieval más rápido, más integrado y potencialmente más sólido~\citep{infllm, snapkv}.
+
+En resumen, {\ourmethod}~codifica eficientemente flujos de video largos, 
+preserva y recupera KV-Caches in-context para abordar video question-answering complejo. Además, {\ourmethod}~separa la codificación de video del question-answering en procesos distintos, mejorando aún más la eficiencia. Como se muestra en la Figura~\ref{fig:teaser}(b), {\ourmethod}~mejora la precisión de VideoQA mientras mantiene estable la latencia de inferencia y el uso de memoria a medida que aumenta el número de frames. 
+El resto del artículo se organiza de la siguiente manera: 
+la Sección~\ref{sec:related_work} proporciona una visión general de la literatura relevante. 
+La Sección~\ref{sec:method} formula la tarea de StreamingVQA y describe en detalle nuestro método propuesto. En la Sección~\ref{sec:experiments}, presentamos estudios de ablación y comparaciones para validar nuestro enfoque. En consecuencia, nuestro enfoque no solo mejora la precisión en benchmarks de VideoQA de formato largo, incluidos MLVU~\citep{mlvu}, \textsc{QAEgo4D$_\texttt{MC}$}~\citep{di2023groundvqa}, EgoSchema~\citep{egoschema} y ActivityNet-QA~\citep{activitynet_qa}, así como benchmarks de StreamingVQA~\citep{flashvstream}, sino que también reduce la latencia de inferencia y el uso de memoria. 

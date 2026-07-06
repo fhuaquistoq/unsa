@@ -1,0 +1,24 @@
+\begin{table}[t]
+\setlength{\tabcolsep}{1.8mm}
+% \renewcommand{\arraystretch}{1.15}
+\centering
+\caption{
+\textbf{Estudio de ablación sobre MLVU$_\texttt{dev-mc}$.}
+ Los experimentos se basan en \texttt{LLaVA-OV-7B}.
+}
+\label{tab:ablation_mlvu}
+\footnotesize
+\resizebox{\linewidth}{!}{
+\begin{tabular}{l c ccc c cc c cc c c}
+    \toprule
+    \multirow{2}{*}{Tarea} &\phantom{a}& \multicolumn{3}{c}{Single Detail} &\phantom{a}& \multicolumn{2}{c}{Multi Detail} &\phantom{a}& \multicolumn{2}{c}{Holistic} &\phantom{a}& \multirow{2}{*}{Prom.} \\
+    \cmidrule{3-5} \cmidrule{7-8} \cmidrule{10-11}
+                       && Needle & Ego  & PlotQA && Order & Count && Topic & Anomaly &&  \\
+    \midrule
+    Uniform Sampling    && 74.1   & 59.7 & 69.8   && 45.9  & 32.0  && 87.9  & 72.0    && 64.7 \\
+    External Retrieval  && 78.6   & 69.6 & 71.6   && 40.2  & 37.9  && 84.5  & 63.0    && 66.3 \\
+    Internal Retrieval  && 75.8   & 66.6 & 76.3   && 45.2  & 36.9  && 90.1  & 74.5    && 68.5 \\
+    \bottomrule
+\end{tabular}
+}
+\end{table}

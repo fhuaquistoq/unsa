@@ -1,0 +1,22 @@
+%
+% --- inline annotations
+%
+\usepackage[dvipsnames]{xcolor}
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\todo}[1]{{\color{red}#1}}
+\newcommand{\TODO}[1]{\textbf{\color{red}[TODO: #1]}}
+\newcommand{\weidi}[1]{{\textcolor{magenta}{weidi: #1} }}
+\newcommand{\DSZ}[1]{{\textcolor{blue}{#1}}}
+% \newcommand{\DSZ}[1]{{#1}}
+% --- disable by uncommenting  
+% \renewcommand{\TODO}[1]{}
+% \renewcommand{\todo}[1]{#1}
+
+\definecolor{mygreen}{RGB}{29, 177, 0}
+\definecolor{darkgreen}{rgb}{0.0, 0.5, 0.0}
+
+\def\ourmethod{ReKV}
+
+\newcommand{\plusvalue}[1]{\hspace{0.2em}\textcolor{darkgreen}{\textbf{\scriptsize{(+#1)}}}}
+\newcommand{\minusvalue}[1]{\hspace{0.2em}\textcolor{red}{\textbf{\scriptsize{(-#1)}}}}
+\newcommand{\retrieve}[2]{#1 FPS $\to$ #2 Frames}

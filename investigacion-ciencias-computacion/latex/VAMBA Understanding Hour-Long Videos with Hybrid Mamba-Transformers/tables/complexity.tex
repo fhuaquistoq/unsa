@@ -1,0 +1,18 @@
+\begin{table}[]
+\centering
+\small
+\caption{Complejidad teórica de tiempo y memoria para LMMs basados en Transformer y \model en pre-filling. $M$ y $N$ representan el número de vision y text tokens. $d$ denota la dimensión oculta.}
+% , C is a small constant. In hour-long video benchmarks, we have $M \gg N \approx d$, $M$ could be at least 100x larger than $N$. }
+\setlength\tabcolsep{7 pt}
+\begin{tabular}{l|c|c}
+\toprule
+Model                  & Time Complexity & Memory Complexity \\ \midrule
+Transformer            &     $O(d(M+N)^2)$             &   $O((M+N)^2)$             \\
+\model                 &   $O(dMN+d^2 M)$              &   $O(MN)$                \\
+% \midrule
+% $\text{Ratio} = \frac{\text{\model}}{\text{Transformer}}$  &   $O(\frac{N + d}{M + 2N + C})$   &   $O(\frac{N}{M + 2N + C})$  \\
+\bottomrule
+\end{tabular}
+\label{tab:complexity}
+\vspace{-1.5em}
+\end{table}

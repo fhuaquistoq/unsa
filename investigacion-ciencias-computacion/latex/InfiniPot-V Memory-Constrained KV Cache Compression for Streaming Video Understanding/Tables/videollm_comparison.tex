@@ -1,0 +1,30 @@
+\begin{table}[t]
+\small
+  \centering
+  \label{tab:video_qa_comparison}
+  \begin{tabular}{l c c c c c c c}
+    \toprule
+    \textbf{Method}                 & \textbf{Size} & \textbf{\# Frames} & \textbf{Budget} & \textbf{EgoSchema} & \textbf{MLVU} & \textbf{VideoMME} & \textbf{LVB} \\
+    Max Duration               &               &                    &             \textbf{$|M|$}    & 3\,min           & 120\,min           & 60\,min          & 60\,min     \\
+    \midrule
+    GPT4-V*                         & –             & 1fps              & –                       & 55.6               & –            & 60.7              & –           \\
+    GPT4-o*                         & –             & 1fps              & –                       & 72.2               & 66.2         & 77.2              & 66.7        \\ \midrule
+    % Gemini-2.5 Pro*                 & –             & –                  & –                       & –                  & –            & 84.8              & –           \\
+    % Video-LLaVA*                    & 7B           & 8                  & 4K                     & 38.4               & 47.3         & 40.4              & 37.6        \\
+    LLaVA-OV*                       & 7B           & 32                 & 8K                     & 60.1               & 64.7         & 58.2              & –           \\
+    LongVU*                         & 7B           & 1fps              & 8K                     & 67.6               & 65.4         & 60.6              & –           \\
+    LongVU*             & 3B           & 1fps              & 8K                     & 59.1               & 55.9         & 51.5              & –           \\
+    \midrule
+    Qwen-2-VL                       & 7B           & 768                & 50K                    & 65.2              & 65.8        & 63.9             & 58.8       \\
+\mscellt Qwen-2-VL + \textbf{Ours}                & 7B           & 768                & 6K                     & 65.6                  & 65.8        & 62.8             & 58.4       \\
+    LLaVA-Next                      & 7B           & 128                & 25K                    & 67.6               & 68.7        & 62.8             & 63.5       \\
+\mscellt    LLaVA-Next + \textbf{Ours}               & 7B           & 128                & 6K                     & 65.8                  & 65.2        & 61.1             & 60.9       \\
+    Qwen-2.5-VL                     & 3B           & 768                & 50K                    & 64.4               & 63.3        & 60.3             & 59.9       \\
+\mscellt Qwen-2.5-VL + \textbf{Ours}                & 3B           & 768                & 6K                     & 61.8                   & 62.1        & 59.3             & 56.5       \\
+    \bottomrule
+  \end{tabular}
+  \vspace{2mm}
+    \caption{Comparación de la exactitud de varios MLLMs en cuatro benchmarks de Offline Video Understanding (OVU). * denota cifras tomadas del artículo oficial.}
+   \label{tab:open-source}
+   % \vspace{-.2in}
+\end{table}

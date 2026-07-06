@@ -1,0 +1,77 @@
+\clearpage
+\setcounter{page}{1}
+\maketitlesupplementary
+
+
+\section{Detalles adicionales de implementación}
+\label{sec:additional_implementation}
+Usamos 8 GPUs NVIDIA A800 80G para entrenar nuestros modelos tanto en el estudio de ablación como en el entrenamiento a gran escala. Para los estudios de ablación, la learning rate se fija en 1e-5 para el preentrenamiento y 1e-7 para el instruction-tuning. Además, realizamos una búsqueda de hiperparámetros y encontramos que fijar la learning rate en 5e-6 durante el instruction-tuning funciona mejor para \model en múltiples benchmarks. Por ello, establecemos la learning rate en 1e-5 para el preentrenamiento y en 5e-6 para el instruction tuning en el entrenamiento a gran escala. Empleamos una programación de learning rate cosenoidal en todas las etapas de entrenamiento, tanto en los estudios de ablación como en el entrenamiento a gran escala. El batch size de entrenamiento se fija en 128. Empleamos métodos de optimización como Flash-Attention 2 \cite{dao2023flashattention}, DeepSpeed ZeRO-3 \cite{rajbhandari2020zero} y gradient checkpointing \cite{chen2016training} para reducir el costo de entrenamiento, y aplicamos sequence parallelism para empaquetar múltiples muestras en una sola secuencia durante el entrenamiento en ambas etapas.
+
+\section{Detalles de evaluación del modelo}
+En esta sección, brindamos más detalles sobre la evaluación de \model y de los modelos de referencia seleccionados.
+
+\subsection{Baseline Models}
+
+\textbf{Qwen2-VL} \cite{wang2024qwen2} is an LMM that uses the Qwen2 LLM as its backbone and a DFN-derived Vision Transformer with 2D RoPE positional embedding. It is pretrained on a vast 1.4T-token multimodal corpus composed of image-text pairs, OCR text (images of text), interleaved image–text web articles, visual QA data, video dialogues, and image-based knowledge datasets. The pre-training is staged: 600B tokens for vision-language alignment followed by 800B tokens mixing richer image–text content and VQA/multitask data, alongside continued pure text to maintain language skills. Finally, Qwen2-VL is instruction-tuned via ChatML-format dialogs that span multiple modalities, e.g. document parsing, comparisons of two images, long video understanding, and even agent-oriented visual tasks.
+
+\noindent\textbf{LLaVA-Mini} \cite{zhang2025llava} is a compact multimodal model built on a 7–8B Vicuna LLM with a CLIP ViT-based vision encoder. It uses the same training data as LLaVA-1.5 \cite{liu2024improved}: about 558K image–caption pairs for initial vision–language pre-training and 665K image-grounded instruction examples for fine-tuning. The pre-training stage aligns visual features to text using caption datasets like COCO \cite{chen2015microsoft} and VisualGenome-based \cite{krishna2017visual} captions, while the instruction-tuning stage uses multimodal dialogues. An enhanced variant of LLaVA-Mini further incorporates 100K video-based instruction samples from Video-ChatGPT \cite{maaz2023video} and other open sources, combined with the original 665K image instructions (total ~3M training instances) to extend its capability to video understanding.
+
+\noindent\textbf{LongLLaVA} \cite{wang2024longllava} extends LLaVA \cite{liu2024improved} to handle very long visual contexts by using a hybrid Transformer–Mamba architecture with a Jamba-9B backbone for language. It follows a three-stage training process, including a single-image feature alignment on Allava-Caption \cite{chen2024allava} and ShareGPT4V \cite{chen2024sharegpt4v}, a single-image instruction fine-tuning on LLava-1.5 and Mantis-Single \cite{jiang2024mantis}, and multi-image instruction fine-tuning on VideoChat2 \cite{li2023videochat} and ShareGPT4Video \cite{chen2025sharegpt4video}. By progressively increasing the number of images per sample, LongLLaVA learns temporal and spatial dependencies and can efficiently handle input sequences up to around 1000 images. 
+
+\noindent\textbf{LongVU} \cite{shen2024longvu} is a multimodal model geared toward long video understanding. It first learns from 3.2 million image–text pairs via a single-image training stage using the LLaVA-OneVision dataset \cite{li2024llavaov}. It then leverages a subset of VideoChat2-IT \cite{li2023videochat} that contains around 0.55M videos, 1K video-classification clips from Kinetics-710 \cite{carreira2019short}, and about 85K multimodal video instruction dialogues from the ShareGPT4Video \cite{chen2025sharegpt4video}.  Additionally, the MovieChat long-video dialogue data \cite{song2024moviechat} is used to provide hour-length conversational examples. This rich training mix enables LongVU to handle extended videos by adaptively compressing frames while preserving essential visual details.
+
+\noindent\textbf{Video-XL} \cite{shu2024video} employs an LLaMA-based 7B language model and a CLIP ViT-L vision encoder, and it is trained entirely on image-based data despite targeting long videos. Its two-stage training first performs projection-layer pre-training on 2M image–text pairs from Laion-2M \cite{schuhmann2021laion} to align visual features with the text space. It then undergoes visual instruction tuning on roughly 695K image-grounded instruction samples from Bunny-695k \cite{he2024efficient}, where the model learns to follow image-based instructions. The training approach lets Video-XL handle hour-long videos in context by compressing visual tokens, achieving strong results on benchmarks for long video comprehension.
+
+\subsection{Evaluation Benchmarks}
+
+\noindent\textbf{LVBench} \cite{wang2024lvbench} is a benchmark designed to test the ability of video LMMs to comprehend extremely long videos. It contains 1,549 question-answer pairs, with an average video length of 4,101 seconds. The evaluation focuses on six fundamental aspects: temporal grounding, which involves identifying specific moments in a video; video summarization, which assesses the model's ability to condense key information; video reasoning, which tests logical inference from video content; entity recognition, which identifies people, objects, or places; event understanding, which captures the sequence and significance of events; and key information retrieval, which ensures the model extracts crucial details. The full test set is used for evaluation.
+
+\noindent\textbf{HourVideo} \cite{chandrasegaran2025hourvideo} is a benchmark dataset for long-form video-language understanding, focusing on videos up to one hour in length. It consists of 500 carefully selected first-person videos sourced from the Ego4D \cite{grauman2022ego4d} dataset, with each video ranging from 20 to 120 minutes in duration. The dataset includes 12,976 human-annotated multiple-choice questions covering four major task categories: summarization, perception, visual reasoning, and navigation. HourVideo is designed to challenge models in long-context reasoning and multimodal comprehension across extended video timelines. Benchmark results reveal that existing multimodal models, such as GPT-4 and LLaVA-NeXT, perform only marginally better than random chance, while human experts achieve an accuracy of 85.0\%. This highlights the dataset's difficulty and the current gap in long-video understanding capabilities.
+
+\noindent\textbf{Video-MME} \cite{fu2024video} is a benchmark specifically designed to evaluate how well LMMs can analyze video content. It features a dataset of 900 videos and 2700 questions, covering six different visual domains. The questions are grouped based on video length into short, medium, and long categories, with median durations of 26 seconds, 164.7 seconds, and 890.7 seconds, respectively. The benchmark supports two evaluation methods: (1) the “w/ subtitle” setting, where both subtitles and questions are provided as text inputs, and (2) the “w/o subtitle” setting, which relies only on raw video inputs alongside the questions. Our study primarily focuses on the “w/o subtitle” format to enhance long video comprehension by leveraging video-based augmentation rather than textual cues from subtitles.
+
+\noindent\textbf{MLVU} \cite{zhou2024mlvu} is a benchmark designed to assess long video understanding across various tasks and video genres. It includes two types of questions: multiple-choice and freeform generation. The evaluation framework measures LMM performance in three key aspects: (1) holistic video understanding, which requires comprehending the entire video for global context; (2) single-detail video understanding, which focuses on recognizing key moments or short segments; and (3) multi-detail video understanding, which involves drawing connections between multiple short clips within the video. Our paper specifically reports accuracy scores for multiple-choice questions from the MLVU development set.
+
+\noindent\textbf{LongVideoBench} \cite{wu2025longvideobench} is a question-answering benchmark designed for interleaved long video-text input. It includes 3,763 videos and 6,678 human-annotated multiple-choice questions covering 17 fine-grained categories. The benchmark supports two evaluation formats: (1) the standard format, where video tokens are processed first, followed by the question descriptions, and (2) the interleaved video-text format, where subtitles are inserted between video frames. We evaluate all baseline models and our \model using the standard input format. The reported results are based on the validation split.
+
+\noindent\textbf{NExT-QA} \cite{xiao2021next} is a video question-answering benchmark designed to evaluate reasoning-based video understanding. It consists of 5,440 videos and approximately 52,000 human-annotated question-answer pairs, covering a diverse range of real-world activities. The dataset includes two types of question formats: multiple-choice questions and open-ended free-form questions. NExT-QA emphasizes causal and temporal reasoning, requiring models to understand event sequences, cause-effect relationships, and interactions within videos. The dataset is divided into three categories: causal, temporal, and descriptive questions. The dataset is split into training (3,870 videos), validation (570 videos), and test (1,000 videos), ensuring standardized benchmarking.
+
+\noindent\textbf{MVBench} \cite{li2024mvbench} is a comprehensive multimodal video understanding benchmark. The dataset introduces a novel static-to-dynamic task transformation, converting existing static image tasks into video-based challenges, assessing a model's ability to perform both low-level perception and high-level cognitive reasoning over time. MVBench automatically converts annotations from 11 publicly available video datasets into unified multiple-choice question-answer pairs, covering diverse scenarios ranging from first-person to third-person perspectives and indoor to outdoor environments. Each question presents five answer choices, ensuring standardized evaluation through human-verified ground truth responses.
+
+\noindent\textbf{DREAM-1K} \cite{wang2024tarsier} is a video description dataset designed for fine-grained event and motion understanding. It contains 1,000 short videos, each averaging 9 seconds, and covers a diverse set of real-world and cinematic scenarios. Unlike question-answering datasets, DREAM-1K requires models to generate detailed multi-sentence descriptions that capture all key actions, interactions, and temporal sequences within each video. The dataset includes videos from five different sources—live-action movies, animated films, stock footage, long YouTube videos, and short-form social media clips—ensuring broad coverage of visual styles. DREAM-1K prioritizes event-based reasoning, expecting models to understand sequential actions, motion cues, and interactions rather than just static descriptions. Evaluation is conducted using AutoDQ (Automatic Description Quality), which measures how well generated descriptions align with reference descriptions by comparing extracted events.
+
+
+
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=1\textwidth]{figures/case_study_2.pdf}
+  % \vspace{-1em}
+  \caption{Additional qualitative results for \model.}
+  \label{fig:case_study_2}
+  % \vspace{-1.5em}
+\end{figure*}
+
+\section{Comparison with Contemporary Work}
+Several contemporary works also investigate hybrid Mamba-Transformer models for long video understanding. For example, STORM \cite{jiang2025token} and BIMBA \cite{islam2025bimba} utilize Mamba blocks between the vision encoder and LMM decoder as additional processing and compression modules for video tokens, achieving high performance in long video understanding. However, different from \model, the overall architecture of the LMM remains unchanged in these methods, with the decoder still relying on full causal self-attention layers for both text and video tokens. As a result, the model architectures proposed in these methods offer limited gains in training and inference efficiency, with any speedup in video processing still primarily attributed to token reduction. In comparison, \model directly employs Mamba-2 layers in the LMM decoder and bypasses the self-attention updates for video tokens. This design enables highly efficient video processing even without reducing the number of tokens.
+
+\begin{table}[h!]
+\centering
+\small
+\caption{Quantitative results for \model with token reduction.}
+\setlength\tabcolsep{3 pt}
+\begin{tabular}{@{}l|c|ccc@{}}
+\toprule
+Models    & GPU Mem (MB)                  & LVBench                     & VideoMME                     & MLVU                     \\ \midrule
+\model    & 45791                         & 42.4                        & 57.4                         & 65.9                     \\
+\model-TR & 33847                         & 41.6                        & 56.9                         & 66.5                     \\ \bottomrule
+\end{tabular}
+\vspace{-10pt}
+
+\label{tab:token_reduction}
+\end{table}
+
+\section{Combining \model and Token Reduction}
+As mentioned in the paper, we expect \model to be compatible with token reduction, and combining \model and token reduction can potentially result in similar performance and even higher efficiency. We provide some preliminary results for combining \model and token reduction in this section. As shown in Table~\ref{tab:token_reduction}, we can simply uniformly drop 50\% of the video tokens during inference (denoted as \model-TR) and achieve little performance drop across multiple benchmarks with better efficiency. We believe finetuning \model with token reduction can further preserve its capacity and leave this as a future work.
+
+\section{Additional Qualitative Results}
+In this section, we showcase more qualitative results from our \model for detailed video captioning and video event understanding. The results are shown in Figure~\ref{fig:case_study_2}.

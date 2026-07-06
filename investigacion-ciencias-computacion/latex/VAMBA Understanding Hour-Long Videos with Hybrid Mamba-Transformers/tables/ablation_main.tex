@@ -1,0 +1,17 @@
+\begin{table}[]
+\centering
+\small
+\caption{Resultados del estudio de ablación para las exploraciones del espacio de diseño de \model. ``CA from SA?'' indica si los pesos de cross-attention se inicializan a partir de capas self-attention. ``VidMME'' representa el benchmark Video-MME.}
+\setlength\tabcolsep{1.5 pt}
+\begin{tabular}{@{}ccccccc@{}}
+\toprule
+\multirow{4}{*}{\begin{tabular}[c]{@{}c@{}}Model\\ ID\end{tabular}} & \multirow{4}{*}{\begin{tabular}[c]{@{}c@{}}CA\\ from\\ SA?\end{tabular}} & \multirow{4}{*}{\begin{tabular}[c]{@{}c@{}}Mamba\\ Block\\ Type\end{tabular}} & Stage 1 & \multicolumn{3}{c}{Stage 2}                                     \\ \cmidrule(l){4-7} 
+                                                                    &                                                                          &                                                                               & G-VEval     & \multicolumn{1}{c}{LVBench} & \multicolumn{1}{c}{VidMME}    & MVBench \\ \cmidrule(l){4-7} 
+                                                                    &                                                                          &                                                                               & ref. free   & \multicolumn{1}{c}{test}    & \multicolumn{1}{c}{w/o sub.} & test    \\ \midrule
+A                                                                   & \xmark                                                                        & N/A                                                                           & 75.7        & \multicolumn{1}{c}{23.7}    & \multicolumn{1}{c}{47.6}         & 40.9    \\
+B                                                                   & \cmark                                                                        & N/A                                                                           & 81.0        & \multicolumn{1}{c}{34.2}    & \multicolumn{1}{c}{51.7}         & 51.8    \\
+C                                                                   & \cmark                                                                        & Mamba                                                                         & 81.8        & \multicolumn{1}{c}{34.2}        & \multicolumn{1}{c}{53.4}             & 53.5        \\
+D                                                                   & \cmark                                                                        & Mamba-2                                                                       & 82.2        & \multicolumn{1}{c}{35.3}    & \multicolumn{1}{c}{54.1}         & 53.5    \\ \bottomrule
+\end{tabular}
+\label{tab:ablation_main}
+\end{table}

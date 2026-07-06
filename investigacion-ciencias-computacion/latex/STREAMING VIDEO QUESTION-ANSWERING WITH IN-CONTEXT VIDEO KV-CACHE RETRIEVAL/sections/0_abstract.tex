@@ -1,0 +1,8 @@
+\begin{abstract}
+
+Proponemos \textbf{\ourmethod}, un nuevo enfoque training-free que habilita el question-answering eficiente sobre video en streaming (StreamingVQA),
+mediante una integración transparente con los Video Large Language Models (Video-LLMs) existentes.
+Los sistemas tradicionales de VideoQA tienen dificultades con videos largos, ya que deben procesar videos completos antes de responder consultas, y repetir este proceso para cada nueva pregunta. En contraste, nuestro enfoque analiza videos largos de manera streaming, lo que permite respuestas rápidas tan pronto como se reciben las consultas del usuario. A partir de un Video-LLM común, primero incorporamos un mecanismo de atención de ventana deslizante, garantizando que los frames de entrada atiendan a un número limitado de frames previos, reduciendo así la sobrecarga computacional.
+Para evitar la pérdida de información, almacenamos las key-value caches (KV-Caches) de video procesadas en RAM y disco, recargándolas en la memoria GPU cuando es necesario. Además, introducimos un método de retrieval que aprovecha un retriever externo o los parámetros internos de los Video-LLMs para recuperar solo las KV-Caches relevantes para la consulta, garantizando tanto eficiencia como precisión en el question-answering. \ourmethod~permite separar la codificación de video y el question-answering en distintos procesos y GPUs, mejorando significativamente la eficiencia de StreamingVQA. Mediante una experimentación exhaustiva, validamos la eficacia y la practicidad de nuestro enfoque, que incrementa notablemente la eficiencia y mejora la aplicabilidad frente a los modelos VideoQA existentes.
+    
+\end{abstract}

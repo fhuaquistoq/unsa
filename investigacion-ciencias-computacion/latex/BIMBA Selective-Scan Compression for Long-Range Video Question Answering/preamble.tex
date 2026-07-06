@@ -1,0 +1,35 @@
+%
+% --- inline annotations
+%
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\todo}[1]{{\color{red}#1}}
+\newcommand{\TODO}[1]{\textbf{\color{red}[TODO: #1]}}
+% --- disable by uncommenting  
+% \renewcommand{\TODO}[1]{}
+% \renewcommand{\todo}[1]{#1}
+
+\usepackage{adjustbox}
+\usepackage{colortbl}
+\usepackage{multirow}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{bm}
+
+\usepackage{amssymb}% http://ctan.org/pkg/amssymb
+\usepackage{pifont}% http://ctan.org/pkg/pifont
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+
+
+
+\def\model{{BIMBA}}
+\def\modelLlava{BIMBA-LLaVA}
+\def\modelLlama{BIMBA-LLaMA}
+
+\newcommand{\emon}[1]{\textcolor{Aquamarine}{[{\bf Emon:} #1]}}
+\newcommand{\gb}[1]{\textcolor{blue}{[{\bf GB:} #1]}}
+\newcommand{\LT}[1]{\textcolor{red}{[{\bf LT:} #1]}}
+\newcommand{\HW}[1]{\textcolor{brown}{[{\bf HW:} #1]}}
+\newcommand{\TN}[1]{\textcolor{orange}{#1}}
+\newcommand{\TNnote}[1]{\textcolor{orange}{[{\bf TN:} #1]}}
+\newcommand{\cut}[1]{\textcolor{pink}{#1}}

@@ -1,0 +1,22 @@
+\begin{wraptable}{r}{0.40\textwidth}
+    \vspace{-10pt}
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \setlength{\tabcolsep}{2pt}
+    \caption{
+        La contribución de nuestros datos de entrenamiento al rendimiento en el benchmark de streaming video understanding. O.general se refiere a OnlineIT-general, mientras que O.drive se refiere a OnlineIT-drive.
+    }
+    
+    \resizebox{0.40\textwidth}{!}{
+        \begin{tabular}{l|ccc}
+        \hline
+        \multirow{2}{*}{\textbf{Data}} & \textbf{ODV-Bench} & \textbf{OVBench} & \textbf{OVO-Bench} \\
+         & Avg & Avg & Overall \\ \hline
+        base & 56.3 & 53.9 & 53.5 \\
+        \rowcolor[HTML]{DFF7DC} base + O.general & 59.9 & 60.5 & \textbf{55.6} \\
+        \rowcolor[HTML]{DFF7DC} base + O.general + O.drive & \textbf{71.2} & \textbf{61.6} & \textbf{55.6} \\ \hline
+        \end{tabular}
+    }
+    \label{tab:ablation_dataset}
+    % \vspace{-10pt}
+\end{wraptable}

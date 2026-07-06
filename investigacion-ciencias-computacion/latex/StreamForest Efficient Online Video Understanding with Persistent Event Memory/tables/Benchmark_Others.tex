@@ -1,0 +1,63 @@
+
+
+\begin{table}[t]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \setlength{\tabcolsep}{6pt}
+
+
+    \caption{
+        \textbf{Comparación de nuestro método con enfoques existentes en tareas de video question answering bajo diversos escenarios.} Nuestro enfoque supera significativamente a los métodos previos en benchmarks de comprensión de streaming video, al tiempo que mantiene un rendimiento sólido y competitivo tanto en comprensión de video largo como corto.
+    }
+
+    
+    \resizebox{1\textwidth}{!}{
+        \begin{tabular}{lcccccccc}
+            \hline \hline
+            \multirow{3}{*}{\textbf{Method}} & \multicolumn{1}{c|}{\multirow{3}{*}{\textbf{Size}}} & \multicolumn{3}{c|}{\textbf{Online Video}} & \multicolumn{2}{c|}{\textbf{Long Video}} & \multicolumn{2}{c}{\textbf{Short Video}} \\ \cline{3-9} 
+             & \multicolumn{1}{c|}{} & \textbf{StreamingBench} & \textbf{OVBench} & \multicolumn{1}{c|}{\textbf{OVO-Bench}} & \textbf{VideoMME} & \multicolumn{1}{c|}{\textbf{MLVU}} & \textbf{MVBench} & \textbf{PerceptionTest} \\
+             & \multicolumn{1}{c|}{} & Real-Time All & Avg & \multicolumn{1}{c|}{Overall} & w/o sub. & \multicolumn{1}{c|}{M-Avg} & Avg & Val \\ \hline
+
+            \multicolumn{9}{l}{\textit{Open-source Offline Video MLLMs}} \\ 
+            \hline
+            
+            InternVL2 \cite{chen2024internvl2} & \multicolumn{1}{c|}{8B} & 63.7 & 48.7 & \multicolumn{1}{c|}{50.1} & 54.0 & \multicolumn{1}{c|}{64.0} & 65.8 & - \\
+            
+            LongVA \cite{zhang2024longva} & \multicolumn{1}{c|}{7B} & 60.0 & 43.6 & \multicolumn{1}{c|}{-} & 52.6 & \multicolumn{1}{c|}{56.3} & - & - \\
+            
+            LLaVA-OneVision \cite{li2024llavaov} & \multicolumn{1}{c|}{7B} & 71.1 & 49.5 & \multicolumn{1}{c|}{52.9} & 58.2 & \multicolumn{1}{c|}{64.7} & 56.7 & 57.1 \\
+            
+            Qwen2-VL \cite{qwen2vl} & \multicolumn{1}{c|}{7B} & 69.0 & 49.7 & \multicolumn{1}{c|}{52.7} & 63.3 & \multicolumn{1}{c|}{-} & 67.0 & 66.9 \\
+            
+            LongVU \cite{shen2024longvu} & \multicolumn{1}{c|}{7B} & - & - & \multicolumn{1}{c|}{48.5} & 60.6 & \multicolumn{1}{c|}{65.4} & 66.9 & - \\
+            
+            LLaVA-Video \cite{zhang2024llavavideo} & \multicolumn{1}{c|}{7B} & - & - & \multicolumn{1}{c|}{53.1} & 63.3 & \multicolumn{1}{c|}{70.8} & 58.6 & 67.9 \\ \hline
+            
+            \multicolumn{9}{l}{\textit{Open-source Online Video MLLMs}} \\ \hline
+            
+            VideoLLM-online \cite{chen2024videollmonline} & \multicolumn{1}{c|}{8B} & 36.0 & 9.6 & \multicolumn{1}{c|}{12.8} & - & \multicolumn{1}{c|}{-} & - & - \\
+            
+            MovieChat \cite{song2024moviechat} & \multicolumn{1}{c|}{7B} & - & 30.9 & \multicolumn{1}{c|}{-} & 38.2 & \multicolumn{1}{c|}{-} & 55.1 & - \\
+            
+            Flash-VStream \cite{zhang2024flashvstream} & \multicolumn{1}{c|}{7B} & 23.2 & 31.2 & \multicolumn{1}{c|}{33.2} & - & \multicolumn{1}{c|}{-} & - & - \\
+            
+            VideoChat-Online \cite{huang2024videochatonline} & \multicolumn{1}{c|}{4B} & - & 54.9 & \multicolumn{1}{c|}{-} & 52.8 & \multicolumn{1}{c|}{-} & 64.9 & - \\
+            
+            Dispider \cite{qian2025dispider} & \multicolumn{1}{c|}{7B} & 67.6 & - & \multicolumn{1}{c|}{41.8} & 57.2 & \multicolumn{1}{c|}{61.7} & - & - \\ 
+
+            \rowcolor[HTML]{DFF7DC}
+            \textbf{StreamForest} & \multicolumn{1}{c|}{\textbf{7B}} & \textbf{77.3} & \textbf{60.5} & \multicolumn{1}{c|}{\textbf{55.6}} & \textbf{61.4} & \multicolumn{1}{c|}{\textbf{70.0}} & \textbf{70.2} & \textbf{73.1} \\ 
+            
+            \rowcolor[HTML]{DFF7DC}
+            \textbf{StreamForest (FT-drive)} & \multicolumn{1}{c|}{\textbf{7B}} & \textbf{76.8} & \textbf{61.6} & \multicolumn{1}{c|}{\textbf{55.6}} & \textbf{61.9} & \multicolumn{1}{c|}{\textbf{69.6}} & \textbf{68.6} & \textbf{71.6} \\ 
+            
+            \hline \hline
+            
+        \end{tabular}
+    }
+    
+
+    
+    \label{tab:Benchmark_Others}
+    % \vspace{-10pt}
+\end{table}

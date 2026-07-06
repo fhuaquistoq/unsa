@@ -1,0 +1,40 @@
+\begin{table}[h]
+% \setlength{\tabcolsep}{1.5mm}
+% \renewcommand{\arraystretch}{1.1}
+\centering
+\caption{
+\textbf{Experimentos adicionales con más Video-LLMs y benchmark.}\\
+``Acc.'' denota accuracy.
+``X Frames'' se refiere a muestrear uniformemente X frames del video.
+``Y FPS $\to$ X Frames'' indica un video de entrada con una tasa de cuadros de Y FPS, del cual se recuperan X frames.
+}
+\label{tab:additional}
+\vspace{-5pt}
+\footnotesize
+\resizebox{\linewidth}{!}{
+\begin{tabu}{l l l l l l}
+    \toprule
+    \multirow{2}{*}{Method} & \multirow{2}{*}{Sampling} & MLVU & \textsc{QaEgo4D} & EgoSchema  & CGBench \\
+    \cmidrule{3-6}
+    & & dev Acc. & test Acc. & Acc. & Acc. \\
+    \midrule   
+    Video-LLaVA-7B~\citep{video_llava} & 8 Frames     & 46.5 & 37.0 & 41.4 & 18.7 \\
+    \quad\textbf{+\ourmethod} & \retrieve{0.5}{8}             & \textbf{47.2}\plusvalue{0.7} & \textbf{37.9}\plusvalue{0.9} & \textbf{42.2}\plusvalue{0.8} & \textbf{19.2}\plusvalue{0.5} \\
+    \hdashline
+    LongVA-7B~\citep{longva} & 32 Frames    & 57.3 & 42.8 & 42.5 & 26.1 \\    
+    \quad\textbf{+\ourmethod} & \retrieve{0.5}{32}             & \textbf{58.6}\plusvalue{1.3} & \textbf{45.6}\plusvalue{2.8} & \textbf{42.7}\plusvalue{0.2} & \textbf{26.4}\plusvalue{0.3} \\
+
+    \hdashline
+    
+    LLaVA-OV-0.5B~\citep{llava_onevision} & 64 Frames    & 53.2 & 42.6 & 29.6 & 21.4 \\
+    \quad\textbf{+\ourmethod} & \retrieve{0.5}{64}              & \textbf{56.1}\plusvalue{2.9} & \textbf{50.0}\plusvalue{7.4} & \textbf{31.0}\plusvalue{1.4} & \textbf{21.7}\plusvalue{0.3} \\
+    \hdashline
+    LLaVA-OV-7B~\citep{llava_onevision} & 64 Frames      & 64.7 & 52.8 & 59.8 & 31.1 \\
+    \quad\textbf{+\ourmethod} & \retrieve{0.5}{64}              & \textbf{68.5}\plusvalue{3.8} & \textbf{56.0}\plusvalue{3.2} & \textbf{60.7}\plusvalue{0.9} & \textbf{33.9}\plusvalue{2.8} \\
+    \hdashline
+    LLaVA-OV-72B~\citep{llava_onevision} & 32 Frames      & 71.9 & 53.6 & 59.6 & 37.2 \\
+    \quad\textbf{+\ourmethod} & \retrieve{0.1}{32}              & \textbf{72.6}\plusvalue{0.7} & \textbf{57.0}\plusvalue{3.4} & \textbf{62.0}\plusvalue{2.4} & \textbf{40.5}\plusvalue{3.3} \\
+    \bottomrule
+\end{tabu}
+}
+\end{table}

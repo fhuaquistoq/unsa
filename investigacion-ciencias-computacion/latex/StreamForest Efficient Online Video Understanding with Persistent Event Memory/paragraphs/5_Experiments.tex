@@ -1,0 +1,72 @@
+\section{Experimentos}
+\label{sec:Experiments}
+
+\paragraph{Detalles de implementación.} Adoptamos SigLiP-so400M\cite{zhai2023siglip} como visual encoder, usamos un MLP como projection head y empleamos Qwen2-7B como LLM. Por defecto, la cantidad de visual tokens está limitada a 8192. Entre ellos, 729 tokens se asignan a percepción en tiempo real, mientras que la memoria espaciotemporal de corto plazo consiste en 18 frames, cada uno representado por 128 visual tokens. Fijamos los pesos de penalización para similitud, conteo de fusiones y distancia temporal en 0.4, 0.4 y 0.2, respectivamente. El modelo se entrena en 32 GPUs A100 usando nuestro dataset propuesto OnlineIT, complementado con datos de video offline de VideoChat-Flash \cite{li2024videochatflash} y LLaVA-Video \cite{zhang2024llavavideo}, así como con datos de imagen de LLaVA-OneVision \cite{li2024llavaov}. Adoptamos una estrategia de entrenamiento de cinco etapas para entrenar StreamForest desde cero. Las primeras tres etapas siguen el paradigma de entrenamiento de MLLMs offline para video largo \cite{li2024videochatflash}. La cuarta etapa realiza fine-tuning de streaming video para obtener StreamForest base. Además, puede incorporarse una quinta etapa opcional entrenando con OnlineIT-Drive, lo que produce StreamForest(FT-drive). Durante la fase de evaluación, restringimos al modelo a procesar frames de streaming a 1 FPS. Para detalles de implementación más específicos, véase el Apéndice \ref{app:sec:More_Implementation_Details}.
+
+
+\subsection{Resultados en benchmarks online}
+
+Evaluamos el rendimiento de nuestro modelo en cuatro benchmarks de online video question answering: ODV-Bench, StreamingBench \cite{lin2024streamingbench}, OVBench \cite{huang2024videochatonline} y OVO-Bench \cite{li2025ovobench}. Estos benchmarks siguen escenarios de streaming video QA, donde los VideoLLMs deben procesar únicamente el contenido de video disponible antes del timestamp actual.
+
+
+\input{tables/Benchmark_Ours}
+
+\paragraph{ODV-Bench.} Integra estrechamente información espaciotemporal para evaluar de forma integral la capacidad de los MLLMs para comprender detalles finos en videos online y realizar predicciones futuras basadas tanto en contexto histórico como actual en escenarios de conducción autónoma. El benchmark incluye tareas como identificar objetos o acciones sutiles, describir posiciones de objetos y relaciones espaciales, y predecir trayectorias de objetos. Estas tareas requieren una sólida percepción espaciotemporal en tiempo real y comprensión contextual. Como se muestra en la Tabla \ref{tab:Benchmark_Ours}, StreamForest alcanza una exactitud promedio de 59.9\% en ODV-Bench sin ser entrenado con OnlineIT-drive y mejora aún más hasta 71.2\% después de entrenarse con él. Esto supera significativamente a todos los MLLMs online y offline existentes, demostrando la fuerte capacidad de generalización de nuestro método hacia tareas downstream de streaming video understanding. Estos resultados resaltan su potencial para aplicaciones del mundo real.
+
+
+
+\input{tables/Benchmark_Others}
+
+
+\paragraph{StreamingBench \& OVBench \& OVO-Bench.} Como se muestra en la Tabla \ref{tab:Benchmark_Others}, StreamForest demuestra un rendimiento sólido en los benchmarks open-source existentes de streaming video understanding. Alcanza una exactitud de 77.3\% en StreamingBench, 60.5\% en OVBench y 55.6\% en OVO-Bench. Estos resultados destacados subrayan la robustez de StreamForest en una amplia gama de escenarios de online video understanding. El rendimiento superior de nuestro modelo puede atribuirse a dos innovaciones arquitectónicas clave. Primero, la Fine-grained Spatiotemporal Window permite percepción espacial precisa y modelado temporal reactivo de corto plazo, ambos críticos para tareas de percepción en tiempo real y respuesta hacia adelante. Segundo, el Persistent Event Memory Forest organiza adaptativamente contenido visual de largo plazo en un bosque de memoria estructurado y eficiente, mejorando significativamente la capacidad del MLLM para retener y razonar sobre eventos pasados. En conjunto, estos dos módulos ofrecen capacidades complementarias que permiten a nuestro modelo manejar eficazmente entradas dinámicas de streaming video de largo horizonte, manteniendo al mismo tiempo alta coherencia contextual.
+
+
+
+\subsection{Resultados en benchmarks offline}
+
+
+
+Además evaluamos nuestro método en dos benchmarks de long video understanding (VideoMME\cite{fu2024videomme} y MLVU\cite{zhou2024mlvu}) y dos datasets de video corto (MVBench\cite{li2024mvbench} y PerceptionTest\cite{patraucean2023perceptiontest}). En el escenario offline, el video completo se proporciona como entrada al MLLM. Muestreamos frames de video a 1 FPS, con un límite máximo de 2048 frames. Para los videos que exceden este límite, los frames se muestrean uniformemente a lo largo de toda la duración. Como se muestra en la Tabla \ref{tab:Benchmark_Others}, nuestro método demuestra un rendimiento superior tanto en tareas de video understanding largo como corto en comparación con los recientes online Video MLLMs de estado del arte. Además, supera a modelos offline líderes en la mayoría de los benchmarks, logrando 61.4\% en VideoMME, 70.0\% en MLVU, 70.2\% en MVBench y 73.1\% en PerceptionTest. Este sólido rendimiento en escenarios offline resalta la robusta capacidad de generalización de nuestro método propuesto.
+
+\subsection{Ablaciones}
+
+\paragraph{Efectividad de Persistent Event Memory Forest:}
+Reemplazamos el PEMF propuesto por varios métodos usados en trabajos previos. Para asegurar una comparación justa, mantenemos consistentes los presupuestos de visual tokens en todos los métodos y realizamos fine-tuning de cada modelo en consecuencia. Los resultados de ablación se muestran en la Tabla \ref{tab:ablation_PEMF}. La estrategia FIFO muestra el peor rendimiento. Esto es especialmente evidente en el benchmark de video largo MLVU (56.7\% vs. 70.0\%), donde el método falla debido al descarte sin filtrado de características visuales históricas. OVBench enfatiza principalmente percepción espaciotemporal fina y de corto plazo. El muestreo uniforme reduce la resolución de la información visual reciente, que es crucial para la comprensión en tiempo real (58.2\% vs. 60.5\% en OVBench). Similarity Merge logra un rendimiento comparable al de nuestro PEMF en OVBench (60.3\% vs. 60.5\%). Sin embargo, sus limitaciones se vuelven claras en tareas que requieren memoria persistente y razonamiento de largo horizonte. En OVO-Bench, PEMF supera a Similarity Merge en +2.2\%, y en MLVU en +2.0\%. Esto se debe a que la fusión basada en similitud puede fusionar en exceso frames dentro de segmentos locales de video, lo que podría conducir a irregularidades espaciotemporales y a la pérdida de representaciones locales a nivel de evento. El pyramidal memory bank mantiene memoria mediante reemplazo de frames. Sin embargo, la capacidad fija limita su habilidad para capturar características espaciotemporales de largo alcance (53.9\% vs. 55.6\% en OVO-Bench y 68.2\% vs. 70.0 en MLVU). En contraste, nuestro método evalúa cada evento visual según similitud a nivel de evento, conteo de fusiones y distancia temporal. Luego realiza consolidación de memoria a nivel de evento. Esta estrategia soporta un mantenimiento eficiente y persistente de características visuales históricas.
+
+
+
+
+\paragraph{Efectividad de la arquitectura completa:}
+Realizamos estudios de ablación sobre tres componentes arquitectónicos clave. En particular, ablatimos la Fine-grained Spatiotemporal Window y el Persistent Event Memory Forest, garantizando al mismo tiempo que el número total de visual tokens se mantenga consistente con la configuración original. Además, reemplazamos la construcción de nodos basada en eventos por un enfoque basado en frames. Como se muestra en la Tabla \ref{tab:ablation_structure}, eliminar ambos módulos conduce a la caída de rendimiento más significativa. Usar solo FSTW o solo PEMF mejora el rendimiento en comparación con el baseline, pero los mejores resultados se logran cuando ambos componentes se integran (+2.5\% en OVBench, +3.1\% en OVO-Bench y +18.2\% en MLVU). Esta ablación conjunta confirma que FSTW y PEMF proporcionan beneficios complementarios. FSTW mejora la percepción espaciotemporal en tiempo real cerca del timestamp de la consulta, mientras que PEMF soporta una memoria de largo plazo eficiente y persistente, produciendo juntos el rendimiento global más fuerte. Además, la construcción de nodos a nivel de evento previene eficazmente la sobre-fusión dentro de los eventos, permitiendo comprimir características visuales al nivel de eventos visuales completos en lugar de frames individuales.
+
+\input{tables/Ablation_Architecture}
+\input{figs/ablation_lenth}
+
+
+\paragraph{Robustez ante distintos presupuestos de visual tokens:}
+Evaluamos la robustez de nuestro método bajo distintas restricciones presupuestarias para visual tokens, desde 1K hasta 10K. La Figura \ref{fig:token_budget} ilustra la variación del rendimiento en los benchmarks MLVU, VideoMME y OVO-Bench bajo estas configuraciones. Notablemente, bajo la restricción estricta de solo 1K visual tokens, StreamForest alcanza una tasa promedio de compresión visual de hasta 99.8\% en benchmarks de video largo. A pesar de este nivel extremo de compresión, el modelo aún mantiene un rendimiento competitivo, lo que demuestra con fuerza la robustez de nuestro enfoque para preservar persistentemente memorias visuales de largo plazo a nivel de evento.
+%
+También realizamos una comparación directa entre nuestro PEMF y Similarity Merge. Los resultados demuestran claramente dos beneficios centrales de nuestro enfoque. Primero, PEMF exhibe un rendimiento absoluto superior, superando consistentemente a Similarity Merge en todos los presupuestos de tokens con una mejora promedio de exactitud de 2--3\%. Segundo, nuestro método muestra mayor resiliencia frente a compresión extrema. Bajo el presupuesto más severo de 1K tokens, PEMF retiene una fracción más alta de su rendimiento con presupuesto completo, logrando una ventaja relativa notable de retención de +1.8\% en VideoMME. Estos resultados experimentales confirman que las ganancias de rendimiento provienen del diseño intrínseco de PEMF, que consolida adaptativamente memoria a nivel de evento para preservar información semánticamente saliente, asegurando así tanto alta exactitud como eficiencia de tokens bajo restricciones estrictas de recursos.
+%
+La Figura \ref{fig:token_budget_time} presenta el tiempo promedio de inferencia de StreamForest bajo distintos presupuestos de visual tokens. La velocidad de inferencia rápida y estable resalta la aplicabilidad práctica de StreamForest.
+
+
+\input{tables/Ablation_computational_cost}
+
+
+\paragraph{Costo computacional:} 
+Proporcionamos un análisis cuantitativo del tiempo de ejecución y el uso de memoria de StreamForest. Para aislar el efecto del mecanismo de memoria, asumimos que las características visuales a nivel de frame ya han sido extraídas por el vision encoder en tiempo real. Como se muestra en la Tabla \ref{tab:runtime_memory}, PEMF impone un límite superior estricto de visual tokens (8K aquí), garantizando que el uso de memoria permanezca estable (\~17 GB) independientemente del número de frames procesados. En consecuencia, los FLOPs y la latencia de inferencia no crecen significativamente incluso con entradas de streaming más largas.
+%
+Además, comparamos PEMF con otros mecanismos de memoria, incluyendo Pyramid Memory Bank \cite{huang2024videochatonline} y la estrategia Similarity Merge \cite{song2024moviechat}. Como se resume en la Tabla \ref{tab:memory_mechanism_comparison}, el tiempo total de ejecución está dominado por el vision encoding (5.2s para 500 frames, $\sim$95 FPS). La actualización de memoria de PEMF es extremadamente ligera (0.172s para 500 frames), lo cual es despreciable en comparación con las ganancias de eficiencia obtenidas al reducir significativamente la cantidad total de visual tokens. 
+% The experiments in the Appendix \ref{app:sec:Efficiency_Multi-round} also demonstrate the high computational efficiency of StreamForest in multi-turn conversational scenarios.
+
+
+\input{tables/Ablation_data}
+\paragraph{Impacto de los datos de entrenamiento:}
+La Tabla \ref{tab:ablation_dataset} presenta el impacto de nuestra estrategia de entrenamiento que integra tanto datasets online como offline. Los resultados demuestran claramente que combinar OnlineIT con datasets existentes de offline VideoQA mejora significativamente el rendimiento en benchmarks de streaming video understanding. OnlineIT está diseñado específicamente para percepción en tiempo real y predicción futura en escenarios de streaming, mitigando eficazmente las alucinaciones causadas por inconsistencias entre el contexto espaciotemporal histórico y el momento actual.
+
+
+
+
+
+

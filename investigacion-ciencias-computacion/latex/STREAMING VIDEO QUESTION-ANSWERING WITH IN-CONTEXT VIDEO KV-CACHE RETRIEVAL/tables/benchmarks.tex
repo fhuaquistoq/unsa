@@ -1,0 +1,29 @@
+\begin{wraptable}{r}{0.54\textwidth}
+\setlength{\tabcolsep}{1.5mm}
+% \renewcommand\arraystretch{1.1}
+\centering
+\footnotesize
+\vspace{-12pt}
+\caption{
+\textbf{Resumen de los benchmarks de evaluación.} 
+MC significa VideoQA de opción múltiple, mientras que OE se refiere a VideoQA de respuesta abierta.
+}
+\vspace{-5pt}
+\label{tab:benchmark_comparison}
+\resizebox{\linewidth}{!}{
+\begin{tabular}{lrrrr}
+    \toprule
+    Benchmark & Duración & \#Videos & \#QA & Tipo \\
+    \midrule
+    MLVU$_\texttt{dev-mc}$ & 12 min & 1,242 & 2,175 & MC \\
+    \textsc{QaEgo4D}$_\texttt{test-mc}$ & 8.3 min & 148 & 500 & MC \\
+    EgoSchema & 3 min & 5,031 & 5,031 & MC \\
+    ActivityNet-QA & 2 min & 800 & 8,000 & OE \\
+    RVS-Ego & 60 min & 10 & 1,465 & OE \\
+    RVS-Movie & 30 min & 22 & 1,905 & OE \\
+    CGBench$_\texttt{mc}$ & 27 min & 1,219 & 12,129 & MC \\
+    \bottomrule
+\vspace{-20pt}
+\end{tabular}
+}
+\end{wraptable}

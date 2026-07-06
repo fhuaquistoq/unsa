@@ -1,0 +1,818 @@
+
+% CVPR 2024 Paper Template; see https://github.com/cvpr-org/author-kit
+
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+\usepackage[pagenumbers]{cvpr} % To force page numbers, e.g. for an arXiv version
+\usepackage{pifont}
+\usepackage{balance}
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{makecell} % to have special column headings
+\usepackage{caption} % to have captions of things that don't float
+\usepackage{xcolor}
+\usepackage{colortbl}
+\definecolor{mygray}{gray}{.9}
+
+\input{preamble}
+\newcommand{\finished}[1]{{\color{green}{\bf finished}{#1}}}
+\newcommand{\TBD}[2]{{\color{red}{\bf TBD}{#2}}}
+\newcommand{\qin}[1]{{\textcolor{red}{[Qin: #1]}}}
+\definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
+\usepackage[pagebackref,breaklinks,colorlinks,allcolors=cvprblue]{hyperref}
+
+%%%%%%%%% PAPER ID  - PLEASE UPDATE
+\def\paperID{****} % *** Enter the Paper ID here
+\def\confName{CVPR}
+\def\confYear{2026}
+
+\title{
+{TimeViper: A Hybrid Mamba-Transformer Vision-Language Model for \\ Efficient Long Video Understanding}
+}
+
+\author{Boshen Xu$^{1*\ddagger}$\quad Zihan Xiao$^{1*}$\quad Jiaze Li$^{2}$\quad Jianzhong Ju$^{2}$\quad Zhenbo Luo$^{2}$\quad Jian Luan$^{2}$\quad Qin Jin$^{1\dagger}$\\
+$^1$ AIM3 Lab, Renmin University of China\quad 
+$^2$ MiLM Plus, Xiaomi Inc.\\
+{\small Project Page: \url{https://xuboshen.github.io/TimeViper/}}
+}
+
+\newcommand{\xbs}[1]{{\color{red}{\bf Xu}: {#1}}}
+
+\begin{document}
+
+
+
+\twocolumn[{%
+\renewcommand\twocolumn[1][]{#1}%
+\maketitle
+\begin{center}
+\newcommand{\teaserwidth}{\textwidth}
+\vspace{-0.35in}
+    \centerline{        
+        \includegraphics[width=\linewidth]{file/fig1-teaser-v1-nologo-v3.pdf}
+    }
+  \captionof{figure}{
+Presentamos \textbf{TimeViper}, un modelo vision-language híbrido Mamba-Transformer para comprensión eficiente de video largo. 
+Mostramos la severa redundancia de vision tokens y un fenómeno de agregación de información vision-to-text en modelos híbridos.
+Para ello, introducimos \textbf{TransV}, el primer módulo de transferencia de tokens que comprime vision tokens en text tokens dentro del LLM, permitiendo que el modelo procese más de 10,000 frames.
+Gracias al cómputo $O(n)$ y al costo de cache $O(1)$ de las capas Mamba, TimeViper genera 40.1\% más tokens por segundo que Qwen3~\cite{yang2025qwen3} al procesar 32k input tokens (aproximadamente 2k frames con 16 tokens por frame) y producir 1k output tokens con batch size 32. 
+TimeViper ofrece un rendimiento competitivo frente a MLLMs basados en Transformer en benchmarks públicos, incluyendo multi-choice QA en VideoMME~\cite{fu2025videomme} (vs. Video-XL~\cite{shu2025videoxl1}), temporal video grounding en Charades~\cite{sigurdsson2018charades} (vs. VTimeLLM~\cite{huang2024vtimellm}), video detailed captioning en VDC~\cite{chai2025auroracap} (vs. AuroraCap~\cite{chai2025auroracap}) y comprensión de videos de una hora en LVBench~\cite{wang2025lvbench} (vs. Gemini-1.5-Pro~\cite{team2024gemini1.5pro}).
+}
+\label{fig:teaser}
+\end{center}%
+}]
+\renewcommand{\thefootnote}%
+{\fnsymbol{footnote}}
+\footnotetext[0]{$\dagger$ Autor de correspondencia; $\ddagger$ Líder del proyecto; $^*$ Contribución equivalente.\\ \textcolor{white}{spac}$^*$Este trabajo se realizó durante su pasantía en Xiaomi.} 
+
+\begin{abstract}
+Presentamos \textbf{TimeViper}, un modelo híbrido vision-language diseñado para abordar los desafíos de la comprensión de video largo.
+Procesar videos largos exige tanto una arquitectura de modelo eficiente como un mecanismo efectivo para manejar contextos temporales extensos.
+Para ello, TimeViper adopta un backbone híbrido Mamba-Transformer que combina la eficiencia de los state-space models con la expresividad de los mecanismos de atención.
+Mediante este diseño híbrido, revelamos el \textit{fenómeno de agregación de información vision-to-text}, donde la información fluye progresivamente desde los vision tokens hacia los text tokens a medida que aumenta la profundidad del LLM, resultando en \textit{severa redundancia de vision tokens}. 
+Motivados por esta observación, proponemos \textbf{TransV}, un módulo de transferencia de información de tokens que transfiere y comprime vision tokens en instruction tokens mientras mantiene las capacidades de comprensión multimodal.
+Este diseño permite a TimeViper procesar videos de una hora que superan los 10,000 frames.
+Experimentos extensivos en múltiples benchmarks demuestran que TimeViper compite con modelos de estado del arte mientras extiende el número de frames manejables. 
+Además analizamos los comportamientos de atención tanto de capas Mamba como Transformer, ofreciendo nuevas perspectivas sobre la interpretabilidad de modelos híbridos.  
+Este trabajo representa un paso inicial hacia el desarrollo, la interpretación y la compresión de arquitecturas híbridas Mamba-Transformer.
+\end{abstract}
+
+
+\section{Introducción}
+\label{sec:intro}
+
+
+
+Comprender videos largos es un desafío esencial y de larga data en visión por computadora, con gran potencial para aplicaciones en plataformas de video~\cite{yang2023vidchapters,tapaswi2016movieqa}, escenarios domésticos~\cite{perrett2025hdepic,yang2025egolife,grauman2022ego4d} y agentes corporizados~\cite{zhang2024uninavid,black2024pi_0}.
+Los avances recientes en multimodal large language models (MLLMs)~\cite{comanici2025gemini2.5pro} han hecho cada vez más viable la comprensión general de videos largos.
+Sin embargo, los modelos existentes todavía tienen dificultades para lograr un equilibrio entre efectividad y eficiencia al manejar contextos de video extensos.
+Sostenemos que construir un modelo de comprensión de videos largos verdaderamente capaz requiere abordar dos desafíos clave:
+\textit{construir un backbone MLLM eficiente} y
+\textit{manejar la redundancia en el procesamiento de contexto largo}.
+
+La mayoría de los trabajos previos~\cite{li2024videochatflash,shu2025videoxl1} adoptan LLMs basados en Transformer como backbone, debido a sus sólidas capacidades de razonamiento y comprensión del lenguaje.
+No obstante, la complejidad computacional cuadrática de la atención los vuelve inherentemente ineficientes para el modelado de contexto largo.
+Para mejorar la eficiencia, trabajos recientes han explorado arquitecturas linealizadas como Mamba~\cite{gu2024mamba,dao2024mamba2}, que reemplazan la atención por state-space models para lograr inferencia en tiempo lineal.
+A pesar de sus ventajas de eficiencia, estos modelos suelen depender en gran medida de distillation a partir de modelos basados en Transformer~\cite{li2025matvlm,liao2025mmmamba} o mostrar un rendimiento limitado en tareas multimodales complejas~\cite{wang2024longllava,zhao2025cobra}.
+De manera alentadora, recientemente ha surgido una nueva generación de LLMs híbridos Mamba-Transformer~\cite{li2025minimax,basant2025nanov2,zuo2025falconh1,dong2025hymba,ren2025samba,lenz2025jamba}, que combinan la eficiencia de los state-space models con la expresividad de la atención.
+Inspirados por estos avances, exploramos una arquitectura híbrida adaptada a la comprensión de videos largos que hereda las fortalezas complementarias de ambas familias de modelos.
+
+Otro gran cuello de botella surge de la redundancia en las secuencias de video largas.
+Por ejemplo, un video de una hora muestreado a 1 frame por segundo, con cada frame codificado en 768 vision tokens~\cite{zhai2023siglip}, produce aproximadamente 2.7 millones de tokens, superando incluso el límite de contexto de un millón de tokens de Gemini~\cite{comanici2025gemini2.5pro}.
+Por ello, reducir la longitud contextual es crucial para un modelado escalable de videos largos.
+La mayoría de los trabajos previos~\cite{islam2025bimba,shen2025longvu,li2024llamavid,chen2024internvl,liu2024nvila,xu2025auroralong} abordan este problema realizando compresión y fusión de vision tokens en la capa de proyección antes de alimentar los tokens al LLM, aprovechando la redundancia dentro de las representaciones ViT~\cite{bolya2022tokenmerge}.
+Sin embargo, en videos largos, el propio LLM sigue siendo el principal cuello de botella computacional de un MLLM, ya que procesa las secuencias comprimidas a través de miles de millones de parámetros.
+Trabajos recientes han intentado aliviar esto mediante internal token dropping~\cite{xing2024pyramiddrop,chen2024fastv,zhang2024sparsevlm,song2024moviechat} o compresión~\cite{shu2025videoxl1,ren2025vamba} dentro del LLM, típicamente guiados por attention scores para identificar vision tokens redundantes.
+No obstante, desarrollar tales estrategias para arquitecturas híbridas sigue siendo en gran medida inexplorado y desafiante, donde el mecanismo para almacenar información de tokens podría diferir de forma fundamental del de los Transformers.
+
+En este trabajo proponemos \textbf{TimeViper}, un MLLM híbrido eficiente diseñado para la comprensión de videos largos.
+Mediante un análisis del intercambio de información dentro del LLM, identificamos un fenómeno de agregación de información de visión a texto.
+A medida que aumenta la profundidad de las capas, la información de los vision tokens converge progresivamente hacia los text tokens, tanto en tareas centradas en instrucciones (por ejemplo, video QA) como en tareas centradas en visión (por ejemplo, video captioning).
+En capas profundas, incluso eliminar todos los vision tokens no provoca degradación del rendimiento, lo que sugiere una severa redundancia de tokens dentro del modelo.
+Motivados por esta observación, introducimos \textbf{TransV}, un mecanismo de compresión de tokens dentro del LLM.
+TransV acorta progresivamente la longitud del contexto transfiriendo vision tokens parciales hacia instruction tokens mediante gated cross-attention, preservando la información visual crítica mientras elimina redundancia.
+Experimentos extensivos demuestran que TimeViper logra un rendimiento prometedor frente a MLLMs basados en Transformer en benchmarks de comprensión de videos largos, incluyendo video QA de opción múltiple, temporal video grounding y detailed video captioning.
+
+Nuestras principales contribuciones se resumen a continuación:
+\begin{itemize}
+    \item Introducimos TimeViper, un modelo vision-language híbrido Mamba-Transformer para la comprensión eficiente de videos largos, con compresión interna de tokens en el LLM que permite procesar más de 10,000 frames.
+    \item Descubrimos el fenómeno de agregación de visión a texto y la redundancia de vision tokens en arquitecturas híbridas, y proponemos TransV, un mecanismo que elimina redundancia visual mediante transferencia explícita de información entre tokens.
+    \item Experimentos extensivos demuestran que TimeViper alcanza un rendimiento comparable al de MLLMs basados en Transformer mientras acelera la velocidad de inferencia.
+\end{itemize}
+
+
+
+
+\section{Trabajos relacionados}
+\label{sec:related_works}
+
+
+\begin{figure*}[t]
+  \centering
+%\vspace{-5pt}	
+  \includegraphics[width=\linewidth]{file/fig2-method.pdf}
+  \caption{
+Ilustración de TimeViper, nuestro MLLM híbrido propuesto para long video understanding. El modelo consta de un visual encoder ViT, un proyector con token merging y un LLM híbrido Mamba-Transformer equipado con TransV. El token merging~\cite{bolya2022tokenmerge} comprime cada frame en 16 vision tokens. Dentro del LLM, TransV transfiere información desde vision tokens redundantes hacia instruction tokens para reducir la cantidad de vision tokens. En particular, TransV descarta uniformemente vision tokens en capas superficiales y elimina vision tokens de baja atención en capas profundas. El módulo de compresión se implementa mediante un mecanismo de Gated Cross-Attention~\cite{alayrac2022flamingo} con pesos adaptativos aprendibles. Nótese que TransV se ilustra antes de la capa de atención por claridad, aunque en la práctica puede aplicarse antes de cualquier capa.
+  }
+  \label{fig:framework}
+\vspace{-8pt}
+\end{figure*}
+
+
+\noindent\textbf{MLLM para long video understanding.} 
+Long video understanding~\cite{kahatapitiya2025langrepo,wang2024videoagent,zhang2024simpleLLM4video,mangalam2023egoschema,fu2025videomme,yue2023movie101} ha sido durante mucho tiempo un problema desafiante en visión por computadora.
+Hacia este objetivo, los MLLMs emergen como un enfoque prometedor, pero tienen dificultades para procesar videos largos mientras comprenden su contenido.
+Los métodos existentes buscan equilibrar eficiencia computacional y rendimiento, y suelen clasificarse en estrategias de submuestreo o compresión.
+Las estrategias de submuestreo~\cite{pan2023retrieving,han2024self-retrieve,fan2024videoagent,yao2025gens,goletto2024amego,ye2025tstar} acortan la longitud del video usando consultas de lenguaje para recuperar los segmentos más relevantes.
+Por ejemplo, VideoAgent~\cite{wang2024videoagent} selecciona iterativamente frames y genera captions para ellos usando modelos vision-language, que luego se entregan a un LLM para responder la pregunta.
+Mientras tanto, las estrategias de compresión condensan embeddings de video redundantes en representaciones más compactas.
+La mayoría de los trabajos~\cite{jin2024chatunivi,dai2023instructblip,islam2025bimba,shen2025longvu,li2024llamavid,chen2024internvl,liu2024nvila,xu2025auroralong,ren2024timechat,jiang2025storm,zohar2025apollo,li2025imove,yang2025visionzip} fusionan características visuales antes de introducirlas en el LLM.
+Por ejemplo, LLaMA-VID~\cite{li2024llamavid} emplea una estrategia de dos tokens que comprime cada frame en dos tokens. 
+Sin embargo, estos métodos no resuelven el cuello de botella computacional del LLM.
+Para mejorar aún más la eficiencia, otra línea de trabajo descarta~\cite{xing2024pyramiddrop,chen2024fastv,li2024videochatflash} o comprime~\cite{zhang2024sparsevlm,ye2025vocollama,shu2025videoxl1,ren2025vamba,alayrac2022flamingo} tokens dentro de los LLMs.
+Por ejemplo, PDrop~\cite{xing2024pyramiddrop} poda progresivamente vision tokens a través de las capas del LLM.
+Aunque es eficiente, descartar tokens según attention scores~\cite{zou2025dont,alvar2025divprune} puede causar pérdida irreversible de información.
+Aunque el token dropping es conveniente y puede aplicarse sin entrenamiento, la compresión de tokens evita pérdida de información.
+VoCo-LLaMA~\cite{ye2025vocollama} y Video-XL~\cite{shu2025videoxl1} proponen comprimir vision tokens en nuevos tokens especiales.
+No obstante, dado que los métodos existentes dependen fuertemente de Transformers, los enfoques de compresión de tokens en MLLM híbridos permanecen inexplorados.
+En este trabajo abrimos esta dirección introduciendo TimeViper, un MLLM híbrido con un módulo de transferencia de información de tokens dentro del LLM, denominado TransV, para comprimir vision tokens en instruction tokens.
+
+
+
+
+
+\noindent\textbf{State-space model para percepción visual.}
+La atención de los Transformers, con su costo computacional cuadrático, sigue siendo un cuello de botella fundamental para la eficiencia.
+Las arquitecturas linealizadas~\cite{peng2023rwkv,gu2024mamba} han resurgido en la comunidad de NLP con el objetivo de reducir la complejidad a tiempo lineal y eliminar la necesidad de KV-cache durante la inferencia.
+Algunos esfuerzos recientes impulsan LLMs con módulos linealizados o arquitecturas híbridas Mamba-Transformer, como Nemotron-Nano~\cite{basant2025nanov2}, Samba~\cite{ren2025samba} y Hymba~\cite{dong2025hymba}.
+Inspirados en estos trabajos, los investigadores han comenzado a explorar arquitecturas linealizadas para tareas de visión por computadora como comprensión de image~\cite{fan2024MALA,zhu2024visionmamba,yu2025mambaout}, video~\cite{li2024videomamba} y 3D~\cite{liu2025map}.
+El auge de los LLM linealizados también ha inspirado modelos multimodales eficientes~\cite{zhao2025cobra,xu2025auroralong,ren2025vamba,qiao2024vlmamba,liao2025mmmamba,wang2024longllava}.
+Sin embargo, dado que las imágenes y clips cortos involucran longitudes de secuencia relativamente limitadas, la ventaja de las arquitecturas linealizadas sigue siendo un tema controvertido~\cite{yu2025mambaout}.
+En contraste, long video understanding demanda naturalmente modelos capaces de procesar contextos extremadamente largos, imponiendo requisitos de eficiencia mucho más estrictos.
+Recientemente, AuroraLong~\cite{xu2025auroralong} combina un ViT con RWKV6~\cite{peng2024rwkv6} y emplea token merging en un proyector para comprimir vision tokens.
+En este trabajo, TimeViper es el primer MLLM híbrido que realiza compresión de tokens dentro del LLM híbrido, alcanzando un rendimiento prometedor entre MLLMs de tamaño 7B mientras mantiene alta eficiencia.
+
+
+
+
+% =================================== Method Start ===================================
+\section{Método}
+\label{sec:method}
+Proponemos TimeViper, un modelo vision-language híbrido Mamba-Transformer equipado con un módulo interno de compresión dentro del LLM, TransV, para long video understanding. 
+Nuestro método se basa en dos ideas clave: 
+1) la construcción de un MLLM híbrido, que integra la eficiencia de los state-space models con la expresividad de los mecanismos de atención, y 
+2) realizar compresión de tokens del LLM mediante transferencia de información de visión a texto. 
+Primero introducimos la estructura del modelo híbrido en~\Cref{subsec:hybrid_structure}. 
+Luego, en~\Cref{subsec:token_transfer}, analizamos el intercambio de información entre vision tokens y text tokens y presentamos nuestro módulo de compresión TransV. 
+Finalmente, describimos la estrategia de entrenamiento en~\Cref{subsec:training}.
+
+\subsection{Model Architecture}
+\label{subsec:hybrid_structure}
+Nuestro modelo sigue el diseño multimodal estándar~\cite{liu2023llava} y consta de tres componentes: un visual encoder (ViT)~\cite{zhai2023siglip}, un proyector y un LLM híbrido Mamba-Transformer~\cite{basant2025nanov2}. El backbone del LLM incluye 27 capas Mamba-2~\cite{dao2024mamba2}, 4 capas de self-attention y 25 capas MLP.
+Siguiendo trabajos previos~\cite{zohar2025apollo,li2024videochatflash}, aplicamos token merging (ToMe)~\cite{bolya2022tokenmerge} en la capa de proyección para reducir la redundancia intra-frame. 
+Dado un video largo con una instrucción textual correspondiente, el ViT codifica los frames de video, y el proyector con ToMe produce una secuencia de vision tokens comprimidos $X_0\in\mathbb{R}^{T_0\times D}$, mientras que la instrucción se tokeniza en text instruction tokens $X_1\in\mathbb{R}^{T_1\times D}$,
+donde típicamente $T_0 \gg T_1$, y $D$ es la dimensión oculta.
+El LLM procesa la entrada multimodal concatenada $X=[X_0, X_1]\in\mathbb{R}^{T\times D}$ de longitud de secuencia $T$ y genera response tokens $Y$.
+
+El backbone híbrido integra capas Mamba-2 y de self-attention, cada una con capacidades complementarias: 
+la capa Mamba-2 es principalmente responsable del modelado posicional de la secuencia, codificando información histórica de la secuencia en una memoria oculta implícita de tamaño fijo mediante mecanismos de olvido y memorización, mientras que la capa de self-attention preserva la historia completa de la secuencia y realiza recuperación y consulta según la importancia de los tokens.
+
+\noindent\textbf{Capa Mamba-2.} 
+Una capa Mamba-2 se construye alrededor de un bloque central de state-space model (SSM), que mantiene recurrentemente un estado oculto compacto que resume información pasada. 
+Sea $x_t$ la entrada en el paso $t$, y $h_t\in\mathbb{R}^{N\times D}$ la memoria oculta. La actualización del SSM se define como:
+\begin{equation}
+    \begin{split}
+        h_{t} &= A_{t} h_{t-1} + B_{t} x_{t}\ \\
+        y_{t} &= C_{t}^T h_{t}\
+    \end{split}
+\label{eq:ssm}
+\end{equation}
+where $A_t$, $B_t$ y $C_t$ son parámetros discretizados del SSM~\cite{dao2024mamba2}.
+Este mecanismo codifica dependencias temporales mediante dinámicas de decaimiento y compuertas aprendibles, permitiendo una propagación eficiente de información a lo largo de secuencias largas. 
+
+\noindent\textbf{Capa de Self-Attention.} 
+En contraste, la capa de self-attention modela directamente las interacciones entre tokens:
+\begin{equation}
+        y = \mathrm{SoftMax}(L\odot \frac{QK^T}{\sqrt{D}})\cdot V
+\label{eq:self-attention}
+\end{equation}
+where $[Q,K,V]=[W_Q,W_K,W_V]X$, y $W_Q,W_K,W_V$ son parámetros aprendibles. $L$ es la causal attention mask. 
+
+Al integrar estos dos mecanismos, el LLM híbrido conserva la expresividad contextual de la atención mientras se beneficia de la eficiencia de los SSMs. 
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=1\linewidth]{file/fig3-blockattn-qa-tvg-vdc-noblockboth.png}
+  \caption{
+Comparación del bloqueo de información para ilustrar el fenómeno de agregación de información de visión a texto en MLLMs híbridos.
+Para tareas centradas en instrucciones (p. ej., multi-choice video QA), la información se agrega primero desde los vision tokens hacia los instruction tokens, que luego se usan para generar la respuesta.
+En contraste, para tareas centradas en visión (p. ej., detailed video captioning), los vision tokens contribuyen directamente a la generación de la respuesta.}
+  \label{fig:motivation_transv-token_aggregation}
+  \vspace{-8pt}	
+
+\end{figure}
+
+
+\subsection{Token Information Transfer}
+\label{subsec:token_transfer}
+Para analizar la dinámica de información dentro de los MLLMs híbridos, y dada la escasez de MLLMs híbridos, primero entrenamos un modelo híbrido sobre datasets open-source para los experimentos y análisis posteriores.
+Para garantizar la generalización de nuestros experimentos sobre tareas downstream, realizamos los siguientes análisis en benchmarks de alta calidad y ampliamente utilizados, incluyendo \textit{tareas centradas en instrucciones} como multi-choice video QA (MCQ) en VideoMME~\cite{fu2025videomme} y temporal video grounding (TVG) en Charades~\cite{sigurdsson2018charades}, y \textit{tareas centradas en visión} como video detailed captioning (VDC) en VDC~\cite{chai2025auroracap}. 
+Empleamos métricas de evaluación estándar para cada tarea, \ie, accuracy para VQA, mIoU para TVG y puntajes juzgados por LLM para VDC.
+
+\noindent\textbf{Fenómeno de agregación de información de visión a texto.}
+Para comprender el patrón de flujo de información dentro del modelo híbrido, investigamos el mecanismo de intercambio de información entre vision, instruction y response tokens en capas de atención durante la generación autorregresiva, siguiendo la metodología de~\cite{kaduri2025whatsintheimage}.
+Aplicamos attention masks $L$ y fijamos los valores correspondientes de la matriz en 0 para bloquear el intercambio de información entre distintos tipos de tokens.
+Para mayor claridad, ilustramos nuestras dos configuraciones de bloqueo de información, \ie, vision-to-instruction (V2I) y vision-to-response (V2R),
+asumiendo que $X_0$, $X_1$ y $Y$ contienen cada uno un único token en la capa $l$-ésima: 
+
+\begin{itemize}
+    \item \noindent bloquear la información desde vision tokens hacia instruction tokens:
+\end{itemize}
+\begin{equation}
+    \begin{bmatrix}
+    X^{l+1}_0,X^{l+1}_1,Y^{l+1}_{:t}
+    \end{bmatrix} = \begin{bmatrix}
+    1 & 0 & 0 \\
+    0 & 1 & 0 \\
+    1 & 1 & 1
+    \end{bmatrix}\cdot
+    \begin{bmatrix}
+    X^{l}_0,X^{l}_1,Y^{l}_{:t}
+    \end{bmatrix}
+\label{eq:block_v2i}
+\end{equation}
+\begin{itemize}
+    \item bloquear la información desde vision tokens hacia response tokens:
+\end{itemize}
+\begin{equation}
+\begin{bmatrix}
+    X^{l+1}_0,X^{l+1}_1,Y^{l+1}_{:t}
+    \end{bmatrix} = \begin{bmatrix}
+1 & 0 & 0 \\
+1 & 1 & 0 \\
+0 & 1 & 1
+\end{bmatrix}\cdot
+\begin{bmatrix}
+X^{l}_0,X^{l}_1,Y^{l}_{:t}
+\end{bmatrix}
+\label{eq:block_v2r}
+\end{equation}
+
+Como se muestra en ~\Cref{fig:motivation_transv-token_aggregation}, observamos un fenómeno consistente de agregación de visión a texto: en tareas centradas en instrucciones, la información visual es absorbida progresivamente por los instruction tokens hasta las capas profundas, mientras que en tareas centradas en visión, los vision tokens contribuyen directamente a la generación de respuestas. 
+Bloquear V2I degrada drásticamente el rendimiento en capas tempranas para MCQ y TVG, pero tiene un impacto despreciable en capas posteriores, confirmando que los instruction tokens finalmente internalizan las pistas visuales. 
+Por el contrario, en VDC, bloquear V2R provoca una caída abrupta en capas superficiales, destacando el papel dominante de los vision tokens en la generación directa de respuestas. 
+
+
+\noindent\textbf{Redundancia de vision tokens en MLLM híbridos.}
+Aunque muchos estudios previos han mostrado redundancia de vision tokens en Transformers~\cite{chen2024fastv,xing2024pyramiddrop,bolya2022tokenmerge}, sigue sin estar claro cómo se manifiesta esa redundancia visual en modelos híbridos.
+Para investigarlo, descartamos vision tokens en distintas capas para observar cambios de rendimiento en benchmarks.
+En particular, usamos dos estrategias de token dropping para vision tokens: descarte uniforme (uni) y descarte guiado por atención (attn), que conserva los top-$k$ vision tokens más atendidos por el último instruction token $X_{T_1}$. 
+Sea $p$ la tasa de descarte de tokens, y sea $T_d = p T_0$ la cantidad de tokens a descartar.
+Definimos el operador de descarte $\mathrm{TD}(\cdot)$ como:
+\begin{equation}
+    \mathrm{TD}(X)=
+    \begin{cases}
+        \mathrm{Uniform}(X, T_d) &\text{uni} \\
+        {{\mathrm{Topk}}(X,-\text{Attn}(X_{T_1},X),T_d}) &\text{attn}
+    \end{cases}
+\end{equation}
+donde $\mathrm{Uniform}(X,k)$ descarta uniformemente $k$ tokens de $X \in \mathbb{R}^{N}$, $\mathrm{TopK}(X,S,k)$ descarta $k$ tokens con los puntajes más altos en $X$ según $S \in \mathbb{R}^{N}$, y $\mathrm{Attn}(\cdot, \cdot)$ calcula los attention scores usando el primer argumento como query y el segundo como key.
+Los resultados en~\Cref{fig:motivation_transv-redundancy_increase_with_layer} muestran que la redundancia aumenta con la profundidad.
+Para MCQ y VDC, los tokens pueden descartarse uniformemente en todas las capas, pero el descarte guiado por atención es confiable solo en capas profundas. 
+En TVG, un descarte excesivo de tokens antes de la primera capa de atención, \ie, la capa 14, perjudica el rendimiento, pero la proporción de descarte puede aumentar en capas posteriores.
+Los vision tokens son críticos en capas superficiales, pero se vuelven casi 100\% redundantes en capas profundas en todos nuestros testbeds.
+En todas las tareas, incluso descartando todos los vision tokens en capas profundas, el modelo aún puede alcanzar alto rendimiento apoyándose únicamente en los instruction tokens, algo sorprendentemente similar a observaciones en MLLMs de imágenes basados en Transformer previos~\cite{chen2024fastv,zhang2025llavamini,zhang2025cross}.
+
+
+
+
+
+\begin{figure}[t]
+  \centering
+%\vspace{-5pt}	
+  \includegraphics[width=1\linewidth]{file/fig4-pdrop-qa-tvg-vdc.png}
+  \caption{ 
+  Ilustración de la redundancia de tokens. Comparamos el rendimiento bajo distintas tasas de descarte de vision tokens $p$ usando estrategias de descarte uniforme y guiado por atención.
+  En el MLLM híbrido, la redundancia de vision tokens aumenta progresivamente con la profundidad de las capas, permitiendo una eliminación más agresiva de tokens en capas profundas con mínima pérdida de rendimiento.  
+  }
+  \label{fig:motivation_transv-redundancy_increase_with_layer}
+\vspace{-8pt}
+\end{figure}
+
+
+
+% \begin{figure*}[t]
+%   \centering
+% %\vspace{-5pt}	
+%   \includegraphics[width=\linewidth]{file/fig2-method.pdf}
+%   \caption{
+% Illustration of TimeViper, our proposed hybrid MLLM for long video understanding. The model consists of a ViT visual encoder, a projector with token merging, and a hybrid Mamba-Transformer LLM equipped with TransV. The token merging~\cite{bolya2022tokenmerge} compresses each frame into 16 vision tokens. Inside the LLM, TransV transfers information from redundant vision tokens to instruction tokens to reduce the number of vision tokens. Specifically, TransV uniformly drops vision tokens in shallow layers and removes low-attention vision tokens in deeper layers. The compression module is implemented through a Gated Cross-Attention mechanism~\cite{alayrac2022flamingo} with adaptive learnable weights. Note that TransV is illustrated before the attention layer for clarity, though it may be applied before any layer in practice.
+%   }
+%   \label{fig:framework}
+% \vspace{-8pt}
+% \end{figure*}
+
+\noindent\textbf{Transferencia de información de tokens mediante TransV.}
+Motivados por estos hallazgos, que muestran que la información se transfiere implícitamente desde vision hacia text tokens y que la redundancia de vision tokens es severa en todas las tareas, proponemos TransV, un módulo liviano de compresión dentro del LLM que transfiere explícitamente información visual a instruction tokens, reduciendo cómputo redundante mientras preserva el rendimiento de la tarea. 
+En la capa $l$-ésima, la transferencia de información de tokens desde vision hacia instruction tokens se formula como:
+\begin{equation}
+    \begin{split}
+        \tilde{X}_1^l &= \mathrm{CrossAttn}_l(X_1^l, \mathrm{TD}_l(X_0^l))    \\
+        X_1^{l+1} &= X_1^l + \tanh(\alpha_l)(\tilde{X}_1^l)
+    \end{split}
+\end{equation}
+donde $\mathrm{CrossAttn}(\cdot,\cdot)$ calcula la atención usando el primer término como query y el segundo como key y value. 
+$\alpha_l$ es un escalar aprendible que controla el grado de agregación de información, y su valor se normaliza al rango $[-1,1]$ mediante $\tanh(\cdot)$. 
+$\alpha_l$ se inicializa en cero para asegurar la comprensión de la instrucción.
+
+
+
+\subsection{Procedimiento de entrenamiento}
+\label{subsec:training}
+Para adaptar eficazmente TimeViper a long video understanding, dividimos el proceso de entrenamiento en dos etapas y entrenamos el modelo usando datos completamente open-source:
+(1) Etapa de alineación image-text: 
+Primero preentrenamos el proyector para alinear las modalidades del ViT y del LLM usando 3M de pares image--text de alta calidad muestreados de CC12M~\cite{changpinyo2021cc12m} y PixelProse~\cite{singla2024pixelprose}. La compresión de tokens se desactiva durante esta etapa. 
+(2) Visual instruction tuning: 
+Luego realizamos fine-tuning del proyector y del LLM, incluyendo los módulos de compresión, sobre aproximadamente 4.8M de pares de instrucciones multimodales, compuestos por 1.8M de datos de instrucciones de video~\cite{sharegemini,bain2021webvid,carreira2017k400,zhang2025llavavideo,chen2024sharegpt4video,li2024videochatflash,song2024moviechat} provenientes principalmente de LLaVA-Video, 
+2.8M de datos de instrucciones de imagen única~\cite{lillavaov} de LLaVA-OneVision, 
+y diversos datasets específicos de tareas downstream que incluyen 
+26K muestras de dense video captioning~\cite{caba2015activitynet,zhou2018youcook2,tang2019coin,zala2023hirest,huang2020vitt} y 
+250K muestras de temporal video grounding~\cite{liu2024etbench,wang2025timer1,yang2023vid2seq,anne2017didemo,afouras2023htstep,miech2019howto100m,zeng2025timesuite,ren2024timechat,guo2025vtgllm,oncescu2021queryd,wang2024internvid}.
+Esta etapa adapta TimeViper para seguimiento de instrucciones y video understanding mientras aprende una compresión interna efectiva mediante TransV.
+
+% =================================== Method End ===================================
+
+% =================================== Experiment Start ===================================
+
+\section{Experimentos}
+\label{sec:exp}
+Primero describimos las configuraciones experimentales en~\Cref{subsec: exp_setups}, seguidas por los estudios de ablación en~\Cref{subsec: abl_studies} y los resultados principales en~\Cref{subsec: main_results}. 
+Finalmente, en~\Cref{subsec: analyses}, proporcionamos un análisis cualitativo que ilustra cómo los modelos híbridos y los Transformers interpretan el contenido visual mediante visualizaciones de atención.
+
+
+
+\subsection{Configuración experimental}
+\label{subsec: exp_setups}
+
+\noindent\textbf{Benchmarks downstream.}
+Evaluamos TimeViper en un conjunto diverso de benchmarks de video understanding:
+(1) \textit{VideoMME}~\cite{fu2025videomme}: un benchmark integral de video QA que cubre múltiples dominios. Incluye 2.7K muestras QA sobre videos que van de 11 segundos a 1 hora. Evaluamos los modelos sin subtítulos textuales.
+(2) \textit{LVBench}~\cite{wang2025lvbench}: un benchmark de comprensión de videos de una hora a través de seis dimensiones, compuesto por 2094 muestras QA de múltiple opción.
+(3) \textit{MLVU}~\cite{zhou2025mlvu}: diseñado para minute-level video understanding, con 2174 muestras QA que abarcan dominios diversos.
+Evaluamos el rendimiento promedio de las tareas de múltiple opción (M-Avg), donde los videos tienen una duración promedio de 653 segundos.
+(4) \textit{LongVideoBench}~\cite{wu2024longvideobench}: apunta a razonamiento referencial de formato largo que requiere retrieval-based QA, con videos de 473 segundos en promedio.
+(5) \textit{MVBench}~\cite{li2024mvbench}: un benchmark de video QA de corto plazo que enfatiza el razonamiento temporal, con 4K pares QA en 20 categorías de tareas. 
+(6) \textit{Charades}~\cite{sigurdsson2018charades}: un benchmark de temporal video grounding que contiene 6672 videos de actividades en interiores a nivel de minutos emparejados con consultas en lenguaje natural.
+(7) \textit{VDC}~\cite{chai2025auroracap}: un benchmark eficiente y de alta fidelidad para video captioning evaluado mediante query-conditioned scoring usando LLaMA3-8B~\cite{dubey2024llama3}. Consta de 1027 videos y evaluamos la partición ``detailed''.
+
+\input{tables/supple_abl_transv_shallow}
+\begin{figure}[t]
+  \centering
+%\vspace{-5pt}	
+  \includegraphics[width=0.9\linewidth]{file/frame_mem.png}
+  \caption{Comparación del uso de memoria GPU durante la inferencia.
+  Mientras ToMe extiende la ventana de contexto hasta aproximadamente 5K frames, TransV escala eficientemente más allá de 10K frames.
+  }
+  \label{fig: frames_GPUMem}
+\vspace{-8pt}
+\end{figure}
+
+
+
+
+
+
+\noindent\textbf{Detalles de implementación.}
+Nuestros datos se organizan en el orden de tokens del system prompt, video tokens e instruction token como entradas del LLM.
+Para todos los procesos de entrenamiento y evaluación, los videos se muestrean a 1 frame por segundo.
+Durante el entrenamiento, los videos de más de 256 frames se submuestrean uniformemente a 256 frames;
+durante la evaluación, usamos como máximo los primeros 256 frames.
+Cada frame de entrada se redimensiona a 384×384 y se codifica inicialmente en 768 vision tokens. 
+Después de proyectarse con ToMe, cada frame se comprime en 16 tokens~\cite{zohar2025apollo,li2024videochatflash}.
+Aplicamos TransV en la séptima capa superficial del LLM con tasa de descarte de tokens $p=50\%$, y en la capa profunda 39, donde TransV se aplica usando una estrategia guiada por atención con $p=90\%$.
+Introducir TransV añade aproximadamente 100M parámetros al modelo. 
+Para acelerar el entrenamiento, implementamos training with data packing~\cite{chen2025eagle2.5}, que soporta entrenamiento con longitud de secuencia variable causada por TransV.
+A lo largo de todas las etapas de entrenamiento, el modelo usa una learning rate de 1e-5, optimizador AdamW con weight decay de 0.01, warmup rate de 0.03 y scheduler de cosine annealing.
+Para los módulos TransV adoptamos una learning rate más alta de 5e-5. 
+
+
+
+\begin{figure}[t]
+  \centering
+%\vspace{-5pt}	
+  \includegraphics[width=0.9\linewidth]{file/frame_time.png}
+  \caption{ 
+  Comparación del tiempo de prefilling.
+  TransV no incurre en latencia adicional con pocas entradas de frames (p. ej., 64 frames) y reduce significativamente el tiempo de prefilling con muchas entradas de frames. 
+  Por ejemplo, con 4,096 frames, TransV reduce el tiempo de prefilling en 15.7\% en comparación con el baseline ToMe.
+  }
+  \label{fig: frames_prefilling_time}
+\vspace{-8pt}
+\end{figure}
+
+
+
+
+\subsection{Estudio de ablación}
+\label{subsec: abl_studies}
+Por simplicidad de representación, cada TransV se denota como \textit{``type\_layer\_ratio-...''}; por ejemplo, \textit{``uni\_7\_0.5-attn\_39\_0.9''} representa aplicar TransV uniforme en la capa 7 con una razón de 50\% y TransV guiado por atención en la capa 39 con una razón de 90\%.
+
+
+\noindent\textbf{Impacto de los componentes de compresión en el consumo de memoria GPU.}
+Aplicamos ToMe en el proyector y TransV en el LLM. Gracias al backbone híbrido Mamba-Transformer, tanto el uso de memoria como el tiempo de prefilling crecen en general de forma aproximadamente lineal con la longitud de entrada.
+\Cref{fig: frames_GPUMem} reporta el uso de memoria a medida que aumenta el número de frames. El modelo vanilla arroja error de ``Out of Memory'' con apenas 128 frames. 
+TimeViper, al aplicar ToMe en el proyector, alivia la carga inicial de tokens, extendiendo el límite hasta aproximadamente 5K frames. 
+TimeViper con TransV habilita además una mejor escalabilidad: con 4,096 frames, reduce el consumo de memoria en 54.8\% respecto de TimeViper, y puede manejar 10K+ frames con margen holgado.
+Esto destaca los roles complementarios de la compresión de tokens en el proyector y dentro del LLM.
+
+\noindent\textbf{Impacto de los componentes de compresión en el tiempo de prefilling.}
+Como se muestra en~\Cref{fig: frames_prefilling_time}, el modelo vanilla ya incurre en 4.5s de latencia con 64 frames. 
+TimeViper reduce drásticamente este valor a 0.4s, y TransV disminuye aún más el tiempo de prefilling, con un efecto que se vuelve más pronunciado a medida que aumenta el número de frames. 
+Notablemente, con 4,096 frames, TransV reduce el tiempo de prefilling en 15.7\% en comparación con TimeViper.
+
+\input{tables/comp_sota}
+
+\begin{figure*}[t]
+  \centering  \includegraphics[width=0.97\linewidth]{file/benchmark_framenum.png}
+  \caption{
+  Comparación del rendimiento a medida que aumenta el número de frames de entrada en benchmarks de long-video understanding.
+  Entrenamos nuestros modelos con 256 frames como entrada y muestreamos 1 frame por segundo durante la evaluación. 
+  El eje x denota aquí el número máximo de frames. 
+  Si un video supera esta longitud, tomamos solo los primeros max frames para la inferencia.
+  }
+  \label{fig: Performance-framenum}
+\vspace{-8pt}
+\end{figure*}
+
+\noindent\textbf{TransV placement in shallow layers.}
+As shown in~\Cref{tab:abl_TransV_module}, the TimeViper baseline can process approximately 5K input frames. 
+By comparing rows 1, 2, and 3, we observe that introducing token dropping or token compression enables the model to handle over 8K frames.
+Comparing rows 2 and 3, using TransV effectively mitigates the Charades performance drop, from 26.1 to 38.1, indicating that it successfully facilitates token transfer.
+Comparing rows 3 and 4, compressing at the 7th layer does not necessarily outperform compression at the 2nd layer on the VDC or TVG benchmarks.
+For example, compression at the 7th layer outperforms the 2nd layer by 0.6 points on MCQ, but performs 0.8 points worse on VDC.
+
+
+
+\noindent\textbf{TransV placement in deep layers.}
+From rows 6 and 7 in~\Cref{tab:abl_TransV_module}, attention-guided TransV yields higher MCQ performance of 56.6 than uniform TransV's 56.2, with minor differences on VDC and Charades. 
+Moreover, transferring token information in deeper layers significantly increases the model’s long-context capacity: comparing rows 1 and 3, the model handles tens of thousands of frames with only a 0.1 drop on VideoMME.
+
+
+\noindent\textbf{Compression rate for TransV in shallow layers.}
+We evaluate a higher compression rate of $p=90\%$ at the 7th layer in~\Cref{tab:abl_TransV_module}.
+Larger compression rate allows the model to process more frames, but it comes with a significant performance drop. 
+Comparing rows 4 and 5, after increasing compression rate from $50\%$ to $90\%$, the accuracy on VideoMME decreases from 56.7 to 53.4.
+
+\begin{figure*}[t]
+  \centering  \includegraphics[width=\linewidth]{file/fig5-matrix.png}
+  \caption{
+      Illustration of attention score matrices in Nanov2~\cite{basant2025nanov2} and Qwen2.5~\cite{qwen2.5} at shallow and deep layers. 
+      White lines divide the input sequence into four distinct segments: system prompt, vision tokens, user instruction, and the generated response.
+  }
+  \label{fig:exp_analyses-attn_mamba_attn_pattern}
+\vspace{-8pt}	
+\end{figure*}
+\noindent\textbf{Impact of different LLM backbones under identical training recipe.}
+To isolate the effect of model architecture from scaling up, we train a Transformer-based baseline using Qwen2.5 following exactly the same training recipe as our hybrid model. As shown in~\Cref{tab:comp_sota}, Qwen2.5 performs on par with TimeViper when trained on our dataset, suggesting that purely Transformer-based architectures do not offer a clear advantage under comparable training conditions.
+Notably, the concurrent work Nanov2-VL, which adopts a standard MLLM architecture but is trained on 46.7M samples, substantially larger than our 7.8M, achieves state-of-the-art performance. 
+This indicates that hybrid MLLMs can benefit significantly from scaling.
+
+
+\subsection{Main Results}
+\label{subsec: main_results}
+
+
+\noindent\textbf{TimeViper achieves competitive performance with current models across video understanding benchmarks.}
+\textit{For MCQ tasks}, 
+as shown in~\Cref{tab:comp_sota}, despite not fine-tuning ViT, TimeViper with TransV achieves an average accuracy of 56.2 on VideoMME, +0.7 points higher than Video-XL (55.5), which compresses tokens into new ones within Qwen2. 
+\textit{For VDC task}, TimeViper achieves strong performance with an accuracy of 39.7, excqeeding the task-specific model Auroracap by +0.7 points.
+\textit{For TVG task,} 
+TimeViper establishes a surprisingly strong baseline with an mIoU of 40.5 on Charades, significantly outperforming the task-specific model VTimeLLM-13B with an mIoU of 34.6. 
+This is particularly notable because TimeViper uses only SigLIP positional embedding for vision tokens and relies on the implicit temporal modeling of Mamba layers. 
+Yet the model learns robust temporal alignments between videos and language query, matching or exceeding prior models such as Qwen2.5-VL-7B that explicitly employ MRoPE for fine-grained timestamp modeling.
+These results collectively demonstrate that hybrid Mamba-Transformer architectures are highly competitive for long video understanding.
+
+
+
+
+\noindent\textbf{Effect of increasing the number of inference frames.}
+Since the model is trained with 256 frames, we evaluate test-time scalability by varying the number of input frames. 
+As shown in~\Cref{fig: Performance-framenum}, TimeViper scales robustly with longer contexts across four long video understanding benchmarks.
+For example, when increasing the input frames from 256 to 512 frames, MLVU improves from 65.64 to 69.00, and LVBench increases from 35.53 to 37.0.
+
+
+\subsection{Qualitative Analysis}
+\label{subsec: analyses}
+To better understand how hybrid MLLMs differ from Transformer-based MLLMs in processing multimodal inputs, we first formalize the definitions of attention scores used in both Mamba-2 and self-attention layers and then analyze attention behaviors across layers. 
+For Mamba layers, we follow~\cite{ameen2025mambavis} to define the attention pattern, while for Transformer layers, we use the attention weights. 
+
+\begin{figure*}[t]
+  \centering
+\includegraphics[width=\linewidth]{file/case_study.pdf}
+  \caption{Qualitative results of TimeViper on three long video understanding tasks. (1) MCQ: The model demonstrates reasoning capability by correctly answering a multi-choice question about the video's content. (2) TVG: It accurately localizes the temporal boundaries for a specific event, reaching an IoU of 0.75. (3) VDC: The model generates a detailed description that showcases its fine-grained comprehension. Green text highlights accurate detailed descriptions. Some output in the middle is omitted for brevity.}
+  \label{fig:case}
+\vspace{-8pt}
+\end{figure*}
+% \noindent\textbf{Mamba-2 Layer.} 
+% A Mamba-2 layer is built around a core state-space model (SSM) block, which recurrently maintains a compact hidden state summarizing past information. 
+% Let $x_t$ denote the input at step $t$, and $h_t\in\mathbb{R}^{N\times D}$ the hidden memory. The SSM update is defined as:
+% \begin{equation}
+%     \begin{split}
+%         h_{t} &= A_{t} h_{t-1} + B_{t} x_{t}\ \\
+%         y_{t} &= C_{t}^T h_{t}\
+%     \end{split}
+% \label{eq:ssm}
+% \end{equation}
+% where $A_t$, $B_t$, and $C_t$ are discretized SSM parameters~\cite{dao2024mamba2}.
+% This mechanism encodes temporal dependencies via learnable decay and gating dynamics, enabling efficient information propagation over long sequences. 
+
+% \noindent\textbf{Self-Attention Layer.} 
+% In contrast, the self-attention layer directly models token interactions:
+% \begin{equation}
+%         y = \mathrm{Softmax}(L\odot \frac{QK^T}{\sqrt{D}})\cdot V
+% \label{eq:self-attention}
+% \end{equation}
+% where $[Q,K,V]=[W_Q,W_K,W_V]X$, and $W_Q,W_K,W_V$ are learnable parameters. $L$ is the causal attention mask. 
+
+
+
+\noindent\textbf{Definition of attention score.}
+For self-attention (\Cref{eq:self-attention}), the attention score $M_{j,i} \in \mathbb{R}$ from $x_j$ to $x_i$ is:
+\begin{equation}
+        y_i = \mathrm{Softmax}(\frac{Q_iK_{\leq i}^T}{\sqrt{D}})\cdot V_{\leq i}=\sum_{j=1}^iM_{i,j} V_j
+\end{equation}
+For the SSM block, we rewrite~\Cref{eq:ssm} to express its attention pattern as the weighted sum from inputs $[x_1, \dots, x_i]$ to the output $y_i$:
+\begin{equation}
+    y_{i} = \sum_{j=1}^i C_{i}^T (\prod_{k=j+1}^i A_{k})B_{j} x_{j} = \sum_{j=1}^iM'_{i,j} x_{j}
+\end{equation}
+Here, $|M'_{i,j}| \in \mathbb{R}^+$ serves as the “attention score”~\cite{ameen2025mambavis, zimerman2025mambavis} from $x_j$ to $x_i$ within the SSM block.
+Although both the self-attention and Mamba mechanisms employ a multi-head design~\cite{vaswani2017attention,dao2024mamba2} along the hidden dimension, we omit this detail in the equations for simplicity.
+
+
+
+\noindent\textbf{Diverse and specialized attention patterns in Mamba layers.} 
+~\Cref{fig:exp_analyses-attn_mamba_attn_pattern} visualizes the attention score matrices of Nano (hybrid) and Qwen (Transformer) from shallow to deep layers.
+Mamba layers exhibit diverse attention patterns, ranging from sparsity, locality to globality, suggesting that different layers and heads specialize in modeling different types of dependencies. 
+For example, Layer 0, Head 8 of Mamba layer (ML0) exhibits sparsity, where only a few tokens receive dominant attention from the following tokens, revealing Mamba's capability to selectively highlight salient tokens.
+In contrast, ML20 exhibits globality, where all tokens attend uniformly to preceding tokens, reflecting its effective integration of prior information.
+ML52 displays locality, focusing primarily on neighboring tokens.
+This diversity highlights the complementary strengths of state-space modeling within hybrid architectures. 
+
+
+\noindent\textbf{Attention sink in self-attention layer of hybrid MLLM.} 
+The ``attention sink''~\cite{xiao2024attentionsink,sun2024massive} is clearly observed in the self-attention layers of Nano, as shown in~\Cref{fig:exp_analyses-attn_mamba_attn_pattern}, where the majority of attention scores are concentrated on the initial few tokens.
+This behavior aligns with observations in traditional Transformer models, as exemplified by Qwen's attention maps such as AL24 and AL27.
+
+
+\noindent\textbf{Decrease of attention to vision tokens across layers.}
+Comparing the second row with the first row in~\Cref{fig:exp_analyses-attn_mamba_attn_pattern}, we observe a clear downward trend in attention scores assigned to vision tokens as the layers deepen. This phenomenon is consistent with our broader findings: as the model processes more layers, visual information becomes increasingly redundant and is subsequently deprioritized by instruction and response tokens.
+
+
+
+
+
+\noindent\textbf{Qualitative results.}
+~\Cref{fig:case} illustrates qualitative examples from MCQ, TVG, and VDC tasks. TimeViper accurately answers complex multi-choice video questions, localizes temporal boundaries with an IoU of 0.75, and produces rich, fine-grained video descriptions.
+
+
+
+
+
+
+\section{Conclusion}
+This work takes an initial step toward understanding and compressing hybrid vision-language models for long videos.
+We introduce TimeViper, a Mamba-Transformer hybrid model equipped with TransV, an internal LLM token transfer module that compresses vision information into text tokens.
+We reveal that visual information gradually shifts into text tokens as depth of hybrid LLM layer increases, resulting in substantial redundancy among vision tokens in deep layers.
+TimeViper can efficiently process hour-long videos while maintaining strong multimodal understanding.
+TimeViper achieves promising performance for long video understanding across multi-choice video QA, temporal video grounding, and detailed video captioning.
+
+
+
+\clearpage
+\appendix
+\section*{Appendix}
+\addcontentsline{toc}{section}{Supplementary Materials}
+
+
+\section{Limitations}
+First, our current performance still falls short of the SOTA models due to limited training data and insufficient model training. 
+Second, while TransV enables processing over 10,000 frames, the model has not been trained on videos of such duration. 
+
+
+\section{Experimental Setups}
+\noindent\textbf{Implementation details.}
+When training attention-based dropping in multi-turn dialogue scenarios, the attention distribution is computed using the last token of the final instruction as the query.
+For temporal video grounding data, we incorporate a time-aware prompt~\cite{li2024videochatflash}: \textit{``The video lasts for \{\} seconds, and \{\} frames are uniformly sampled from it.''} 
+During training, we randomly sample one instruction from a pool of 15 manually constructed task prompts, such as: \textit{``From the video, locate the portion that aligns with the textual query {}, and output the start and end timestamps in seconds. The output format of the predicted timestamp should be like: 'start to end' seconds. A specific example is : 12.0 to 20.0 seconds''}. 
+We do not use a system prompt, but we retain the BOS token to act as an attention sink~\cite{xiao2024attentionsink}.
+
+\noindent\textbf{Training data summary.}
+Our training pipeline adopts a two-stage strategy.
+We summarize the training data in~\Cref{tab:data_recipe}.
+Specifically, in the first image-text alignment stage, we utilize 3 million images randomly sampled from the CC12M dataset~\cite{changpinyo2021cc12m}, paired with captions sourced from PixelProse~\cite{singla2024pixelprose}.
+In the second video instruction tuning stage, we assemble a composite dataset to enhance MLLM's video understanding and timestamp prediction capabilities, comprising: 
+(1) 1.3M samples from LLaVA-Video~\cite{zhang2025llavavideo};
+(2) 253K data from Kinetics400~\cite{carreira2017k400} and WebVid~\cite{bain2021webvid} that are recaptioned with GPT-4o or Gemini by ShareGemini~\cite{sharegemini} and ShareGPT-4~\cite{chen2024sharegpt4video};
+(3) 100K samples from ET-Instruct~\cite{liu2024etbench}; 
+(4) 112K samples from VideoGPT-Plus~\cite{Maaz2024VideoGPT+};
+(5) 11K samples from LongVid~\cite{li2024videochatflash} and MovieChat~\cite{song2024moviechat};
+(6) 26K dense video captioning (DVC) samples aggregated from ActivityNet~\cite{caba2015activitynet}, COIN~\cite{tang2019coin}, HiREST~\cite{zala2023hirest}, ViTT~\cite{huang2020vitt}, and YouCook2~\cite{zhou2018youcook2};
+and (7) 250K temporal video grounding (TVG) samples~\cite{wang2025timer1} from YT-Temporal~\cite{yang2023vid2seq}, DiDeMo~\cite{anne2017didemo}, QuerYD~\cite{oncescu2021queryd}, InternVid~\cite{wang2024internvid}, and HowTo100M~\cite{miech2019howto100m}. 
+We obtain grounding data with annotations from VTG-IT~\cite{guo2025vtgllm}, TimeIT~\cite{ren2024timechat}, TimePro~\cite{zeng2025timesuite}, HTStep~\cite{afouras2023htstep}, and LongVid~\cite{li2024videochatflash}.
+This data collection process yields 339K temporal grounding samples. 
+To ensure data quality, we apply a simple cleaning protocol to the TVG data. 
+Specifically, we filter out coarse-grained samples where the ground truth duration exceeds 30 seconds or spans more than one-third of the total video length. 
+We also discard invalid entries containing out-of-bound timestamps.
+Consequently, our TVG training data remains 250K.
+
+\begin{figure}[t]
+  \centering  \includegraphics[width=1\linewidth]{file/fig6-attentions-per-layer-share2.png}
+  \caption{
+  Comparison of average attention scores across all layers in Nanov2 and Qwen2.5. 
+  The visualization shows both attention and Mamba layers for Nano, and attention layers for Qwen. 
+  For Mamba layers, we normalize each row of the attention scores using the $L_1$ norm so that all values fall within the range $[0,1]$.
+  }
+  \label{fig:exp_analyses-comp_qwen_nano_attn}
+\vspace{-8pt}
+\end{figure}
+
+
+\input{tables/supple_summary_methods}
+\input{tables/supple_summary_data}
+
+
+\input{tables/supple_qwen_transv}
+
+
+\section{Main Results}
+\noindent\textbf{TransV can be also applied to Qwen2.5.}
+Qwen can also use TransV to handle ultra-long sequences, as shown in~\Cref{tab:supple_qwen_transv}. 
+We observe that on LVBench, this even brings a +0.4 improvement. 
+However, the performance drop on VDC is more severe for Qwen than for Nano. 
+For example, Qwen drops from 42.0 to 40.7 (a decrease of 1.3 points), whereas Nano drops from 39.7 to 39.1 (a decrease of 0.6 points).
+
+
+
+
+
+
+
+\section{Qualitative Results}
+
+
+We define average attention scores used in both Mamba-2 and self-attention layers to analyze attentions received by different types of tokens.
+
+\noindent\textbf{Average attention score computation.} We adopt the category-level attention score definition from LLaVA-Mini~\cite{zhang2025llavamini}.
+Tokens are grouped into instruction, vision, and response categories:
+$\mathcal{T}_\text{ins}$, $\mathcal{T}_\text{vis}$, and $\mathcal{T}_\text{res}$.
+Let $a_{ij}$ denote the attention score from token $t_i$ to token $t_j$, averaged over all attention heads.
+For two token categories $\mathcal{A}, \mathcal{B} \in \{\mathcal{T}_\text{ins}, \mathcal{T}_\text{vis}, \mathcal{T}_\text{res}\}$,
+we define their category-level attention score as:
+\begin{equation}
+\text{Attn}(\mathcal{A} \!\to\! \mathcal{B})
+=
+\frac{
+\sum_{t_i \in \mathcal{A}} \sum_{t_j \in \mathcal{B}} a_{ij}
+}{
+\left|\left\{\, t_i \in \mathcal{A} \;\big|\; \sum_{t_j \in \mathcal{B}} a_{ij} > 0 \right\}\right|
+}.
+\label{eq:avg_attn}
+\end{equation}
+
+\noindent The denominator counts the number of tokens in $\mathcal{A}$ that attend to any token in $\mathcal{B}$ with non-zero weight, ensuring that tokens masked by the causal attention mask are excluded.
+
+
+
+\vspace{4pt} \noindent In~\Cref{fig:exp_analyses-comp_qwen_nano_attn}, we analyze the overall attention scores from the entire sequence
+$\mathcal{T} = \mathcal{T}_\text{ins} \cup \mathcal{T}_\text{vis} \cup \mathcal{T}_\text{res}$
+to a target category $\mathcal{B}$.  To ensure equal contribution from each category, we compute the arithmetic mean of the scores:
+\begin{equation}
+\begin{aligned}
+\text{Attn}(\mathcal{T} \!\to\! \mathcal{B})
+=
+\frac{1}{3}
+\big(
+& \text{Attn}(\mathcal{T}_\text{ins} \!\to\! \mathcal{B}) \\
++ & \text{Attn}(\mathcal{T}_\text{vis} \!\to\! \mathcal{B}) \\
++ & \text{Attn}(\mathcal{T}_\text{res} \!\to\! \mathcal{B})
+\big).
+\end{aligned}
+\end{equation}
+
+
+\noindent\textbf{Hybrid MLLMs preserve stronger attention to vision tokens.} 
+To quantify model behavior, we compute the average attention received by instruction, vision, and response tokens across all layers.
+As shown in~\Cref{fig:exp_analyses-comp_qwen_nano_attn}, Qwen rapidly down-weights vision tokens after the early layers, instead favoring instruction and response tokens.
+In contrast, Nano maintains noticeably higher attention to vision tokens throughout the network.
+These findings suggest that the hybrid model is more effective at attending to visual information than the Transformer-based architecture.
+
+
+
+\noindent\textbf{Qualitative results on VideoMME.}
+~\Cref{fig:case_videomme} provides qualitative examples illustrating the effectiveness of TransV on the MCQ task.
+In the first case (top row), the query requires retrieving fine-grained visual information, specifically, the defending layers about the Berlin Wall. 
+The compressed model, TimeViper w/ TransV, successfully attends to the critical frame at 03:36, which clearly depicts the structure of the wall, enabling it to select the correct answer. 
+This example highlights TransV's capability to identify and attend to key visual cues within long videos.
+In the second case (bottom row), the query requires long-term temporal reasoning to infer the chronological order of topics in a biology lecture. 
+The correct answer relies on aggregating information across the entire video duration. 
+In this case, a model must accurately align the textual concepts (e.g., structure, photosynthesis) with their corresponding temporal segments (00:52, 07:37, etc.), 
+As shown in the visual evidence, TimeViper w/ TransV correctly deduces the sequence (c)-(d)-(e)-(a)-(b), demonstrating its capability in modeling global temporal dependencies and understanding narrative structure.
+
+\noindent\textbf{Qualitative results on Charades.}
+For temporal video grounding results shown in~\Cref{fig:case_charades}, we observe that incorporating the compression module yields only minimal changes. Both the original and compressed models correctly interpret timestamps and successfully localize video segments that correspond to the natural language query.
+
+\noindent\textbf{Qualitative results on VDC.}
+~\Cref{fig:case_vdc} presents the qualitative comparison for the video detailed captioning task. 
+In the generated captions, green text denotes accurate visual details, while red text indicates hallucinations or factual errors.
+In the first example showing a person painting (top row), the baseline model suffers from severe object hallucination, fabricating elements such as a ``sponge'' which are absent in the video. 
+Surprisingly, TimeViper w/ TransV generates more faithful description, accurately recognizing specific objects like ``paintbrushes''. 
+This suggests that compression may help reduce hallucination by filtering out irrelevant or misleading visual information.
+In the second example (bottom row), the compression module TransV largely retains the original model behavior where there are both correct and incorrect captions.
+
+
+
+% \begin{figure*}[]
+%   \centering
+% \includegraphics[width=0.5\linewidth]{file/vdc_case_single.pdf}
+%   \caption{Qualitative results on VDC.}
+%   \label{fig:case_vdc}
+% \vspace{-8pt}
+% \end{figure*}
+
+% \begin{figure*}[]
+%   \centering
+% \includegraphics[width=0.5\linewidth]{file/charades_case.pdf}
+%   \caption{Qualitative results on Charades.}
+%   \label{fig:case_charades}
+% \vspace{-8pt}
+% \end{figure*}
+
+
+% \begin{figure*}[]
+%   \centering
+% \includegraphics[width=0.5\linewidth]{file/videomme_case.pdf}
+%   \caption{Qualitative results on VideoMME.}
+%   \label{fig:case_videomme}
+% \vspace{-8pt}
+% \end{figure*}
+\begin{figure*}[t]
+  \centering
+
+  \begin{subfigure}{\linewidth}
+    \centering
+    \includegraphics[width=0.83\linewidth,keepaspectratio]{file/vdc_case_single.pdf}
+    \caption{Qualitative results on VDC.}
+    \label{fig:case_vdc}
+  \end{subfigure}
+
+  \vspace{6pt} % 可调，控制子图间距
+
+  \begin{subfigure}{\linewidth}
+    \centering
+    \includegraphics[width=0.83\linewidth,keepaspectratio]{file/charades_case.pdf}
+    \caption{Qualitative results on Charades.}
+    \label{fig:case_charades}
+  \end{subfigure}
+
+  \vspace{6pt}
+
+  \begin{subfigure}{\linewidth}
+    \centering
+    \includegraphics[width=0.83\linewidth,keepaspectratio]{file/videomme_case.pdf}
+    \caption{Qualitative results on VideoMME.}
+    \label{fig:case_videomme}
+  \end{subfigure}
+
+  \caption{Qualitative results on three benchmarks.}
+  \label{fig:three_vertical_cases}
+\end{figure*}
+
+\clearpage
+{
+\bibliographystyle{ieeenat_fullname}
+\bibliography{main}
+}
+
+
+\end{document}

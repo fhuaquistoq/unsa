@@ -1,0 +1,39 @@
+\begin{table}[ht]
+    \centering
+    \setlength{\tabcolsep}{12pt}
+    \renewcommand{\arraystretch}{1.2}
+    
+    % 
+    \caption{Parameter settings for three-stage offline pre-training.}
+    
+    \resizebox{\textwidth}{!}{%
+    
+        \begin{tabular}{@{}ll|c|c|c@{}}
+        \toprule
+        & & \textbf{Stage-1}  & \textbf{Stage-2} & \textbf{Stage-3} \\ 
+        \midrule 
+        \multirow{2}{*}{\rotatebox[origin=c]{90}{\footnotesize \textit{Vision}}}
+        & \textbf{Resolution$\times$Num. frames}  & 384 & 384$\times$8 & Max 384$\times$512  \\
+        & \#Tokens & 64$\times$4  & 64$\times$8 & Max 16$\times$512   \\
+        \midrule 
+        \multirow{2}{*}{\rotatebox[origin=c]{90}{\footnotesize \textit{Data}}}
+        & \textbf{Dataset} & Image \& Short Video & Image \& Short Video
+        & Image \& Short / Long Video \\
+        & \#Samples & 0.6M \& 0.5M & 3.8M \& 3.4M  & 0.5M \& 2.8M \\
+        \midrule
+        \multirow{2}{*}{\rotatebox[origin=c]{90}{\footnotesize \textit{Model}}}
+        & \textbf{Trainable} & Projector & Full Model & Full Model  \\
+        & \#parameters & 16.98MB & 8030.35MB & 8030.35MB \\
+        \midrule 
+        \multirow{4}{*}{\rotatebox[origin=c]{90}{\footnotesize \textit{Training}}}
+        & \textbf{Batch Size} & 512 & 256 & 256  \\
+        & \textbf{LR} of \textit{vision encoder} & 1$\times 10^{-3}$ & 2 $\times 10^{-6}$ & 2 $\times 10^{-6}$  \\    
+        & \textbf{LR}\textit{ of connector \& LLM} & 1$\times 10^{-3}$ & 1 $\times 10^{-5}$ & 1 $\times 10^{-5}$   \\
+        & \textbf{Epoch} & 1 & 1 & 1\\
+        \bottomrule
+        \end{tabular}
+        
+    }
+    
+    \label{app:tab:training_strategy_offline}
+\end{table}

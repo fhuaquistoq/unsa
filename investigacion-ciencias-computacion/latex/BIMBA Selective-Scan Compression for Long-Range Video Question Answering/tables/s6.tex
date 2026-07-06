@@ -1,0 +1,18 @@
+\begin{table}
+  \caption{}
+  \small
+  \centering
+  \resizebox{0.5\textwidth}{!}{%
+  \begin{tabular}{@{}lllll@{}}
+    \toprule & Convolution & Recurrence   & Self-Attention  & State-Space  \\
+    \midrule
+    Parameters & \( LH \)                                                                                                                                             & \( \bm{H^2} \) & \( \bm{H^2} \)       & \( \bm{H^2} \)                             \\
+    Parallel   & \textbf{Yes}                                                                                                                                         & No             & \textbf{Yes}         & \textbf{Yes}                                     \\
+    Memory      & \( \bm{BLH} \)                                                                                                                                       & \( \bm{BLH} \) & \( B(L^2 + HL) \)    & \( \bm{BLH} \)                                   \\
+    Training Time  & \( \bm{\tilde{L}H(B + H)} \)                                                                                                                         & \( BLH^2 \)    & \( B(L^2H + LH^2) \) & \( \bm{BH(\tilde{H}+\tilde{L}) + B\tilde{L}H} \) \\
+    Inference Time & \( LH^2 \)                                                                                                                                           & \( \bm{H^2} \) & \( L^2H + H^2L \)    & \( \bm{H^2} \)                                   \\
+    \bottomrule
+  \end{tabular}
+  }
+  \label{tab:ssm}
+\end{table}

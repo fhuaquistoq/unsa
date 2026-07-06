@@ -1,0 +1,42 @@
+\begin{table*}[!t]
+\centering
+\small
+\caption{Comparaciones entre modelos base y \model en benchmarks de comprensión de video de longitud media o corta. \textbf{Bold}: mejores resultados en cada sección. \uline{Underline}: segundo mejor. * indica resultados basados en nuestros scripts de evaluación.}
+\begin{tabular}{lcccccccc}
+\toprule
+& & \multicolumn{3}{c}{Medium-Length Understanding} & \multicolumn{2}{c}{Short Video Understanding} & Video Captioning \\ \cmidrule(l){3-8} 
+Models & Size & Video-MME & MLVU & {LongVideoBench} & MVBench & {NExT-QA} & DREAM-1K \\ \cmidrule(l){3-8} 
+& & w/o subtitles & m-avg & {val} & test & {mc} & F1 \\ \midrule
+\multicolumn{8}{c}{\cellcolor[HTML]{EFEFEF}\textit{Proprietary Models}} \\
+GPT-4V \cite{achiam2023gpt} & - & 59.9 & 49.2 & {59.1} & 43.5 & 70.4 & 34.4 \\
+GPT-4o \cite{OpenAI_GPT4o} & - & 71.9 & 64.6 & {66.7} & - & {76.0} & 39.2 \\
+Gemini-1.5-Pro \cite{team2024gemini} & - & 75.0 & 62.9 & {64.0} & 54.2 & 76.4 & 36.2 \\ \midrule
+\multicolumn{8}{c}{\cellcolor[HTML]{EFEFEF}\textit{Open-source Transformer-based LMMs}} \\
+VideoChat2 \cite{li2024mvbench} & 7B & 39.5 & 47.9 & {39.3} & 51.9 & {78.6} & 26.6 \\
+ShareGPT4Video \cite{chen2025sharegpt4video} & 7B & 39.9 & 46.4 & {39.7} & 51.2 & - & 19.5 \\
+LongVA \cite{zhang2024long} & 7B & 52.4 & 56.3 & {51.8} & 49.2 & {68.3} & - \\
+Video-CCAM \cite{fei2024video} & 9B & 50.3 & 58.5 & - & 64.6 & - & - \\
+Kangaroo \cite{liu2024kangaroo} & 8B & 56.0 & 61.0 & {54.8} & 61.1 & - & - \\
+InternVL2 \cite{chen2024internvl} & 8B & 54.0 & ~48.1\textsuperscript{*} & ~51.8\textsuperscript{*} & 66.4 & - & 26.9 \\
+LLaVA-OneVision \cite{li2024llavaov} & 7B & 58.2 & ~62.6\textsuperscript{*} & \textbf{56.4} & 56.7 & \textbf{79.4} & \textbf{31.7} \\
+Qwen2-VL \cite{wang2024qwen2} & 7B & \textbf{63.3} & \textbf{~64.2\textsuperscript{*}} & ~52.4\textsuperscript{*} & \textbf{67.0} & - & 29.6 \\
+Phi-4-Mini \cite{abouelenin2025phi4minitechnicalreportcompact} & 5.6B & 55.0  & 60.1  & 46.7 & 60.4 & - & -\\
+\midrule
+% InternVL2.5    & 8B & 64.2 & 68.9  & 60.0 & 72.0 & - & - \\ 
+% Qwen2.5-VL     & 7B & 65.1 & 70.2  & 56.0 & 69.6 & - & - \\
+% STORM          & 7B & 63.4 & 72.9  & 60.5 & 71.3 & - & - \\
+% InternVideo2.5 & 7B & 65.1 & 72.8  & 60.6 & 75.7 & - & - \\
+% \midrule
+\multicolumn{8}{c}{\cellcolor[HTML]{EFEFEF}\textit{Open-source Efficient LMMs}} \\
+LLaVA-Mini \cite{zhang2025llava} & 7B & 40.3 & 44.3 & ~19.3\textsuperscript{*} & 44.5 & ~47.6\textsuperscript{*} & 22.9 \\
+LongLLaVA \cite{wang2024longllava} & 9B & 51.6 & ~53.3\textsuperscript{*} & ~42.1\textsuperscript{*} & 54.6 & ~72.2\textsuperscript{*} & \uline{24.6} \\
+LongVU \cite{shen2024longvu} & 7B & ~55.3\textsuperscript{*} & \uline{65.4} & ~53.5\textsuperscript{*} &  \textbf{66.9} &  \uline{~78.0\textsuperscript{*}} & \textbf{28.1} \\
+% LongVILA~\citep{longvila} & 7B & ~60.1\textsuperscript{*} & - & 57.1 & -  &  - & - \\
+% Orxy-1.5 \citep{liu2024oryx}   & 7B & 58.8 & 67.6 & - & 67.6 & - & - \\
+Video-XL \cite{shu2024video} & 7B & \uline{55.5} & 64.9 & {50.7} & 55.3 & ~77.5\textsuperscript{*} & 23.5 \\
+\midrule
+\model & 10B & \textbf{57.8} & \textbf{65.9} & {\textbf{55.9}} & \uline{60.4} & \textbf{78.1} & \textbf{28.1} \\ \bottomrule
+\end{tabular}
+\label{tab:other_bench}
+\vspace{-1em}
+\end{table*}

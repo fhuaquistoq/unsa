@@ -1,0 +1,19 @@
+\begin{table}[]
+\resizebox{0.5\textwidth}{!}{%
+\begin{tabular}{lcccc}
+\toprule
+\multicolumn{1}{l}{\multirow{2}{*}{\begin{tabular}[l]{@{}l@{}}Compression\\ Method\end{tabular}}} & \multicolumn{2}{c}{\modelLlava} & \multicolumn{2}{c}{\modelLlama} \\ 
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+\multicolumn{1}{c}{}  & NextQA & EgoSchema & NextQA & EgoSchema \\ 
+\toprule
+Vanilla  & 67.16       & 50.13          & 72.77        & 58.23      \\
+Pooling   & 68.85       & 52.78          & 71.27        & 57.16     \\
+Self-Attention  & 69.61       & 53.61          & 72.16    & 54.19  \\
+Perceiver  & 70.23       & 54.21          & 73.41        & 56.13  \\
+BIMBA  & \textbf{73.57}       & \textbf{58.40}          & \textbf{75.57}        & \textbf{62.20}          \\ 
+\bottomrule
+\end{tabular}
+}
+\caption{Comparison Between Different Compression Methods.}
+\label{tab:compression}
+\end{table}

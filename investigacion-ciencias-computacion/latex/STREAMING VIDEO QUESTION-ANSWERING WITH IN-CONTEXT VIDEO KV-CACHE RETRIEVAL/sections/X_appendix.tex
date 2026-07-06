@@ -1,0 +1,182 @@
+\lstset{
+basicstyle=\small\ttfamily,
+columns=flexible,
+breaklines=true,
+moredelim=**[is][\color{red}]{@}{@}
+}
+
+\appendix
+
+En el apéndice, proporcionamos detalles adicionales de implementación, experimentos y discusiones sobre limitaciones y trabajo futuro.
+
+\section{Detalles adicionales de implementación}
+
+\subsection{Serving multiproceso}
+
+Como se discutió en la Sección~\ref{sec:task}, nuestro enfoque permite separar el video modeling y el question-answering en distintos procesos y GPUs, mejorando significativamente la eficiencia en aplicaciones del mundo real. Específicamente, dedicamos un proceso principal a la codificación del flujo de video, utilizando atención de ventana deslizante para analizar el video y almacenar la cache calculada en RAM. Si se supera la capacidad de la RAM, los datos pueden descargarse a disco. Además, se mantiene un pool de procesos, cuyo número se determina por la frecuencia de las consultas y los recursos disponibles. Cada proceso carga los mismos parámetros del Video-LLM, pero opera de manera independiente. El procesamiento del video continúa sin interrupciones, sin esperar a que las tareas de question-answering finalicen. Cuando se plantea una consulta, registramos su timestamp para garantizar que la información de video posterior a ese punto quede excluida de la respuesta. Luego, se activa un proceso disponible del pool para recuperar key-value vectors de video relevantes usando nuestro método, cargándolos en su GPU para el question-answering. Este enfoque habilita aplicaciones eficientes de StreamingVQA, con un potencial significativo en áreas como robótica, vigilancia, realidad aumentada y transmisiones en vivo.
+
+\subsection{Plantillas de prompt para VideoQA}
+
+Usamos la misma plantilla de prompt para todos los benchmarks de VideoQA de opción múltiple. El texto en~\texttt{\textcolor{red}{red}} indica entradas variables.
+
+\begin{lstlisting}
+System:
+You are a helpful assistant.
+User: 
+@<video>@
+Question: @<question>@
+Options:
+(A) @<Option_A>@
+(B) @<Option_B>@
+(C) @<Option_C>@
+(D) @<Option_D>@
+(E) @<Option_E>@
+Answer with the option's letter from the given choices directly.
+Assistant:
+\end{lstlisting}
+
+La plantilla de prompt para VideoQA de respuesta abierta es aún más simple:
+
+\begin{lstlisting}
+System:
+You are a helpful assistant.
+User: 
+@<video>@
+@<question>@
+Assistant:
+\end{lstlisting}
+
+\subsection{Cálculo del tamaño de la KV-Cache}
+
+El tamaño de la KV-Cache puede calcularse usando la siguiente fórmula, asumiendo precisión FP16:
+\begin{equation*}
+    2 \times L~\text{layers} \times T~\text{frames} \times M~\text{tokens/frame} \times H~\text{heads} \times D~\text{dimension} \times 2~\text{bytes}.
+\end{equation*}
+
+Para \texttt{LLaVA-OV-7B}~\citep{llava_onevision}, con $L=28$, $M=196$, $H=4$ y $D=128$, procesar un video de 1 hora a 0.5 FPS ($T=1800$) da como resultado un tamaño total de KV-Cache de 18.8 GB.
+
+De manera similar, para \texttt{LLaVA-OV-0.5B}~\citep{llava_onevision}, con $L=24$, $M=196$, $H=2$ y $D=64$, procesar un video de 1 hora a 0.5 FPS da como resultado un tamaño total de KV-Cache de 4.0 GB.
+
+Estos cálculos teóricos son consistentes con los resultados experimentales mostrados en la Tabla~\ref{tab:streamingvqa}.
+
+\section{Experimentos adicionales}
+
+\subsection{Experimentos con más Video-LLMs y benchmark}
+
+Para evaluar más a fondo la capacidad de generalización de nuestro enfoque, lo probamos en Video-LLMs adicionales: \texttt{Video-LLaVA-7B}~\citep{video_llava}, \texttt{LongVA-7B}~\citep{longva} y \texttt{LLaVA-OV-72B}~\citep{llava_onevision}. Utilizamos model sharding para \texttt{LLaVA-OV-72B}, lo que ralentizó significativamente la inferencia. Para mitigar esto, reducimos el FPS a 0.1 y el número de frames recuperados a 32, asegurando una evaluación eficiente. Como se muestra en \Cref{tab:additional}, ReKV mejoró consistentemente el rendimiento en varios modelos y benchmarks, destacando su robustez y adaptabilidad.
+
+\input{tables/additional_exp}
+
+\subsection{Fair comparisons with Flash-VStream} \label{sec:fair_comparison}
+
+\Cref{tab:sota,tab:streamingvqa} compared \texttt{LLaVA-OneVision+ReKV} with \texttt{Flash-VStream}. However, these comparisons may be unfair due to different architecture and training data. Thus, here we conduct \textbf{fair} comparisons using the same Video-LLM backbone, including the identical visual encoder (\texttt{CLIP-ViT-L/14}), projector (2-layer MLP), LLM (\texttt{Vicuna-7B-v1.5}), training data, and train/eval pipelines.
+
+Due to the inaccessibility of WebVid videos\footnote{https://github.com/m-bain/webvid} used in Flash-VStream’s original training, we use 232K randomly sampled InternVid videos\footnote{https://huggingface.co/datasets/OpenGVLab/InternVid} as a substitute. This ensures comparable experimental settings.
+We train a baseline Video-LLM model (\texttt{Base}) and a Flash-VStream-enhanced version (\texttt{Base+Flash}). Similarly, we integrate ReKV into the same baseline (\texttt{Base+ReKV}) for fair comparisons.
+To maintain parity, the baseline uniformly samples 16 frames per video, resized to $224\times224$. Visual features of shape $(T, 16, 16, D)$ are average-pooled to $(T, 8, 8, D)$ before being passed through the MLP projector and into the LLM.
+Both Flash-VStream and ReKV process video at 0.5 FPS, with ReKV retrieving 16 frames.
+
+\begin{table}[h]
+% \setlength{\tabcolsep}{1.5mm}
+% \renewcommand{\arraystretch}{1.1}
+\centering
+\caption{
+\textbf{Fair comparisons with Flash-VStream.}
+\textcolor{gray}{``Original Flash''} is the checkpoint officially published by Flash-VStream while ``Base+Flash'' is our reproduced version.
+}
+\label{tab:flash}
+\vspace{-5pt}
+\footnotesize
+\resizebox{0.9\linewidth}{!}{
+\begin{tabu}{l l l l l l}
+    \toprule
+    Method & MLVU$_\texttt{dev-mc}$ & \textsc{QaEgo4D}$_\texttt{test-mc}$ & EgoSchema  & RVS-Movie & RVS-Ego \\
+    \midrule   
+    Base & 49.8 & 39.0 & 42.6 & 47.2 & 54.1 \\
+    Base+Flash & 51.0	& 37.4	& 41.2	& 50.1	& \textbf{55.4} \\
+    \textbf{Base+ReKV}	& \textbf{51.9}\plusvalue{0.9}	& \textbf{40.5}\plusvalue{3.1}	& \textbf{43.7}\plusvalue{2.5}	& \textbf{51.9}\plusvalue{1.8}	& 54.7\minusvalue{0.7} \\
+    \rowfont{\color{gray}} Original Flash	& 50.2	& 38.2	& 38.1	& 53.1	& 57.3 \\
+    \bottomrule
+\end{tabu}
+}
+\end{table}
+
+As shown in Table~\ref{tab:flash}, \texttt{Base+ReKV} consistently outperforms the base Video-LLM \texttt{Base} and surpasses \texttt{Base+Flash} in most cases, highlighting its superiority under fair comparative conditions.
+Additionally, ReKV offers enhanced usability, seamlessly integrating with existing Video-LLMs without requiring extensive retraining.
+
+On the contrary, the reproduced \texttt{Base+Flash} does not consistently outperform \texttt{Base}. It excels on StreamingVQA (RVS-Movie and RVS-Ego) and MLVU but underperforms on \textsc{QAEgo4D} and EgoSchema.
+This discrepancy is likely due to significant visual information loss: the \texttt{Base} model processes 1024 visual tokens ($16\times64$), while \texttt{Base+Flash} uses only 681 memory tokens.
+
+For additional context, we include results from the original Flash-VStream (\texttt{Original Flash}) using checkpoints from its official repository\footnote{https://github.com/IVGSZ/Flash-VStream}.
+Our reproduced \texttt{Base+Flash} shows performance deviations, likely due to differences in training data and potential environmental factors.
+
+\subsection{Computational Complexity}
+
+We ensure \textbf{fair} comparisons by using the identical Video-LLM backbone (Sec.~\ref{sec:fair_comparison}) under controlled streaming conditions (Sec.~\ref{sec:streaming}). Specifically, we measured the FLOPs and MACs of the base Video-LLM, Flash-VStream, and our external and internal retrieval methods. We analyzed \textbf{average TFLOPs and TMACs per QA over various question frequencies} in a 1-hour video, leveraging the \texttt{calflops} library~\citep{ye2023calflops}.
+
+As shown in~\Cref{tab:tflops,tab:tmacs}, ReKV’s efficiency improves significantly with increasing QA frequency.
+The video stream is encoded only once, and computed results are reused across QAs, leading to reduced per-query complexity as QA frequency rises.
+Flash-VStream outperforms ReKV at low QA frequencies (\textit{e.g.}, 100 QAs). However, ReKV’s complexity decreases more rapidly with increased QA frequency, primarily due to Flash-VStream’s high memory update overhead.
+ReKV is thus better suited for high-concurrency scenarios such as live streaming and requires no additional training.
+
+Furthermore, Internal retrieval consistently outperforms external retrieval, reducing average FLOPs by 15.5\% and MACs by 15.2\%.
+These results underscore ReKV’s ability to balance computational efficiency and effectiveness, particularly in dynamic, high-query environments.
+This positions ReKV as a practical and scalable solution for streaming video understanding.
+
+\begin{table}[h]
+\setlength{\tabcolsep}{1.5mm}
+% \renewcommand{\arraystretch}{1.1}
+\centering
+\caption{
+\textbf{TFLOPs / QA.}
+}
+\label{tab:tflops}
+\vspace{-5pt}
+\footnotesize
+\resizebox{0.7\linewidth}{!}{
+\begin{tabu}{l cccc}
+    \toprule
+    \#QAs & Baseline &Flash-VStream & ReKV (External) & ReKV (Internal) \\
+    \midrule   
+    100 &	22.4 &	\textbf{15.5} &	21.7 &	18.5 \\
+    200 &	12.7 &	14.1 &	11.4 &	\textbf{9.6} \\
+    360 &	8.5 &	13.8 &	6.8 &	\textbf{5.6} \\
+    \bottomrule
+\end{tabu}
+}
+\vspace{-5pt}
+\end{table}
+
+\begin{table}[h]
+\setlength{\tabcolsep}{1.5mm}
+% \renewcommand{\arraystretch}{1.1}
+\centering
+\caption{
+\textbf{TMACs / QA.}
+}
+\label{tab:tmacs}
+\vspace{-5pt}
+\footnotesize
+\resizebox{0.7\linewidth}{!}{
+\begin{tabu}{l cccc}
+    \toprule
+    \#QAs & Baseline &Flash-VStream & ReKV (External) & ReKV (Internal) \\
+    \midrule   
+    100 &	11.2 &	\textbf{7.8} &	10.8 &	9.2 \\
+    200 &	6.4 &	7.1 &	5.7 &	\textbf{4.8} \\
+    360 &	4.3 &	6.8 &	3.3 &	\textbf{2.8} \\
+    \bottomrule
+\end{tabu}
+}
+\vspace{-5pt}
+\end{table}
+
+
+\section{Limitations and Future Work}
+\label{sec:limitation}
+
+While \ourmethod~improves the accuracy and efficiency of Video-LLMs in the StreamingVQA task, it still has several limitations that deserves future investigation:
+{\em First}, although the KV-Cache offloading to RAM or disk is manageable, as shown in Table~\ref{tab:streamingvqa}, handling extremely long video streams, such as those in surveillance, may lead to an unsustainable increase in cache size. This issue can be mitigated by integrating techniques such as quantization, token pruning, and compression.
+{\em Second}, the use of a constant block size for grouping consecutive frames during retrieval can disrupt video continuity. A more refined solution would involve segmenting videos into semantically coherent blocks.
+{\em Third}, our method retrieves a fixed number of frames. Future work could explore dynamic retrieval strategies that adjust the number of frames based on video context and query requirements.
+{\em Finally}, StreamingVQA remains an under-explored task with few available benchmarks. Developing high-quality benchmarks with precise temporal annotations is crucial for advancing future research.

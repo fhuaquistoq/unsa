@@ -1,0 +1,719 @@
+@inproceedings{gpt3,
+ author = {Brown, Tom and Mann, Benjamin and Ryder, Nick and Subbiah, Melanie and Kaplan, Jared D and Dhariwal, Prafulla and Neelakantan, Arvind and Shyam, Pranav and Sastry, Girish and Askell, Amanda and Agarwal, Sandhini and Herbert-Voss, Ariel and Krueger, Gretchen and Henighan, Tom and Child, Rewon and Ramesh, Aditya and Ziegler, Daniel and Wu, Jeffrey and Winter, Clemens and Hesse, Chris and Chen, Mark and Sigler, Eric and Litwin, Mateusz and Gray, Scott and Chess, Benjamin and Clark, Jack and Berner, Christopher and McCandlish, Sam and Radford, Alec and Sutskever, Ilya and Amodei, Dario},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {H. Larochelle and M. Ranzato and R. Hadsell and M.F. Balcan and H. Lin},
+ pages = {1877--1901},
+ publisher = {Curran Associates, Inc.},
+ title = {Language Models are Few-Shot Learners},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Paper.pdf},
+ volume = {33},
+ year = {2020}
+}
+
+
+@article{corallo-papotti-2024-finch,
+    title = "{FINCH}: Prompt-guided Key-Value Cache Compression for Large Language Models",
+    author = "Corallo, Giulio  and
+      Papotti, Paolo",
+    journal = "Transactions of the Association for Computational Linguistics",
+    volume = "12",
+    year = "2024",
+    address = "Cambridge, MA",
+    publisher = "MIT Press",
+    url = "https://aclanthology.org/2024.tacl-1.83/",
+    doi = "10.1162/tacl_a_00716",
+    pages = "1517--1532",
+    abstract = "Recent large language model applications, such as Retrieval-Augmented Generation and chatbots, have led to an increased need to process longer input contexts. However, this requirement is hampered by inherent limitations. Architecturally, models are constrained by a context window defined during training. Additionally, processing extensive texts requires substantial GPU memory. We propose a novel approach, Finch, to compress the input context by leveraging the pre-trained model weights of the self-attention. Given a prompt and a long text, Finch iteratively identifies the most relevant Key (K) and Value (V) pairs over chunks of the text conditioned on the prompt. Only such pairs are stored in the KV cache, which, within the space constrained by the context window, ultimately contains a compressed version of the long text. Our proposal enables models to consume large inputs even with high compression (up to 93x) while preserving semantic integrity without the need for fine-tuning."
+}
+
+@misc{openai2022chatgpt,
+    author = {{OpenAI}},
+    title = {Introducing {ChatGPT}},
+    year = {2022},
+    howpublished = {\url{https://openai.com/blog/chatgpt}},
+    note = {Accessed: 2024-01-30}
+}
+
+@misc{google2024cgemini-2.0,
+    author = {Sundar Pichai and Demis Hassabis and Koray Kavukcuoglu},
+    title = {Introducing Gemini 2.0: our new AI model for the agentic era},
+    year = {2024},
+    howpublished = {\url{https://blog.google/technology/google-deepmind/google-gemini-ai-update-december-2024}},
+}
+
+@misc{touvron2023llamaopenefficientfoundation,
+      title={LLaMA: Open and Efficient Foundation Language Models}, 
+      author={Hugo Touvron and Thibaut Lavril and Gautier Izacard and Xavier Martinet and Marie-Anne Lachaux and Timothée Lacroix and Baptiste Rozière and Naman Goyal and Eric Hambro and Faisal Azhar and Aurelien Rodriguez and Armand Joulin and Edouard Grave and Guillaume Lample},
+      year={2023},
+      eprint={2302.13971},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2302.13971}, 
+}
+
+@article{qwen2.5,
+    title   = {Qwen2.5 Technical Report}, 
+    author  = {An Yang and Baosong Yang and Beichen Zhang and Binyuan Hui and Bo Zheng and Bowen Yu and Chengyuan Li and Dayiheng Liu and Fei Huang and Haoran Wei and Huan Lin and Jian Yang and Jianhong Tu and Jianwei Zhang and Jianxin Yang and Jiaxi Yang and Jingren Zhou and Junyang Lin and Kai Dang and Keming Lu and Keqin Bao and Kexin Yang and Le Yu and Mei Li and Mingfeng Xue and Pei Zhang and Qin Zhu and Rui Men and Runji Lin and Tianhao Li and Tingyu Xia and Xingzhang Ren and Xuancheng Ren and Yang Fan and Yang Su and Yichang Zhang and Yu Wan and Yuqiong Liu and Zeyu Cui and Zhenru Zhang and Zihan Qiu},
+    journal = {arXiv preprint arXiv:2412.15115},
+    year    = {2024}
+}
+
+@inproceedings{llava,
+ author = {Liu, Haotian and Li, Chunyuan and Wu, Qingyang and Lee, Yong Jae},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {A. Oh and T. Naumann and A. Globerson and K. Saenko and M. Hardt and S. Levine},
+ pages = {34892--34916},
+ publisher = {Curran Associates, Inc.},
+ title = {Visual Instruction Tuning},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2023/file/6dcf277ea32ce3288914faf369fe6de0-Paper-Conference.pdf},
+ volume = {36},
+ year = {2023}
+}
+
+@inproceedings{liu2024improved,
+  title={Improved baselines with visual instruction tuning},
+  author={Liu, Haotian and Li, Chunyuan and Li, Yuheng and Lee, Yong Jae},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  pages={26296--26306},
+  year={2024}
+}
+
+@article{Qwen-VL,
+  title={Qwen-VL: A Versatile Vision-Language Model for Understanding, Localization, Text Reading, and Beyond},
+  author={Bai, Jinze and Bai, Shuai and Yang, Shusheng and Wang, Shijie and Tan, Sinan and Wang, Peng and Lin, Junyang and Zhou, Chang and Zhou, Jingren},
+  journal={arXiv preprint arXiv:2308.12966},
+  year={2023}
+}
+
+
+@article{reid2024gemini,
+  title={Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context},
+  author={Reid, Machel and Savinov, Nikolay and Teplyashin, Denis and Lepikhin, Dmitry and Lillicrap, Timothy and Alayrac, Jean-baptiste and Soricut, Radu and Lazaridou, Angeliki and Firat, Orhan and Schrittwieser, Julian and others},
+  journal={arXiv preprint arXiv:2403.05530},
+  year={2024}
+}
+
+@misc{li2024videochatchatcentricvideounderstanding,
+      title={VideoChat: Chat-Centric Video Understanding}, 
+      author={KunChang Li and Yinan He and Yi Wang and Yizhuo Li and Wenhai Wang and Ping Luo and Yali Wang and Limin Wang and Yu Qiao},
+      year={2024},
+      eprint={2305.06355},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2305.06355}, 
+}
+
+@article{Qwen2VL,
+  title={Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution},
+  author={Wang, Peng and Bai, Shuai and Tan, Sinan and Wang, Shijie and Fan, Zhihao and Bai, Jinze and Chen, Keqin and Liu, Xuejing and Wang, Jialin and Ge, Wenbin and Fan, Yang and Dang, Kai and Du, Mengfei and Ren, Xuancheng and Men, Rui and Liu, Dayiheng and Zhou, Chang and Zhou, Jingren and Lin, Junyang},
+  journal={arXiv preprint arXiv:2409.12191},
+  year={2024}
+}
+
+@misc{zhang2024llavanext-video,
+  title={LLaVA-NeXT: A Strong Zero-shot Video Understanding Model},
+  author={Zhang, Yuanhan and Li, Bo and Liu, haotian and Lee, Yong jae and Gui, Liangke and Fu, Di and Feng, Jiashi and Liu, Ziwei and Li, Chunyuan},
+  month={April},
+  year={2024},
+  url={https://llava-vl.github.io/blog/2024-04-30-llava-next-video/},
+}
+
+@misc{grattafiori2024llama3herdmodels,
+      title={The Llama 3 Herd of Models}, 
+      author={Aaron Grattafiori et al},
+      year={2024},
+      eprint={2407.21783},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2407.21783}, 
+}
+
+@misc{deepmind2023astra,
+    author = {{Google DeepMind}},
+    title = {Project {ASTRA}},
+    year = {2024},
+    howpublished = {\url{https://deepmind.google/technologies/project-astra/}},
+}
+
+@misc{openai2023gpt4v,
+    title = {GPT-4V(ision) System Card},
+    author = {{OpenAI}},
+    year = {2023},
+    url = {https://openai.com/index/gpt-4v-system-card/}
+}
+
+@misc{openai2023gpt4o,
+    author = {{OpenAI}},
+    title = {Hello GPT-4o},
+    year = {2024},
+    howpublished = {\url{https://openai.com/index/hello-gpt-4o/}},
+}
+
+
+@inproceedings{
+li2024snapkv,
+title={Snap{KV}: {LLM} Knows What You are Looking for Before Generation},
+author={Yuhong Li and Yingbing Huang and Bowen Yang and Bharat Venkitesh and Acyr Locatelli and Hanchen Ye and Tianle Cai and Patrick Lewis and Deming Chen},
+booktitle={The Thirty-eighth Annual Conference on Neural Information Processing Systems},
+year={2024},
+url={https://openreview.net/forum?id=poE54GOq2l}
+}
+
+@inproceedings{
+zhang2023ho,
+title={H2O: Heavy-Hitter Oracle for Efficient Generative Inference of Large Language Models},
+author={Zhenyu Zhang and Ying Sheng and Tianyi Zhou and Tianlong Chen and Lianmin Zheng and Ruisi Cai and Zhao Song and Yuandong Tian and Christopher Re and Clark Barrett and Zhangyang Wang and Beidi Chen},
+booktitle={Thirty-seventh Conference on Neural Information Processing Systems},
+year={2023},
+url={https://openreview.net/forum?id=RkRrPp7GKO}
+}
+
+@misc{chen2024image,
+      title={An Image is Worth 1/2 Tokens After Layer 2: Plug-and-Play Inference Acceleration for Large Vision-Language Models}, 
+      author={Liang Chen and Haozhe Zhao and Tianyu Liu and Shuai Bai and Junyang Lin and Chang Zhou and Baobao Chang},
+      year={2024},
+      eprint={2403.06764},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+@misc{shen2024longvu,
+      title={LongVU: Spatiotemporal Adaptive Compression for Long Video-Language Understanding}, 
+      author={Xiaoqian Shen and Yunyang Xiong and Changsheng Zhao and Lemeng Wu and Jun Chen and Chenchen Zhu and Zechun Liu and Fanyi Xiao and Balakrishnan Varadarajan and Florian Bordes and Zhuang Liu and Hu Xu and Hyunwoo J. Kim and Bilge Soran and Raghuraman Krishnamoorthi and Mohamed Elhoseiny and Vikas Chandra},
+      year={2024},
+      eprint={2410.17434},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2410.17434}, 
+}
+
+@inproceedings{
+Shangzhe2025streaming,
+title={Streaming Video Question-Answering with In-context Video {KV}-Cache Retrieval},
+author={Shangzhe Di, Zhelun Yu},
+booktitle={The Thirteenth International Conference on Learning Representations},
+year={2025},
+url={https://openreview.net/forum?id=8g9fs6mdEG}
+}
+
+@misc{zhang2024flashvstream,
+      title={Flash-VStream: Memory-Based Real-Time Understanding for Long Video Streams}, 
+      author={Haoji Zhang and Yiqin Wang and Yansong Tang and Yong Liu and Jiashi Feng and Jifeng Dai and Xiaojie Jin},
+      year={2024},
+      eprint={2406.08085},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2406.08085}, 
+}
+
+@inproceedings{fu2024headkv,
+      title={Not All Heads Matter: A Head-Level KV Cache Compression Method with Integrated Retrieval and Reasoning}, 
+      author={Yu Fu and Zefan Cai and Abedelkadir Asi and Wayne Xiong and Yue Dong and Wen Xiao},
+      booktitle={The Thirteenth International Conference on Learning Representations},
+      year={2025},
+      url={https://arxiv.org/abs/2410.19258}, 
+}
+
+@misc{zhang2024sparsevlm,
+      title={SparseVLM: Visual Token Sparsification for Efficient Vision-Language Model Inference}, 
+      author={Yuan Zhang and Chun-Kai Fan and Junpeng Ma and Wenzhao Zheng and Tao Huang and Kuan Cheng and Denis Gudovskiy and Tomoyuki Okuno and Yohei Nakata and Kurt Keutzer and Shanghang Zhang},
+      year={2024},
+      eprint={2410.04417},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2410.04417}, 
+}
+
+@inproceedings{
+Chen2025longvila,
+title={Long{VILA}: Scaling Long-Context Visual Language Models for Long Videos},
+author={Yukang Chen and Fuzhao Xue and Dacheng Li and Qinghao Hu and Ligeng Zhu and Xiuyu Li and Yunhao Fang and Haotian Tang and Shang Yang and Zhijian Liu and Ethan He and Hongxu Yin and Pavlo Molchanov and Jan Kautz and Linxi Fan and Yuke Zhu and Yao Lu and Song Han},
+booktitle={The Thirteenth International Conference on Learning Representations},
+year={2025},
+url={https://openreview.net/forum?id=wCXAlfvCy6}
+}
+
+@misc{zhao2024acceleratingmultimodallargelanguage,
+      title={Accelerating Multimodal Large Language Models by Searching Optimal Vision Token Reduction}, 
+      author={Shiyu Zhao and Zhenting Wang and Felix Juefei-Xu and Xide Xia and Miao Liu and Xiaofang Wang and Mingfu Liang and Ning Zhang and Dimitris N. Metaxas and Licheng Yu},
+      year={2024},
+      eprint={2412.00556},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2412.00556}, 
+}
+
+@article{hooper2024squeezed,
+  title={Squeezed Attention: Accelerating Long Context Length LLM Inference},
+  author={Hooper, Coleman and Kim, Sehoon and Mohammadzadeh, Hiva and Maheswaran, Monishwaran and Paik, June and Mahoney, Michael W and Keutzer, Kurt and Gholami, Amir},
+  journal={arXiv preprint arXiv:2411.09688},
+  year={2024}
+}
+
+@inproceedings{kim-etal-2024-infinipot,
+    title = "{I}nfini{P}ot: Infinite Context Processing on Memory-Constrained {LLM}s",
+    author = "Kim, Minsoo  and
+      Shim, Kyuhong  and
+      Choi, Jungwook  and
+      Chang, Simyung",
+    editor = "Al-Onaizan, Yaser  and
+      Bansal, Mohit  and
+      Chen, Yun-Nung",
+    booktitle = "Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing",
+    month = nov,
+    year = "2024",
+    address = "Miami, Florida, USA",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2024.emnlp-main.897/",
+    doi = "10.18653/v1/2024.emnlp-main.897",
+    pages = "16046--16060",
+}
+
+@misc{arif2024hired,
+      title={HiRED: Attention-Guided Token Dropping for Efficient Inference of High-Resolution Vision-Language Models}, 
+      author={Kazi Hasan Ibn Arif and JinYi Yoon and Dimitrios S. Nikolopoulos and Hans Vandierendonck and Deepu John and Bo Ji},
+      year={2024},
+      eprint={2408.10945},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2408.10945}, 
+}
+
+@misc{zhang2024fastervlm,
+      title={[CLS] Attention is All You Need for Training-Free Visual Token Pruning: Make VLM Inference Faster}, 
+      author={Qizhe Zhang and Aosong Cheng and Ming Lu and Zhiyong Zhuo and Minqi Wang and Jiajun Cao and Shaobo Guo and Qi She and Shanghang Zhang},
+      year={2024},
+      eprint={2412.01818},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2412.01818}, 
+}
+
+@article{fu2024videomme,
+  title={Video-MME: The First-Ever Comprehensive Evaluation Benchmark of Multi-modal LLMs in Video Analysis},
+  author={Fu, Chaoyou and Dai, Yuhan and Luo, Yondong and Li, Lei and Ren, Shuhuai and Zhang, Renrui and Wang, Zihan and Zhou, Chenyu and Shen, Yunhang and Zhang, Mengdan and others},
+  journal={arXiv preprint arXiv:2405.21075},
+  year={2024}
+}
+
+@article{MLVU,
+  title={MLVU: A Comprehensive Benchmark for Multi-Task Long Video Understanding},
+  author={Zhou, Junjie and Shu, Yan and Zhao, Bo and Wu, Boya and Xiao, Shitao and Yang, Xi and Xiong, Yongping and Zhang, Bo and Huang, Tiejun and Liu, Zheng},
+  journal={arXiv preprint arXiv:2406.04264},
+  year={2024}
+}
+
+@inproceedings{
+wu2024longvideobench,
+title={LongVideoBench: A Benchmark for Long-context Interleaved Video-Language Understanding},
+author={Haoning Wu and Dongxu Li and Bei Chen and Junnan Li},
+booktitle={The Thirty-eight Conference on Neural Information Processing Systems Datasets and Benchmarks Track},
+year={2024},
+url={https://openreview.net/forum?id=3G1ZDXOI4f}
+}
+
+@inproceedings{
+tang2025razorattention,
+title={RazorAttention: Efficient {KV} Cache Compression Through Retrieval Heads},
+author={Hanlin Tang and Yang Lin and Jing Lin and Qingsen Han and Shikuan Hong and Danning Ke and Yiwu Yao and Gongyi Wang},
+booktitle={The Thirteenth International Conference on Learning Representations},
+year={2025},
+url={https://openreview.net/forum?id=tkiZQlL04w}
+}
+
+@inproceedings{NIPS2017_3f5ee243,
+ author = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N and Kaiser, \L ukasz and Polosukhin, Illia},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {I. Guyon and U. Von Luxburg and S. Bengio and H. Wallach and R. Fergus and S. Vishwanathan and R. Garnett},
+ pages = {},
+ publisher = {Curran Associates, Inc.},
+ title = {Attention is All you Need},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf},
+ volume = {30},
+ year = {2017}
+}
+
+@misc{zohar2024apolloexplorationvideounderstanding,
+      title={Apollo: An Exploration of Video Understanding in Large Multimodal Models}, 
+      author={Orr Zohar and Xiaohan Wang and Yann Dubois and Nikhil Mehta and Tong Xiao and Philippe Hansen-Estruch and Licheng Yu and Xiaofang Wang and Felix Juefei-Xu and Ning Zhang and Serena Yeung-Levy and Xide Xia},
+      year={2024},
+      eprint={2412.10360},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2412.10360}, 
+}
+
+@inproceedings{
+tong2024cambrian,
+title={Cambrian-1: A Fully Open, Vision-Centric Exploration of Multimodal {LLM}s},
+author={Shengbang Tong and Ellis L Brown II and Penghao Wu and Sanghyun Woo and ADITHYA JAIRAM IYER and Sai Charitha Akula and Shusheng Yang and Jihan Yang and Manoj Middepogu and Ziteng Wang and Xichen Pan and Rob Fergus and Yann LeCun and Saining Xie},
+booktitle={The Thirty-eighth Annual Conference on Neural Information Processing Systems},
+year={2024},
+url={https://openreview.net/forum?id=Vi8AepAXGy}
+}
+
+
+@inproceedings{
+neo2025towards,
+title={Towards Interpreting Visual Information Processing in Vision-Language Models},
+author={Clement Neo and Luke Ong and Philip Torr and Mor Geva and David Krueger and Fazl Barez},
+booktitle={The Thirteenth International Conference on Learning Representations},
+year={2025},
+url={https://openreview.net/forum?id=chanJGoa7f}
+}
+
+@ARTICLE{h264,
+  author={Wiegand, T. and Sullivan, G.J. and Bjontegaard, G. and Luthra, A.},
+  journal={IEEE Transactions on Circuits and Systems for Video Technology}, 
+  title={Overview of the H.264/AVC video coding standard}, 
+  year={2003},
+  volume={13},
+  number={7},
+  pages={560-576},
+  keywords={Automatic voltage control;Video coding;IEC standards;ISO standards;Standardization;Video compression;MPEG standards;Telephony;Multimedia communication;Broadcasting},
+  doi={10.1109/TCSVT.2003.815165}}
+
+@misc{Qwen2.5-VL,
+    title = {Qwen2.5-VL},
+    url = {https://qwenlm.github.io/blog/qwen2.5-vl/},
+    author = {Qwen Team},
+    month = {January},
+    year = {2025}
+}
+
+@inproceedings{
+xiao2024efficient,
+title={Efficient Streaming Language Models with Attention Sinks},
+author={Guangxuan Xiao and Yuandong Tian and Beidi Chen and Song Han and Mike Lewis},
+booktitle={The Twelfth International Conference on Learning Representations},
+year={2024},
+url={https://openreview.net/forum?id=NG7sS51zVF}
+}
+
+@misc{tan2024informationlargelanguagemodel,
+      title={The Information of Large Language Model Geometry}, 
+      author={Zhiquan Tan and Chenghai Li and Weiran Huang},
+      year={2024},
+      eprint={2402.03471},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2402.03471}, 
+}
+
+  @inproceedings{chen2024internvl,
+    title={Internvl: Scaling up vision foundation models and aligning for generic visual-linguistic tasks},
+    author={Chen, Zhe and Wu, Jiannan and Wang, Wenhai and Su, Weijie and Chen, Guo and Xing, Sen and Zhong, Muyan and Zhang, Qinglong and Zhu, Xizhou and Lu, Lewei and others},
+    booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+    pages={24185--24198},
+    year={2024}
+  }
+
+@article{farquhar2024detecting,
+  title={Detecting hallucinations in large language models using semantic entropy},
+  author={Farquhar, Sebastian and Kossen, Jannik and Kuhn, Livia and others},
+  journal={Nature},
+  volume={630},
+  pages={625--630},
+  year={2024},
+  publisher={Nature Publishing Group},
+  doi={10.1038/s41586-024-07421-0}
+}
+
+@misc{abdin2024phi3technicalreporthighly,
+      title={Phi-3 Technical Report: A Highly Capable Language Model Locally on Your Phone}, 
+      author={Marah Abdin et al},
+      year={2024},
+      eprint={2404.14219},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2404.14219}, 
+}
+
+@article{lin2023video,
+  title={Video-LLaVA: Learning United Visual Representation by Alignment Before Projection},
+  author={Lin, Bin and Zhu, Bin and Ye, Yang and Ning, Munan and Jin, Peng and Yuan, Li},
+  journal={arXiv preprint arXiv:2311.10122},
+  year={2023}
+}
+
+@inproceedings{
+liu2024ringattention,
+title={RingAttention with Blockwise Transformers for Near-Infinite Context},
+author={Hao Liu and Matei Zaharia and Pieter Abbeel},
+booktitle={The Twelfth International Conference on Learning Representations},
+year={2024},
+url={https://openreview.net/forum?id=WsRHpHH4s0}
+}
+
+@misc{tao2024dycokedynamiccompressiontokens,
+      title={DyCoke: Dynamic Compression of Tokens for Fast Video Large Language Models}, 
+      author={Keda Tao and Can Qin and Haoxuan You and Yang Sui and Huan Wang},
+      year={2024},
+      eprint={2411.15024},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2411.15024}, 
+}
+
+@article{Beltagy2020Longformer,
+  title={Longformer: The Long-Document Transformer},
+  author={Iz Beltagy and Matthew E. Peters and Arman Cohan},
+  journal={arXiv:2004.05150},
+  year={2020},
+}
+
+@inproceedings{dao2023flashattention2,
+  title={Flash{A}ttention-2: Faster Attention with Better Parallelism and Work Partitioning},
+  author={Dao, Tri},
+  booktitle={International Conference on Learning Representations (ICLR)},
+  year={2024}
+}
+
+
+
+@inproceedings{ringattention,
+    title={RingAttention with Blockwise Transformers for Near-Infinite Context},
+    author={Hao Liu and Matei Zaharia and Pieter Abbeel},
+    booktitle={The Twelfth International Conference on Learning Representations},
+    year={2024},
+    url={https://openreview.net/forum?id=WsRHpHH4s0}
+}
+
+@inproceedings{pagedattention,
+  title={Efficient memory management for large language model serving with pagedattention},
+  author={Kwon, Woosuk and Li, Zhuohan and Zhuang, Siyuan and Sheng, Ying and Zheng, Lianmin and Yu, Cody Hao and Gonzalez, Joseph and Zhang, Hao and Stoica, Ion},
+  booktitle={Proceedings of the 29th Symposium on Operating Systems Principles},
+  pages={611--626},
+  year={2023}
+}
+
+@inproceedings{peng2024yarn,
+    title={Ya{RN}: Efficient Context Window Extension of Large Language Models},
+    author={Bowen Peng and Jeffrey Quesnelle and Honglu Fan and Enrico Shippole},
+    booktitle={The Twelfth International Conference on Learning Representations},
+    year={2024},
+    url={https://openreview.net/forum?id=wHBfxhZu1u}
+}
+
+@inproceedings{ge2024model,
+    title={Model Tells You What to Discard: Adaptive {KV} Cache Compression for {LLM}s},
+    author={Suyu Ge and Yunan Zhang and Liyuan Liu and Minjia Zhang and Jiawei Han and Jianfeng Gao},
+    booktitle={The Twelfth International Conference on Learning Representations},
+    year={2024},
+    url={https://openreview.net/forum?id=uNrFpDPMyo}
+}
+
+@inproceedings{yang2024pyramidinfer,
+    title = "{P}yramid{I}nfer: Pyramid {KV} Cache Compression for High-throughput {LLM} Inference",
+    author = "Yang, Dongjie  and
+      Han, Xiaodong  and
+      Gao, Yan  and
+      Hu, Yao  and
+      Zhang, Shilin  and
+      Zhao, Hai",
+    booktitle = "Findings of the Association for Computational Linguistics: ACL 2024",
+    month = aug,
+    year = "2024",
+    pages = "3258--3270"
+}
+
+@misc{corallo2025ragtaskawarekvcache,
+      title={Beyond RAG: Task-Aware KV Cache Compression for Comprehensive Knowledge Reasoning}, 
+      author={Giulio Corallo and Orion Weller and Fabio Petroni and Paolo Papotti},
+      year={2025},
+      eprint={2503.04973},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2503.04973}, 
+}
+
+@inproceedings{devoto2024simple,
+    title = "A Simple and Effective $L\_2$ Norm-Based Strategy for {KV} Cache Compression",
+    author = "Devoto, Alessio  and
+      Zhao, Yu  and
+      Scardapane, Simone  and
+      Minervini, Pasquale",
+    booktitle = "Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing",
+    month = nov,
+    year = "2024",
+    pages = "18476--18499",
+}
+
+@misc{kim2025kvzipqueryagnostickvcache,
+      title={KVzip: Query-Agnostic KV Cache Compression with Context Reconstruction}, 
+      author={Jang-Hyun Kim and Jinuk Kim and Sangwoo Kwon and Jae W. Lee and Sangdoo Yun and Hyun Oh Song},
+      year={2025},
+      eprint={2505.23416},
+      archivePrefix={arXiv},
+      primaryClass={cs.DB},
+      url={https://arxiv.org/abs/2505.23416}, 
+}
+
+@inproceedings{xu2025think,
+    title={ThinK: Thinner Key Cache by Query-Driven Pruning},
+    author={Yuhui Xu and Zhanming Jie and Hanze Dong and Lei Wang and Xudong Lu and Aojun Zhou and Amrita Saha and Caiming Xiong and Doyen Sahoo},
+    booktitle={The Thirteenth International Conference on Learning Representations},
+    year={2025},
+}
+
+@inproceedings{li2023redundancy,
+  title={Redundancy-aware transformer for video question answering},
+  author={Li, Yicong and Yang, Xun and Zhang, An and Feng, Chun and Wang, Xiang and Chua, Tat-Seng},
+  booktitle={Proceedings of the 31st ACM International Conference on Multimedia},
+  pages={3172--3180},
+  year={2023}
+}
+
+@article{he2024zipvl,
+  title={Zipvl: Efficient large vision-language models with dynamic token sparsification and kv cache compression},
+  author={He, Yefei and Chen, Feng and Liu, Jing and Shao, Wenqi and Zhou, Hong and Zhang, Kaipeng and Zhuang, Bohan},
+  journal={arXiv preprint arXiv:2410.08584},
+  year={2024}
+}
+
+@InProceedings{Grauman_2022_CVPR,
+    author    = {Grauman, Kristen and Westbury, Andrew and Byrne, Eugene and Chavis, Zachary and Furnari, Antonino and Girdhar, Rohit and Hamburger, Jackson and Jiang, Hao and Liu, Miao and Liu, Xingyu and Martin, Miguel and Nagarajan, Tushar and Radosavovic, Ilija and Ramakrishnan, Santhosh Kumar and Ryan, Fiona and Sharma, Jayant and Wray, Michael and Xu, Mengmeng and Xu, Eric Zhongcong and Zhao, Chen and Bansal, Siddhant and Batra, Dhruv and Cartillier, Vincent and Crane, Sean and Do, Tien and Doulaty, Morrie and Erapalli, Akshay and Feichtenhofer, Christoph and Fragomeni, Adriano and Fu, Qichen and Gebreselasie, Abrham and Gonz\'alez, Cristina and Hillis, James and Huang, Xuhua and Huang, Yifei and Jia, Wenqi and Khoo, Weslie and Kol\'a\v{r}, J\'achym and Kottur, Satwik and Kumar, Anurag and Landini, Federico and Li, Chao and Li, Yanghao and Li, Zhenqiang and Mangalam, Karttikeya and Modhugu, Raghava and Munro, Jonathan and Murrell, Tullie and Nishiyasu, Takumi and Price, Will and Ruiz, Paola and Ramazanova, Merey and Sari, Leda and Somasundaram, Kiran and Southerland, Audrey and Sugano, Yusuke and Tao, Ruijie and Vo, Minh and Wang, Yuchen and Wu, Xindi and Yagi, Takuma and Zhao, Ziwei and Zhu, Yunyi and Arbel\'aez, Pablo and Crandall, David and Damen, Dima and Farinella, Giovanni Maria and Fuegen, Christian and Ghanem, Bernard and Ithapu, Vamsi Krishna and Jawahar, C. V. and Joo, Hanbyul and Kitani, Kris and Li, Haizhou and Newcombe, Richard and Oliva, Aude and Park, Hyun Soo and Rehg, James M. and Sato, Yoichi and Shi, Jianbo and Shou, Mike Zheng and Torralba, Antonio and Torresani, Lorenzo and Yan, Mingfei and Malik, Jitendra},
+    title     = {Ego4D: Around the World in 3,000 Hours of Egocentric Video},
+    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    month     = {June},
+    year      = {2022},
+    pages     = {18995-19012}
+}
+
+@inproceedings{
+mangalam2023egoschema,
+title={EgoSchema: A Diagnostic Benchmark for Very Long-form Video Language Understanding},
+author={Karttikeya Mangalam and Raiymbek Akshulakov and Jitendra Malik},
+booktitle={Thirty-seventh Conference on Neural Information Processing Systems Datasets and Benchmarks Track},
+year={2023},
+url={https://openreview.net/forum?id=JVlWseddak}
+}
+
+@misc{
+chan2025analyzing,
+title={Analyzing the Language of Visual Tokens},
+author={David Chan and Rodolfo Corona and Joonyong Park and Cheol Jun Cho and Yutong Bai and Trevor Darrell},
+year={2025},
+url={https://openreview.net/forum?id=qPTFzmXVLd}
+}
+
+@inproceedings{
+yang2025svbench,
+title={{SVB}ench: A Benchmark with Temporal Multi-Turn Dialogues for Streaming Video Understanding},
+author={Zhenyu Yang and Yuhang Hu and Zemin Du and Dizhan Xue and Shengsheng Qian and Jiahong Wu and Fan Yang and Weiming Dong and Changsheng Xu},
+booktitle={The Thirteenth International Conference on Learning Representations},
+year={2025},
+url={https://openreview.net/forum?id=Hz4BYVY8YM}
+}
+
+@article{li2024llava,
+  	title={LLaVA-OneVision: Easy Visual Task Transfer},
+  	author={Li, Bo and Zhang, Yuanhan and Guo, Dong and Zhang, Renrui and Li, Feng and Zhang, Hao and Zhang, Kaichen and Li, Yanwei and Liu, Ziwei and Li, Chunyuan},
+  	journal={arXiv preprint arXiv:2408.03326},
+  	year={2024}
+}
+
+@misc{su2023roformerenhancedtransformerrotary,
+      title={RoFormer: Enhanced Transformer with Rotary Position Embedding}, 
+      author={Jianlin Su and Yu Lu and Shengfeng Pan and Ahmed Murtadha and Bo Wen and Yunfeng Liu},
+      year={2023},
+      eprint={2104.09864},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2104.09864}, 
+}
+
+@misc{feichtenhofer2019slowfastnetworksvideorecognition,
+      title={SlowFast Networks for Video Recognition}, 
+      author={Christoph Feichtenhofer and Haoqi Fan and Jitendra Malik and Kaiming He},
+      year={2019},
+      eprint={1812.03982},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/1812.03982}, 
+}
+
+@inproceedings{huang2020movienet,
+  title={Movienet: A holistic dataset for movie understanding},
+  author={Huang, Qingqiu and Xiong, Yu and Rao, Anyi and Wang, Jiaze and Lin, Dahua},
+  booktitle={Computer Vision--ECCV 2020: 16th European Conference, Glasgow, UK, August 23--28, 2020, Proceedings, Part IV 16},
+  pages={709--727},
+  year={2020},
+  organization={Springer}
+}
+
+@misc{xu2025slowfastllava15familytokenefficientvideo,
+      title={SlowFast-LLaVA-1.5: A Family of Token-Efficient Video Large Language Models for Long-Form Video Understanding}, 
+      author={Mingze Xu and Mingfei Gao and Shiyu Li and Jiasen Lu and Zhe Gan and Zhengfeng Lai and Meng Cao and Kai Kang and Yinfei Yang and Afshin Dehghan},
+      year={2025},
+      eprint={2503.18943},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2503.18943}, 
+}
+
+@misc{park2025keydiffkeysimilaritybasedkv,
+      title={KeyDiff: Key Similarity-Based KV Cache Eviction for Long-Context LLM Inference in Resource-Constrained Environments}, 
+      author={Junyoung Park and Dalton Jones and Matthew J Morse and Raghavv Goel and Mingu Lee and Chris Lott},
+      year={2025},
+      eprint={2504.15364},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2504.15364}, 
+}
+
+@misc{huang2025locretenhancingevictionlongcontext,
+      title={Locret: Enhancing Eviction in Long-Context LLM Inference with Trained Retaining Heads on Consumer-Grade Devices}, 
+      author={Yuxiang Huang and Binhang Yuan and Xu Han and Chaojun Xiao and Zhiyuan Liu},
+      year={2025},
+      eprint={2410.01805},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2410.01805}, 
+}
+
+@article{waisberg2024meta,
+  title={Meta smart glasses—large language models and the future for assistive glasses for individuals with vision impairments},
+  author={Waisberg, Ethan and Ong, Joshua and Masalkhi, Mouayad and Zaman, Nasif and Sarker, Prithul and Lee, Andrew G and Tavakkoli, Alireza},
+  journal={Eye},
+  volume={38},
+  number={6},
+  pages={1036--1038},
+  year={2024},
+  publisher={Nature Publishing Group UK London}
+}
+@techreport{MorganStanley2024FigureAI,
+  author = {Morgan Stanley},
+  institution = {Morgan Stanley},
+  title = {Humanoids: Investment Implications of Embodied AI},
+  year = {2024},
+  month = {June},
+  note = {Accessed via Future Management Group: https://www.futuremanagementgroup.com/wp-content/uploads/240626-Humanoid-Robots-Morgan-Stanley.pdf},
+}
+
+@techreport{Karumbunathan2022JetsonAGXOrin,
+  author    = {Karumbunathan, Leela S.},
+  title     = {{NVIDIA Jetson AGX Orin Series Technical Brief}},
+  institution = {NVIDIA Corporation},
+  year      = {2022},
+  month     = {July},
+  number    = {TB\_10749-001\_v1.2},
+  note      = {Version 1.2}
+}
+
+@article{lin2024streaming,
+  title={StreamingBench: Assessing the Gap for MLLMs to Achieve Streaming Video Understanding},
+  author={Junming Lin and Zheng Fang and Chi Chen and Zihao Wan and Fuwen Luo and Peng Li and Yang Liu and Maosong Sun},
+  journal={arXiv preprint arXiv:2411.03628},
+  year={2024}
+}
+
+@misc{li2025ovobenchfarvideollmsrealworld,
+      title={OVO-Bench: How Far is Your Video-LLMs from Real-World Online Video Understanding?}, 
+      author={Yifei Li and Junbo Niu and Ziyang Miao and Chunjiang Ge and Yuanhang Zhou and Qihao He and Xiaoyi Dong and Haodong Duan and Shuangrui Ding and Rui Qian and Pan Zhang and Yuhang Zang and Yuhang Cao and Conghui He and Jiaqi Wang},
+      year={2025},
+      eprint={2501.05510},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2501.05510}, 
+}

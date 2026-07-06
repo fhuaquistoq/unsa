@@ -1,0 +1,62 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+\begin{table}[t]
+    \begin{minipage}[t]{0.52\linewidth}
+        % \vspace{0pt}
+        \centering
+        \setlength{\tabcolsep}{3pt}
+        \renewcommand{\arraystretch}{1.1}
+
+        \caption{
+            Comparación entre nuestro PEMF propuesto y otras estrategias de memoria de uso común.
+        }
+        
+        \resizebox{1\textwidth}{!}{
+            \begin{tabular}{l|ccc}
+            \hline
+             & \textbf{OVBench} & \textbf{OVO-Bench} & \textbf{MLVU}  \\
+            \multirow{-2}{*}{\textbf{Memory Policy}} & Avg & Overall & M-Avg  \\ \hline
+            Uniform Sampling & 58.2 & 52.7 & 69.4  \\
+            First In First Out & 58.7 & 52.9 & 56.7  \\
+            Similarity Merge \cite{song2024moviechat} & 60.3 & 53.4 & 68.0  \\
+            Pyramid Memory Bank \cite{huang2024videochatonline} & 60.3 & 53.9 & 68.2  \\
+            \rowcolor[HTML]{DFF7DC}
+            \textbf{PEMF (Ours)} & \textbf{60.5} & \textbf{55.6} & \textbf{70.0}  \\ \hline
+            \end{tabular}
+        }
+        % \vspace{5pt}
+
+        \label{tab:ablation_PEMF}
+    \end{minipage}
+    \hspace{2pt}
+    \begin{minipage}[t]{0.46\linewidth}
+        % \vspace{0pt}
+        \centering
+        \setlength{\tabcolsep}{3pt}
+        \renewcommand{\arraystretch}{1.1}
+
+        \caption{
+            Estudio de ablación sobre los componentes clave de StreamForest.
+        }
+        
+        \resizebox{1\textwidth}{!}{
+            \begin{tabular}{l|ccc}
+            \hline
+             & \textbf{OVBench} & \textbf{OVO-Bench} & \textbf{MLVU}  \\
+            \multirow{-2}{*}{\textbf{Model}} & Avg & Overall & M-Avg  \\ \hline
+            w/o FSTW \& PEMF & 58.0 & 52.5 & 51.8  \\
+            w/o FSTW & 59.1 & 53.7 & 69.4  \\
+            w/o PEMF & 58.9 & 53.5 & 56.6  \\
+            w/o Event & 59.4 & 52.6 & 69.1  \\
+            \rowcolor[HTML]{DFF7DC} 
+            \textbf{Ours} & \textbf{60.5} & \textbf{55.6} & \textbf{70.0}  \\ \hline
+            \end{tabular}
+        }
+        % \vspace{5pt}
+
+        \label{tab:ablation_structure}
+    \end{minipage}
+
+% \vspace{-0.4cm}
+    
+\end{table}

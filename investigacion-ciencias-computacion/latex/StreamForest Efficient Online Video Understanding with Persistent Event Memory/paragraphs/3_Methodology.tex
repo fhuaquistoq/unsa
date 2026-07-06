@@ -1,0 +1,75 @@
+\section{Metodología}
+\label{sec:Methodology}
+
+
+\subsection{Arquitectura de Streaming Video Understanding: StreamForest}
+
+En esta sección detallamos nuestro StreamForest propuesto. En particular, el diseño central de StreamForest reside en Fine-grained Spatiotemporal Window y Persistent Memory Forest, que trabajan en conjunto para permitir que el modelo retenga memorias de largo plazo de eventos pasados mientras sostiene percepción en tiempo real.
+
+
+\subsubsection{Fine-grained Spatiotemporal Window}
+
+
+Para satisfacer los requisitos de percepción espaciotemporal en tiempo real de streaming video understanding, introducimos la Fine-grained Spatiotemporal Window (FSTW). Observamos que en aplicaciones prácticas, la mayoría de las pistas que requieren razonamiento espaciotemporal fino se concentran cerca del momento de la pregunta. Por ello, retenemos solo características espaciotemporales finas de corto plazo a nivel de segundos. 
+
+En concreto, la FSTW consta de dos componentes: percepción en tiempo real y memoria espaciotemporal de corto plazo. La percepción en tiempo real muestrea directamente características visuales de alta resolución del frame actual, que se codifican con información posicional espaciotemporal. A medida que llegan nuevos frames, los frames más antiguos se comprimen a lo largo de la dimensión espacial y se transfieren a la memoria espaciotemporal de corto plazo. Al mismo tiempo, el modelo calcula similitud entre frames nuevos y antiguos para habilitar la segmentación posterior a nivel de evento. La memoria espaciotemporal de corto plazo mantiene una secuencia de frames con duración de $t_s$ segundos. Cuando su capacidad se excede, las características visuales sobrantes se descargan al Persistent Event Memory Forest. Segmentamos características visuales continuas en meta-eventos identificando la posición con el mínimo local de similitud entre frames en la secuencia. Esto garantiza que cada meta-evento capture una transición espaciotemporal coherente. Un meta-evento se trata como un nodo independiente, compuesto por una colección de visual tokens de frames consecutivos similares. Estos nodos forman la base de la memoria de largo plazo del MLLM.
+
+
+
+
+
+
+\input{figs/architecture}
+
+\subsubsection{Persistent Event Memory Forest}
+
+
+Para procesar eficientemente características de frames de video que llegan de forma continua en escenarios de streaming, proponemos Persistent Event Memory Forest (PEMF), una arquitectura de memoria diseñada específicamente para soportar memoria de largo plazo en el contexto de streaming video. A diferencia de métodos previos que dependen de compresión directa por similitud entre frames \cite{song2024moviechat} o jerarquías de memoria estáticas \cite{huang2024videochatonline}, PEMF comprime y organiza adaptativamente la información de video a nivel de evento. Construye una memoria jerárquica con estructura de árbol guiada por tres funciones de penalización, permitiendo que el modelo retenga contenido semánticamente rico y no redundante mientras gestiona la memoria eficientemente a medida que evoluciona en el tiempo. Para controlar el crecimiento de memoria, imponemos un límite superior $L_q$ sobre la cantidad de tokens de memoria de largo plazo almacenados en PEMF. Cuando este límite se supera, PEMF realiza consolidación jerárquica de memoria fusionando adaptativamente nodos de eventos adyacentes en nodos únicos dentro de la estructura arbórea. La selección de nodos a fusionar está guiada por tres funciones de penalización que consideran distancia temporal, similitud de contenido y frecuencia de fusión, garantizando que la memoria se mantenga informativa y compacta.
+
+
+\textbf{\textit{Penalización por similitud.}} En videos largos, los segmentos de video adyacentes suelen exhibir alta similitud visual, lo que produce una redundancia sustancial de características. Por ello, introducimos una penalización por similitud que fomenta la fusión de nodos de eventos con contenido visual altamente similar. Debido a diferencias en la duración de los eventos, dos nodos de eventos candidatos (denotados como $x_i$, $x_{i+1}$) pueden contener diferentes cantidades de visual tokens. Para manejar esta discrepancia, inspirados en ToMe \cite{bolya2022tome}, adoptamos un enfoque de matching sobre grafos bipartitos. En particular, tratamos las características visuales de los dos nodos de eventos como conjuntos en un grafo bipartito y calculamos similitudes por pares entre tokens a través de estos conjuntos.
+%
+Sea $X_i \in \mathbb{R}^{n_i \times d}$ la representación de características de visual tokens del nodo de evento $x_i$, donde $n_i$ es la cantidad de tokens en $x_i$. Calculamos la matriz de similitud coseno por pares $S_i = sim(X_i, X_{i+1}) \in \mathbb{R}^{n_i \times n_{i+1}}$, y seleccionamos los $k_i$ puntajes de similitud más altos, correspondientes a los pares de tokens más similares entre los dos nodos de eventos. La penalización por similitud $P_s$ se define como uno menos el promedio de estos $k_i$ puntajes de similitud más altos:
+\begin{equation}
+P_s(x_i, x_{i+1}) = 1 - \frac{1}{k_i} \sum_{(p,q) \in \mathcal{T}_i} S_{i}^{(p,q)}, \quad  \mathcal{T}_i = \operatorname{argTopK}_{(p,q)}(S_{i}^{(p, q)},\ k_i).
+\end{equation}
+%
+\textbf{\textit{Penalización por conteo de fusiones.}} Cuando los nodos de eventos participan repetidamente en fusiones jerárquicas de memoria con estructura arbórea, sus detalles visuales pueden degradarse gradualmente debido a la pérdida acumulada de información. Esta degradación puede conducir a inconsistencias espaciotemporales locales, deteriorando en última instancia la exactitud del long-term video understanding. Para mitigar este problema, introducimos una penalización por conteo de fusiones como término de regularización. Esta penaliza nodos excesivamente fusionados y fomenta un proceso de integración de memoria más equilibrado, preservando así la fidelidad de cada representación de evento.
+%
+Sea $c_i$ el conteo histórico de fusiones del nodo de evento $x_i$, y sea $c_{max}$ su valor máximo en el instante de consulta. Definimos la penalización por conteo de fusiones $P_m$ como sigue:
+\begin{equation}
+P_m(x_i,x_{i+1})=\frac{c_i+c_{i+1}}{2c_{max}}.
+\end{equation}
+%
+\textbf{\textit{Penalización por distancia temporal.}} En escenarios reales de streaming video understanding, los frames temporalmente más cercanos al momento actual de la consulta suelen contener información más relevante. Esta observación sugiere que las características visuales recientes deben preservarse con mayor fidelidad, mientras que las históricas pueden comprimirse de manera más agresiva. Para implementar esta intuición, introducimos una penalización por distancia temporal, que anima al modelo a retener representaciones más detalladas de eventos temporalmente próximos al tiempo que promueve el olvido de detalles de eventos distantes en el pasado.
+%
+Sea $t_q$ el tiempo actual de consulta o interacción y sea $t_i$ el tiempo del evento $i$. El cálculo de $t_i$ se detalla en el Apéndice \ref{app:sec:Details_of_node_timestamp}. Definimos la penalización temporal $P_t$ como sigue:
+\begin{equation}
+P_t(x_i,x_{i+1})=1-\frac{d_i+d_{i+1}}{2},\quad d_i=\frac{t_q-t_i}{t_q}.
+\end{equation}
+%
+\textbf{\textit{Penalización total.}} Incorporamos las tres penalizaciones anteriores para guiar el proceso adaptativo de fusión de nodos de eventos en PEMF, donde la combinación de estos tres factores determina la prioridad de fusión de pares de nodos de eventos.
+\begin{equation}
+P(x_i,x_{i+1})=w_s P_s(x_i,x_{i+1}) + w_m P_m(x_i,x_{i+1}) + w_t P_t(x_i,x_{i+1}).
+\end{equation}
+Los pesos de penalización $w_s$, $w_m$ y $w_t$ determinan conjuntamente el comportamiento de PEMF. Cuando solo se aplica la penalización por similitud, la estrategia degenera en compresión basada en similitud. Usar solo la penalización por conteo de fusiones conduce a un comportamiento similar al downsampling uniforme. Cuando la penalización por distancia temporal se usa de forma aislada, el método aproxima FIFO. Al ajustar estos pesos de penalización, nuestro método habilita un trade-off flexible entre estas estrategias, permitiéndole adaptarse eficazmente a varias tareas de streaming y equilibrar el ahorro eficiente de almacenamiento con la retención de información relevante para la tarea en diversos escenarios del mundo real.
+
+
+Los nodos seleccionados para fusionarse se determinan identificando el par con el menor puntaje total de penalización. Empleamos ToMe \cite{bolya2022tome} para el proceso de fusión, comprimiendo el número de visual tokens hasta la mitad del total de tokens del par de nodos seleccionado. Al recibir una consulta del usuario, las características visuales de todos los nodos raíz en PEMF, junto con todas las características visuales almacenadas en FSTW, se introducen en el LLM para soportar interacción en tiempo real y en streaming.
+
+
+
+
+
+
+\subsection{Dataset de instruction-tuning: OnlineIT}
+
+
+
+Los datasets offline existentes para long video suelen exhibir sesgo distribucional, donde la evidencia clave para responder preguntas suele concentrarse en la mitad del video. Como resultado, los MLLMs ajustados con esos datos tienden a sobreenfatizar contenido histórico, lo que puede conducir a alucinaciones al interpretar correctamente el momento actual. Aunque se han publicado algunos datasets para streaming video understanding \cite{chen2024videollmonline,wang2024mmduet,yang2025svbench,qian2025dispider}, siguen siendo limitados en volumen de datos, calidad y diversidad de tareas. Para abordar estas limitaciones, construimos OnlineIT, un dataset de entrenamiento diseñado específicamente para streaming video understanding. OnlineIT se enfoca en comprensión fina de eventos y comprensión espaciotemporal en tiempo real en escenarios de streaming, y mejora significativamente el rendimiento de los MLLMs en tareas de streaming video understanding.
+
+
+
+\paragraph{OnlineIT-general.} Con base en criterios de diversidad, longitud y dificultad, curamos y refinamos varios datasets existentes de alta calidad para fine-tuning en streaming video understanding \cite{huang2024videochatonline, wang2024mmduet, qian2025dispider}. A partir de ellos, desarrollamos además dos nuevos datasets que comprenden 32K instancias de entrenamiento de streaming de alta calidad. Este dataset presenta mayor escala, distribución más amplia y mayor diversidad de tareas, facilitando el aprendizaje de representaciones de streaming video más generalizables.
+
+\paragraph{OnlineIT-drive.} Incluye 89K instancias de entrenamiento de streaming QA provenientes de escenarios de conducción autónoma. Este dataset está diseñado para mejorar el rendimiento de los MLLMs en tareas downstream complejas y en tiempo real. En particular, al integrar semántica de escena, regulaciones de tránsito y eventos comunes de conducción, extraemos elementos clave de escenas y clips de video de conducción para generar un dataset de preguntas y respuestas fundamentado en contextos de conducción autónoma. OnlineIT-Drive cubre principalmente cuatro áreas: (1) localización en tiempo real y conciencia semántica, (2) comprensión de entidades de tránsito estáticas, (3) comprensión de entidades de tránsito dinámicas y (4) evaluación de eventos de riesgo y accidentes.

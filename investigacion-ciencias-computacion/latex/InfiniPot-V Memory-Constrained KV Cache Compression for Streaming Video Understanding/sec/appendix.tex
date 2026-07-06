@@ -1,0 +1,294 @@
+\clearpage
+% \setcounter{page}{1}
+\setcounter{figure}{0}
+\setcounter{equation}{0}
+% \setcounter{footnote}{0}
+\setcounter{table}{0}
+\setcounter{section}{0}
+\appendix
+
+
+
+\input{Tables/algorithm}
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lcccccc}
+\toprule
+VideoMME  &\multicolumn{6}{c}{$|M| = \alpha |\text{TaR}| + (1-\alpha) |\text{VaN}|$, $|M| = 6\text{K}$} \\ \midrule
+Qwen-2-VL-7B & $\alpha=0$ (VaN) & $\alpha=0.2$ & $\alpha=0.4$ & $\alpha=0.6$ & $\alpha=0.8$ & $\alpha=1$ (TaR) \\
+\cmidrule(lr){1-7}
+Short (-3 min) & 74.4 & 74.3 & 74.1 & 74.9 & 74.4 & 73.8 \\
+Medium (3 - 30 min)  & 59.9 & 59.3 & 61.3 & 61.4 & 61.2 & 58.2 \\
+Long (30 - 120 min)  & 51.9 & 51.0 & 52.4 & 53.1 & 53.4 & 53.2 \\ \cmidrule(lr){1-7}
+Average  & 62.1 & 61.6 & 62.6 & \textbf{63.1} & \underline{63.0} & 61.7 \\
+\midrule
+LLaVA-Next-7B & $\alpha=0$ (VaN) & $\alpha=0.2$ & $\alpha=0.4$ & $\alpha=0.6$ & $\alpha=0.8$ & $\alpha=1$ (TaR) \\
+\cmidrule(lr){1-7}
+Short (-3 min)   & 69.8 & 69.8 & 72.0 & 71.1 & 71.9 & 68.8 \\
+Medium (3 - 30 min)     & 59.3 & 59.3 & 59.2 & 58.7 & 57.7 & 57.3 \\
+Long (30 - 120 min)    & 52.1 & 52.1 & 52.7 & 52.0 & 51.4 & 51.0 \\ \cmidrule(lr){1-7}
+Average    & 60.4 & 60.4 & \textbf{61.3} & \underline{60.6} & 60.3 & 59.0 \\
+\bottomrule
+\end{tabular}
+\vspace{2mm}
+\caption{\textbf{TaR and VaN Combination Ratio}: Sweep over combination ratio $\alpha$ in TaR and VaN combination under a 6K memory budget ($|M|$) on VideoMME. $\alpha{=}0$ and $\alpha{=}1$ correspond to VaN-only and TaR-only, respectively. The best-performing configurations are shown in \textbf{bold}, while the second-best results are \underline{underlined}.}
+\label{tab:alpha_sweep}
+\vspace{-.15in}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lcccccccc}
+\toprule
+Qwen-2-VL-7B & \multicolumn{4}{c}{MLVU}            & \multicolumn{4}{c}{VideoMME}      \\
+ \cmidrule(lr){1-1} \cmidrule(lr){2-5} \cmidrule(lr){6-9}
+ $|M| = 6\text{K}$  & Holistic & Single & Multi & Avg. & Short & Medium & Long & Avg. \\
+\midrule
+$r=f\times0.125$        & 77.6 & 66.2 & 43.9 & \underline{63.1} & 68.7 & 57.3 & 51.0 & \textbf{59.0} \\
+$r=f\times0.25$         & 77.8 & 67.1 & 43.5 & \textbf{63.4} & 68.0 & 57.2 & 51.1 & \underline{58.8} \\
+$r=f\times0.50$          & 78.6 & 64.6 & 39.0 & 61.3 & 65.1 & 56.7 & 49.7 & 57.2 \\
+\midrule
+$|M|/|C|=0.75$   & 78.2 & 71.7 & 44.6 & \textbf{65.8} & 74.4 & 59.9 & 51.9 & \underline{62.1} \\
+$|M|/|C|=0.50$   & 76.8 & 68.2 & 42.3 & \underline{63.3} & 74.1 & 60.3 & 52.9 & \textbf{62.4} \\
+$|M|/|C|=0.25$   & 73.2 & 65.9 & 39.1 & 60.3 & 73.6 & 56.9 & 50.4 & 60.3 \\
+\bottomrule
+\end{tabular}
+\vspace{2mm}
+\caption{\textbf{Recent Frame and Compression Ratio Exploration}: \textbf{Top}: Sweep over recent frame numbers $r$ determined by multiplying various ratios ($0.125, 0.25, 0.5$) to $f$ (frame number corresponding to memory budget $|M|$) in TaR. \textbf{Bottom}: Performance under varying compression ratios $|M|/|C|$ across MLVU and VideoMME with \texttt{Qwen-2-VL-7B}. TaR performs best with $r\leq0.25$ and compression ratio $\geq0.5$. The highest values are shown in \textbf{bold}, with the second-highest \underline{underlined}.}
+\label{tab:recent_compress_ratio}
+\vspace{-.2in}
+\end{table}
+
+\section{InfiniPot-V Algorithm and Configuration}\label{appn:algorithm}
+
+
+\subsection{Algorithm Description} Algorithm~\ref{alg:infinipot_v} presents the complete process of InfiniPot-V's cache control framework along with its compression formulation. InfiniPot-V processes video streams by continuously pre-filling and compressing the KV cache using two token selection strategies: Temporal-axis Redundancy (TaR) and Value Norm (VaN). For TaR, the algorithm splits video frames into recent frames (the latest $r$ frames) and past frames, then computes cosine similarities between corresponding patches to identify and remove redundant visual tokens. (Line 10)
+
+For spatial semantic importance token selection, a layer-wise adaptive pooling mechanism based on VaN is employed. The pooling size is dynamically determined by the Coefficient of Variation (CV) of the VaN, (Line 18) where a higher CV indicates a sparser or more distinct feature distribution. Pre-computed model-specific CV thresholds $\{\tau_1, \tau_2, \tau_3\}$ determine pooling sizes from the set \{1,3,5,7\}, selecting larger windows for uniform (low CV) VaN distributions and smaller ones for sparse (high CV) VaN distributions (Line 21).
+
+To integrate both criteria, TaR-selected tokens are prioritized by assigning them the maximum VaN score before the final token selection. Specifically, by setting $\text{VaN}_{pool,l}[\mathcal{I}_l] = \max(\text{VaN}_{pool,l})$ (Line 24) and then applying a TopK selection, the algorithm ensures that temporally distinctive tokens are preserved while allowing VaN to select additional tokens based on semantic importance.
+
+\subsection{Hyper-Parameter Exploration}\label{appn:hyper_parameter} InfiniPot-V involves three main hyper-parameters: the TaR and VaN budget allocation ratio $\alpha$, the number of recent frames $r$ used in TaR, and the target compression size $C$ applied at each continual KV cache compression step. This section presents comparative experiments exploring each hyper-parameter.
+
+\paragraph{TaR and VaN Budget Ratio ($\alpha$)} We compare the accuracy of offline video understanding (OVU) task across different values of $\alpha$, which determines the budget allocation between TaR and VaN under a fixed memory budget ($|M|=6\text{K}$), for both Qwen-2-VL-7B and LLaVA-Next-7B models. As shown in Tab.~\ref{tab:alpha_sweep}, performance peaks when $\alpha$ is between 0.4 and 0.6, outperforming the use of either VaN-only ($\alpha=0$) or TaR-only ($\alpha=1$). This confirms the effectiveness of our approach, which jointly considers both spatial and temporal dimensions for KV cache compression.
+
+\paragraph{Recent Frames ($r$) and Compression Ratio ($|M|/|C|$)} Tab.~\ref{tab:recent_compress_ratio} presents exploration experiments for two key hyperparameters: the recent frames number $r$, which determines the proportion of recent frames within the memory budget in TaR, and the compression ratio $|M|/|C|$, which defines what proportion of the compression size $|C|$ to maintain relative to the memory budget $|M|$ in continual KV cache compression (CKV). 
+
+For the recent frame number $r$ (Tab.~\ref{tab:recent_compress_ratio}, Top), we observe optimal performance on both MLVU and VideoMME benchmarks when $r \leq 0.25f$. Setting $r=0.5f$ results in an excessive number of frames being designated as the latest frames for temporal redundancy measurement, which limits the effectiveness of redundancy reduction. This limitation is reflected in the decreased performance metrics. (61.3 vs 63.4 in MLVU and 57.2 vs 59.0 in VideoMME) Note that the $r$ sweep experiments are conducted using TaR-only settings ($\alpha=1$).
+
+For the compression ratio ($|M|/|C|$), we conduct comparative experiments across three ratios (0.75, 0.50, and 0.25). As shown in Tab.~\ref{tab:recent_compress_ratio} Bottom, an excessive compression ratio such as 0.25 in CKV results in noticeable performance degradation. These findings confirm that a ratio of 0.5 or higher represents an appropriate configuration for CKV.
+
+Based on these explorations, we standardize the hyperparameter values at $\alpha=0.5$, $r=0.125$, and $|M|/|C|=0.75$ for all main experimental results when evaluating InfiniPot-V.
+
+
+\section{Experimental Setting Details}\label{appn:exp}
+
+\subsection{MLLMs Video Sampling Details.} For all benchmarks, we employ a consistent uniform frame sampling strategy to ensure maximized long video understanding performance across all settings. For Qwen-2-VL~\cite{Qwen2VL}, which supports dynamic image resizing based on the number of frames, we use the hyper-parameter configuration reported to yield the best performance in their original work: \texttt{FPS\_MAX\_FRAMES} = 768, \texttt{VIDEO\_MIN\_PIXEL} = ${128 \times 28 \times 28}$ and \texttt{VIDEO\_MAX\_PIXEL} = ${768 \times 28 \times 28}$. Although theoretically larger token budgets could be set, we adopt this configuration to match the optimal context length of 50K as reported in the original paper~\cite{Qwen2VL}, on top of which we applied KV cache compression. For LLaVA, we set the number of sampled frames to 128 to ensure it remained within the model’s trained context length (<32K). With this video sampling configuration, Qwen-2-VL~\cite{Qwen2VL} uses 384 frames with 130 tokens per frame, resulting in a total context length of 49,920 tokens, while LLaVA-Next~\cite{zhang2024llavanext-video} and LLaVA-OV~\cite{li2024llava} use 128 frames with 196 tokens per frame, yielding a total of 25,088 for offline long video inputs.
+
+\subsection{Long Video Understanding Benchmark Details} 
+\paragraph{Offline Video Understanding(OVU)} We evaluate our method on four multiple-choice based offline video question answering benchmarks: Video-MME~\cite{fu2024videomme}, MLVU~\cite{MLVU}, EgoSchema~\cite{mangalam2023egoschema}, and LongVideoBench~\cite{wu2024longvideobench}. For MLVU and EgoSchema, we use the development sets for evaluation.
+
+For Video-MME, we report results without subtitles version. This is because prepending subtitles for all video frames as a single context block directly before the question represents an unrealistic setting that is incompatible with streaming scenarios, where subtitles are typically unavailable during real-time video processing and would not be accessible as complete context in advance.
+
+\paragraph{Streaming Video Understanding (SVU)} For SVU evaluation, we use two benchmarks: RVS-Ego and EVS-Movie~\cite{zhang2024flashvstream}. RVS-Ego is constructed from 10 videos from the Ego4D~\cite{Grauman_2022_CVPR} dataset, while RVS-Movie uses 22 long videos from MovieNet~\cite{huang2020movienet}. Each benchmark consists of a QA set containing open-ended generation questions and their corresponding timestamps indicating when each question should be presented during video streaming.
+
+The evaluation process works as follows: during CKV processing, when the video stream reaches the timestamp of a given question sample, we present the question and generate an answer based on the compressed KV cache accumulated up to that point. The generated answers are then compared against ground-truth answers using \texttt{GPT-3.5-turbo-0125} to produce accuracy and score metrics.
+
+\subsection{Baseline Settings}
+\paragraph{Input Video Compression (IVC) Details.}
+For the comparison with Input Video Compression (IVC) methods in Tab.~\ref{tab:ic_cache} and ~\ref{tab:full_ivc}, we implement LongVU~\cite{shen2024longvu} and DyCoke~\cite{tao2024dycokedynamiccompressiontokens} as follows: For \textbf{LongVU}, we apply Spatial Token Compression (STC) every 8 frames as specified in the original paper. STC compresses vision token embeddings by identifying temporally redundant patches using cosine similarity between patches. We adjust the similarity threshold to control the compression rate while maintaining the original methodology. For \textbf{DyCoke}, we implement Token Temporal Merging (TTM) which, similar to LongVU, compresses vision encoder output features. TTM calculates cosine similarity between patches in adjacent frames to eliminate redundant patch embeddings. Following the original paper, we process compression every 4 frames and adjust the similarity threshold to control compression rates.
+
+For fair comparison in the Continual KV cache compression (CKV) framework in Tab.~\ref{tab:ic_cache}, we adapt both methods to work within memory constraint $|M|$. Specifically, we compress each input video stream to size $|C|$ and implement sliding window attention~\cite{Beltagy2020Longformer} to evict older KV cache entries once the cache size reaches the predefined memory limit ($|M|$). This adaptation ensures all methods operate under identical memory constraints for a fair comparison with InfiniPot-V. For benchmark comparing InfiniPot-V with IVC methods that use full vision encoding without cache compression, see Tab.~\ref{tab:full_ivc}.
+
+\paragraph{KV Cache Compression (KVC) Details.} In Fig.~\ref{fig:cache_compression}, we compare three KV cache compression methods within Continual KV cache compression (CKV). First, \textbf{Uniform Select}, inspired by uniform video sampling approaches, selects frames at regular intervals and retains all KV cache tokens corresponding to those frames. For \textbf{SnapKV}~\cite{li2024snapkv}, we follow the original method configuration under the CKV process, using the last 32 tokens of the given budget $|M|$ tokens as an observation window ($w$) to calculate attention scores for token selection (see Eq.~\ref{eq:importance-future} in Appendix.~\ref{appn:prelim}). Additionally, we apply 1D pooling with a kernel size of 7 to these scores, as done in the original implementation\footnote{https://github.com/FasterDecoding/SnapKV}. For \textbf{InfiniPot}~\cite{kim-etal-2024-infinipot}, we design a proxy prompt for video compression: "Provide a detailed description of this video." This prompt is utilized in the CaP method to generate attention scores and apply KV cache compression. Detailed experimental results are provided in Tab.~\ref{tab:full_table}.
+
+\paragraph{FastV Hyper-Parameter Settings.} To provide additional performance comparison with compression methods specialized for MLLMs, we also include performance comparisons with FastV~\cite{chen2024image} in Tab.\ref{tab:full_table}. FastV requires two hyper-parameters, $L$ and $R$, which specify the layer where token pruning begins and the percentage of tokens to prune. For a fair comparison, we adjust the $R$ of FastV to ensure that the total number of KV cache entries across layers matches the total entry count of other baselines that maintain the same number of KV-cache entries across each layer.  Specifically, for Qwen-2-VL, the $(L, R)$ pairs corresponding to memory budgets of 3K, and 6K are set to (2, 2.8\%) and (2, 5.8\%) respectively.
+
+\subsection{Positional Encoding Details.} MLLM backbone LLMs utilize positional encoding to differentiate vision token positions. LLaVA-Next~\cite{zhang2024llavanext-video} and LLaVA-OV~\cite{li2024llava} use standard 1D RoPE~\cite{su2023roformerenhancedtransformerrotary}, while Qwen-2-VL~\cite{Qwen2VL} employs 3D RoPE for multimodal encoding. For Offline Video Understanding(OVU), we apply KV cache compression after positional encoding (i.e., Post RoPE). However, Streaming Video Understanding(SVU) presents a challenge: continuous video stream processing can exceed the model's maximum positional range. For example, in LLaVA models with 196 tokens per frame, streaming more than 6 minutes of video at 0.5 FPS exceeds the 32K context window (note that RVS-Ego and RVS-Movie average over 60 minutes). 
+
+To address this, we adopt strategies from InfiniPot~\cite{kim-etal-2024-infinipot} and ReKV~\cite{Shangzhe2025streaming}, re-ordering positional indices to fit within the memory budget $|M|$ at each CKV step. Specifically, we cache the pre-positional encoded KV's hidden states and re-assign positional indices during decoding, ensuring they never exceed $|M|$ position regardless of video length. While this enables SVU for arbitrarily long videos, it discards the original positional information of vision tokens. In particular, additional handling is required for Qwen-2-VL’s 3D RoPE. Developing methods that preserve the original spatial and temporal position encoding while supporting streaming video lengths beyond the model’s positional capacity remains an open direction for future work.
+
+
+% The model code was implemented based on the official repositories of LLaVA-Next~\cite{zhang2024llavanext-video}~\footnote{https://github.com/LLaVA-VL/LLaVA-NeXT} and Qwen-2.5-VL~\footnote{https://github.com/QwenLM/Qwen2.5-VL}.
+
+
+\begin{figure*}[t]
+\centerline{\includegraphics[width=1\textwidth]{Figures/appn_fig1.pdf}}
+\caption{\textbf{Qualitative Results of Multi-Turn Conversation}: Full-KV uses 16K cache while InfiniPot-V and SnapKV employ 3K compressed KV cache. SnapKV performs query-guided cache compression based on Q1 before proceeding with multi-turn conversation. The video sample is from the MLVU ego reasoning subtask, using the \texttt{Qwen-2-VL-7B model}. 128 frame sampling is used.}\label{fig:multi_turn}
+\vspace{-.2in}
+\end{figure*}
+
+\section{Multi-Turn Video Understanding Analysis}\label{appn:multi_turn}
+Fig.~\ref{fig:multi_turn} presents a qualitative comparison between query-dependent (SnapKV)\cite{li2024snapkv} and query-agnostic (InfiniPot-V) KV cache compression approaches in multi-turn conversations with streaming video input. When SnapKV performs compression based on Q1, it generates answers almost identical to the Full KV cache for that specific query (Q1), answering that the butter was placed in the refrigerator. However, this query-guided compression strategy reveals significant limitations when handling different types of queries (Q2, Q3) about the same video content. Specifically, SnapKV makes critical errors in subsequent queries - misidentifying a kettle as "two spoons" in Q2 and incorrectly counting the total number of bread pieces in Q3.
+
+In contrast, InfiniPot-V maintains accurate answers consistently across all three queries using the same 3K compressed KV cache. It correctly identifies that the butter was placed in the fridge (Q1), recognizes the kettle on the stove (Q2), and counts all 4 pieces of bread throughout the cooking process (Q3), demonstrating the effectiveness of query-agnostic compression for multi-turn streaming video scenarios.
+
+\section{Why Query-Agnostic KV Cache Compression Matters for SVU?}\label{appn:query_agnostic}
+
+In this section, we provide a detailed analysis of why query-agnostic compression is essential for Streaming Video Understanding (SVU), building upon the requirements discussed in Sec.~\ref{sec:background}. To demonstrate how these SVU-specific constraints impact existing KV cache compression methods, we present a case study across three representative scenarios.
+
+% In this section, we discuss the core requirements of Streaming Video Understanding (SVU) from the perspective of KV cache compression, with particular emphasis on analyzing why \textit{query-agnostic} compression is essential as discussed in Sec.~\ref{sec:background}. 
+
+\subsection{Preliminary: Attention-based KV Cache Compression}\label{appn:prelim}
+
+Eviction-based KV cache compression reduces cache size by removing tokens with the lowest importance scores.
+Employing attention scores for computing token importance scores is the predominant approach in previous methods~\cite{li2024snapkv,chen2024image,fu2024headkv,hooper2024squeezed}.
+
+In methods such as SnapKV~\cite{li2024snapkv}, the importance scores $u_t$ of a token $x_t$ are computed by aggregating attention scores from the last $w$ tokens (i.e., observation window) which contain the user instruction:
+\vspace{-.1in}
+\begin{equation}
+u_t = \sum_{i=N-w}^{N} \text{Attn}(x_{i} \rightarrow x_{t}),
+\label{eq:importance-future}
+\end{equation}
+where $N$ is the current sequence length.
+Using these scores, the KV cache is compressed by retaining the top-$M$ tokens with the highest aggregated attention scores.
+Here, $M$ defines the memory budget: $\mathcal{I} = \text{TopK}(u, M)$ and $u = [u_1, \cdots, u_N]$ indicates the importance scores of all tokens.
+The compressed Key and Value caches are then formed by extracting tokens at indices $\mathcal{I}$:
+\begin{equation}
+\tilde{K} = K[:, \mathcal{I}, :], \quad \tilde{V} = V[:, \mathcal{I}, :]
+\label{eq:cache-compression}
+\end{equation}
+where $K, V \in \mathbb{R}^{H \times N \times D}$ are the uncompressed Key and Value caches with $H$ heads, $N$ tokens, and per-head dimension $D$. 
+This approach has two characteristics: (1) it requires computing the full KV cache for all tokens before compression, and (2) it requires the user query to be present at the end of the context. We refer to these approaches as \textit{query-guided} or \textit{attention-based} cache compression methods.\footnote{Throughout this paper, "query" refers to the user's instruction or question related to the given video.}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/appn_fig2.pdf}
+\caption{\textbf{KV Cache Compression Case Study with SVU}: Illustration of cache control strategies under three conditions, differing in the presence of two core requirements for Streaming Video Understanding (SVU): memory constrained (MC) and query agnostic (QA). (a) Case 1: Query-guided compression retains relevant (GT) frames for accurate responses. (b) Case 2: Without query guidance, compression fails to preserve critical frames, resulting in inaccurate responses. (c) \textbf{Case 3} \textbf{(Streaming scenario)}: In streaming video processing, where frames arrive continuously, continual KV cache compression (CKV) is necessary, but queries are unavailable during compression.}
+\label{fig:case_study}
+\vspace{-2mm}
+\end{figure}
+
+
+\subsection{Case Study: Towards Streaming Video Understanding with CKV}\label{appn:case_study}
+
+To investigate the applicability of attention-based KV cache compression methods to streaming video understanding, we examine three cache control strategies (Fig.~\ref{fig:case_study}).
+
+\input{Tables/case_study}
+\paragraph{Case 1.} Recent KV cache compression methods~\cite{li2024snapkv,fu2024headkv} assume full access to context and queries at compression time, as shown in Fig.~\ref{fig:case_study}(a). In this memory-unconstrained setting, the model observes the full input before compression. Previous works~\cite{li2024snapkv} have demonstrated that attention scores effectively identify query-relevant tokens KV cache (orange box corresponding to GT Frame in Fig.~\ref{fig:case_study}(a)), enabling compression that retains critical information while discarding less important tokens. As shown in Tab.~\ref{tab:case_study}, this approach maintains performance comparable to the uncompressed cache setup (68.01 vs 68.75) at the cost of large memory usage at compression, detailed in Fig.~\ref{fig:background}.
+
+
+
+\paragraph{Case 2.} Fig.~\ref{fig:case_study}(b) illustrates how attention-based cache compression fails when user queries are unavailable during compression.
+Under this scenario, although the memory budget is assumed unconstrained, the KV cache is compressed without consideration of (future) queries, causing important visual tokens (orange tokens cache corresponding to the GT Frame) lost during compression.
+To quantify this degradation and explore alternatives, we test compression with generic queries ($q'$: "What is happening in this video?", $q'':$"What are the key events in this video?") and the last vision tokens ($q_v$) for importance scoring:
+
+\begin{equation}
+u^{\text{alt}}_t = \text{Attn}(q_{\text{alt}} \rightarrow x_t), \quad 
+q_{\text{alt}} \in \{q', q'', q_v\}
+\label{eq:alternative-importance}
+\end{equation}
+
+Tab.~\ref{tab:case_study} and Fig.~\ref{fig:case_study}(a) show that these alternatives significantly degrade performance (60.32 vs 68.75), even with unconstrained memory.
+
+\paragraph{Case 3: Streaming Scenario.} Beyond the query-agnostic challenge in Case 2, deploying streaming video understanding on resource-constrained devices requires fixed memory usage for the KV cache.
+For input video streams, these constraints necessitate continual compression when new frames arrive and memory capacity is reached, as shown in Fig.~\ref{fig:case_study}(c).
+To evaluate this scenario, we use the query-agnostic approach from Case 2 with vision tokens ($q_v$) for importance scoring, while compressing the KV cache whenever memory limits are reached.
+As shown in Tab.~\ref{tab:case_study}, this combined constraint further degrades performance (57.55 vs 60.32), highlighting the challenge of preserving key information under both query-agnostic and memory-constrained settings.
+
+This case study reveals two key challenges for KV cache compression in streaming video: 1) the need for \textit{query-agnostic compression} due to continuous incoming video, and 2) the requirement to maintain \textit{fixed memory constraints}. These challenges cause significant performance drops in previous methods~\cite{li2024snapkv,kim-etal-2024-infinipot,chen2024image}, motivating Continual KV cache compression (CKV) specifically designed for memory-constrained streaming video.
+
+
+% \usepackage{caption}   % for \captionof
+
+\begin{table}[t]
+  \centering
+  % left = figure
+  \begin{minipage}[t]{0.5\textwidth}
+    \vspace{0pt}                 % makes the [t] stick
+    \includegraphics[width=0.95\textwidth]{Figures/appn_fig3.pdf}
+    \vspace{0.5mm}
+    \captionof{figure}{\textbf{Jaccard Similarity between KV Caches}: Compare KV cache sets selected by different queries ($q_1,q_2,q_3$) across layers.}
+    \label{fig:jac_sim}
+  \end{minipage}%
+  \hfill
+  % right = table
+  \begin{minipage}[t]{0.45\textwidth}
+    \vspace{2pt}
+    \resizebox{\textwidth}{!}{%
+      \begin{tabular}{c|cc|cc}
+        \toprule
+        Context & \multicolumn{2}{c|}{Case 1, 2} & \multicolumn{2}{c}{Case 3 (Ours)} \\
+        Length & Mem (GB) & TTFT (s) & Mem (GB) & TTFT (s) \\ 
+        \midrule
+        5K    & 21.29 & 0.98 & 20.93 & 1.08 \\
+        25K   & 33.76 & 1.21 & 21.60 & 1.12 \\
+        50K   & 58.55 & 2.12 & 22.16 & 1.17 \\
+        100K  & 79.38 & 3.27 & 22.85 & 1.20 \\
+        \bottomrule
+      \end{tabular}%
+    }
+    \vspace{2mm}
+    \captionof{table}{\textbf{Peak GPU Memory and TTFT}: Comparison of peak memory usage and Time-To-First-Token(TTFT) across different context lengths for memory-unconstrained (Case 1, 2) and memory-constrained (Case 3) approaches.}
+    \label{tab:memory_ttft}
+  \end{minipage}
+  \vspace{-.2in}
+\end{table}
+
+
+\paragraph{Attention Scoring Analysis} We further analyze the query-dependent nature of attention-based KV cache compression using the VideoMME benchmark. To investigate why performance varies with different queries, we compute the Jaccard similarity between token sets selected for different queries across layers using attention scores at each layer. For this analysis, $q_1, q_2, q_3$ represent three distinct questions associated with the same video sample in the VideoMME benchmark. As shown in Fig.~\ref{fig:jac_sim}, the similarity between token sets decreases significantly in the middle-to-late layers, dropping to around 0.4. This indicates that each query selects a different set of tokens, particularly in deeper layers. This analysis highlights that attention-based scoring methods inherently select query-specific tokens, explaining the performance degradation when query information is unavailable or changes during streaming video scenarios.
+
+\section{Memory and Latency Measurement Results}\label{appn:memory_latency}
+
+Table~\ref{tab:memory_ttft} presents measurements of peak memory consumption and Time-To-First-Token (TTFT) during the prefill stage, conducted on a single NVIDIA A100-80GB GPU using PyTorch. The experiments averaged over five runs with three warmup iterations, compare the performance of memory-unconstrained (Case 1, 2) and memory-constrained (Case 3) approaches across various context lengths. For memory-unconstrained methods, we observe a linear growth in memory requirements, escalating from 21.29 GB at 5K tokens to 79.38 GB at 100K tokens, accompanied by a proportional increase in TTFT from 0.98 to 3.27 seconds.
+
+Our memory-constrained continual KV cache compression (Case 3) exhibits remarkably different behavior. Despite the increasing context length, the peak memory usage shows only minimal growth, rising modestly from 20.93 GB at 5K tokens to 22.85 GB at 100K tokens. Similarly, the TTFT remains relatively stable, increasing from 1.08 to 1.20 seconds across the same range. These detailed measurements demonstrate that our approach effectively maintains near-constant resource utilization while processing extended video frames.
+
+\input{sec/5_related}
+
+\section{Experimental Results Data}
+
+\input{Tables/full_table}
+
+\begin{table*}[t]
+\centering
+% \small
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lccccccccccc}
+\toprule
+Qwen-2-VL & Vision & Decoding & \multicolumn{4}{c}{MLVU} & \multicolumn{4}{c}{VideoMME} & \\
+\cmidrule(lr){4-7} \cmidrule(lr){8-11}
+IVC Methods & Budget & Budget & Holistic & Single & Multi & Avg. & Short & Med & Long & Avg. & Avg. \\
+\midrule
+Full KV        & 50K & 50K & 76.3 & 73.9 & 43.3 & 65.9 & 74.7 & 62.1 & 55.0 & 63.9 & 64.2 \\ \midrule
+Uniform     & 50K & 6K  & 77.7 & 69.8 & 41.6 & 64.0 & 74.9 & 58.0 & 52.8 & 61.9 & 62.5 \\
+TTM~\cite{tao2024dycokedynamiccompressiontokens} & 50K & 6K  & 78.2 & 70.0 & 42.7 & 64.5 & 74.9 & 59.2 & 52.7 & 62.3 & 62.9 \\
+STC~\cite{shen2024longvu} & 50K & 6K  & 77.9 & 71.5 & 44.7 & 65.7 & 74.3 & 59.6 & 54.6 & \textbf{62.8} & \textbf{63.8} \\
+\cmidrule(lr){1-12}
+\mscellt \textbf{InfiniPot-V}        & 6K  & 6K  & 77.2 & 72.3 & 44.7 & \textbf{65.8} & 74.1 & 60.8 & 53.4 & \textbf{62.8} & \textbf{63.8} \\ \midrule
+Uniform     & 50K & 3K  & 75.7 & 66.5 & 38.6 & 61.1 & 72.2 & 53.4 & 50.0 & 58.6 & 59.4 \\
+TTM~\cite{tao2024dycokedynamiccompressiontokens}         & 50K & 3K  & 77.3 & 67.8 & 39.5 & 62.4 & 72.7 & 56.2 & 52.2 & 60.4 & 61.0 \\
+STC~\cite{shen2024longvu} & 50K & 3K  & 76.9 & 68.2 & 41.7 & 63.1 & 71.2 & 55.9 & 53.7 & 60.3 & 61.3 \\
+\cmidrule(lr){1-12}
+\mscellt \textbf{InfiniPot-V}    & 3K  & 3K  & 77.7 & 70.4 & 43.2 & \textbf{64.7} & 73.9 & 57.8 & 51.8 & \textbf{61.1} & \textbf{62.5} \\
+\bottomrule
+\end{tabular}
+}
+\vspace{1mm}
+\caption{\textbf{InfiniPot-V vs IVC}: Performance comparison between Input-Vision Compression (IVC) methodology and InfiniPot-V. Vision budget denotes the vision token length before IVC, while decoding budget refers to the input token length used during decoding. Evaluated using Qwen-2-VL with MLVU and VideoMME datasets.}
+\label{tab:full_ivc}
+\end{table*}
+
+\subsection{Comparison between InfiniPot-V and KVC}
+
+Tab.~\ref{tab:full_table} provides a detailed performance comparison between KV cache compression (KVC) methods and InfiniPot-V across offline video understanding (OVU) benchmarks under various compression ratios for two models: Qwen-2-VL and LLaVA-Next.
+
+In Case 1, where the full prefill is conducted and the final query is accessible at compression time, FastV demonstrates significantly inferior performance at similar compression ratios due to its aggressive token-pruning strategy. In contrast, SnapKV shows robust performance at high compression ratios across both models by utilizing the full context KV cache and retaining vision tokens that are highly correlated with the given query.
+
+Case 2 examines the query-agnostic setting, where, as explored in our earlier case study in Appendix.~\ref{appn:case_study}, SnapKV exhibits notable performance degradation across both models when applied in a query-agnostic manner, showing performance comparable to uniform selection baseline.
+
+In Case 3, which represents the CKV framework scenario where the constrained memory budget is used for both prefill and decoding stages, InfiniPot-V significantly outperforms all three baselines across various compression ratios on both models, as showcased in Fig.~\ref{fig:cache_compression}.
+
+\subsection{Comparison between InfiniPot-V and IVC}
+Table~\ref{tab:full_ivc} presents a performance comparison between Input-Vision Compression (IVC) methods and InfiniPot-V on the MLVU and Video-MME benchmarks using the Qwen-2-VL model. Under a 6K decoding budget, the IVC methods demonstrate robust overall performance by utilizing the full vision encoding budget (50K tokens). InfiniPot-V achieves comparable or slightly superior performance to these methods while operating under constrained memory budgets for both vision encoding and decoding stages (6K tokens).
+
+When the decoding budget is compressed to 3K tokens, the IVC methods exhibit performance degradation, with LongVU's STC methodology achieving the highest performance among the IVC approaches. Notably, InfiniPot-V demonstrates both efficiency and effectiveness by achieving higher accuracy than IVC methods that utilize the full vision encoding budget, while operating under constrained budgets (3K) for both vision encoding and decoding stages. 
+
+\section{Limitation and Future Work}
+
+InfiniPot-V introduces the first training-free, query-agnostic framework for memory-constrained streaming video understanding, enabling length-independent KV cache compression with minimal accuracy loss across long-form, real-time scenarios. However, several avenues exist for further advancement. Current approaches focus primarily on vision tokens, yet real-world streaming applications involve multiple modalities including speech, text, and video simultaneously. Future work could extend our framework to unified multimodal compression, enabling more realistic and comprehensive streaming understanding systems that efficiently manage diverse input types within fixed memory constraints.
+
+Additionally, our current fixed budget allocation between TaR and VaN components could benefit from adaptive mechanisms that dynamically adjust compression ratios based on input characteristics—allocating more resources to temporal redundancy reduction for static scenes or prioritizing spatial importance for content-rich frames. Furthermore, while InfiniPot-V's training-free nature ensures broad applicability, end-to-end learning approaches could optimize models specifically for continual compression scenarios, potentially enabling more aggressive compression ratios through learned token importance estimation~\cite{huang2025locretenhancingevictionlongcontext} tailored to streaming video understanding tasks.

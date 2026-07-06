@@ -1,0 +1,53 @@
+\section{Resultados y análisis}
+
+Primero analizamos varios aspectos de nuestro modelo, incluida la comparación con diferentes métodos de compresión (\Cref{sec:compression}), el diseño arquitectónico (\Cref{sec:architecture}) y la selección de tokens condicionada por la pregunta (\Cref{sec:question condition}). Por último, comparamos con video MLLMs state-of-the-art en \Cref{sec:prior methods}.
+
+\subsection{Comparison of Compression Methods}
+\label{sec:compression}
+
+We compare \model~with other compression techniques and a baseline that uses all tokens without compression. 
+
+\paragraph{Analysis of accuracy.} We begin by analyzing the accuracy of the different models as a function of the number of input spatiotemporal tokens. Specifically, we vary the number of frames sampled from the video to produce input token sequences of varying lengths. We experiment with 1, 4, 8, 16, 32, and 64 frames, resulting in 576, 2,304, 9,216, 18,432, and 36,864 input tokens for models based on LLaVA, and 1,600, 6,400, 12,800, 25,600, 51,200, and 102,400 input tokens for models based on LLaMA. While the Vanilla method generates a number of output tokens equal to the length of the input sequence, we apply the compression methods in this comparison using compression of $1\times 2\times 2$ in spatiotemporal ($T\times H\times W$) dimensions up to 16 frames and $2\times 2\times 2$ for inputs of 32 frames and $4\times 2\times 2$ for sequences of 64 frames.
+
+\Cref{fig:performance1} shows accuracy for LLaVA-based models (top row) and LLaMA-based models (bottom row) on NeXT-QA (left) and EgoSchema (right). First, our results show that the Vanilla method performs significantly worse than our \model, underscoring the importance of spatiotemporal token compression for video question-answering. Second, we observe that as the number of input tokens increases, the performance of the pooling method saturates. For pooling models, performance even declines beyond 16 frames, indicating that the pooling compression strategy struggles to capture long-range spatiotemporal dependencies when many frames are given as input. Third, while self-attention performs similarly to \model\ for short input sequences (up to 16 frames or 9,216 tokens for \modelLlava\ and 8 frames or 12,800 tokens for \modelLlama), it runs out of GPU memory beyond that. In comparison, our model consistently outperforms the widely used compression mechanism Perceiver~\cite{jaegle2021perceiver} and other methods, achieving consistently higher accuracy for all token sequence lengths with a monotonically increasing performance as more frames are added to the input. It yields the highest performance at 36,864 tokens for \modelLlava\ and 102,400 tokens for \modelLlama. This demonstrates the effectiveness of our token compression mechanism for long-range video understanding.
+
+
+\input{figures/computation_llava}
+
+
+\vspace{-3mm}
+\paragraph{Analysis of computational cost.}
+\label{sec:computation}
+
+In this section, we compare the computational cost of our model against baselines in terms of GPU memory usage (\Cref{fig:computation llava} (left)) and runtime (\Cref{fig:computation llava} (right)). We report results for LLaVA-based models, while the supplementary material provides an analysis of LLaMA-based models.
+
+As shown in \Cref{fig:computation llava} (left), both the Vanilla method and self-attention exhibit a sharp increase in memory usage as the input length increases, leading to out-of-memory (OOM) errors for sequences longer than 16 frames (9,216 tokens). Pooling consumes the least GPU memory but, as previously observed, results in the lowest accuracy. In contrast, our method maintains low memory usage across all input lengths while achieving the highest accuracy.
+
+\Cref{fig:computation llava} (right) presents runtime comparisons. We can observe that the runtime of the Vanilla method grows dramatically with the input length. Self-attention also incurs a higher runtime cost, and we can only experiment with sequences up to 16 frames or 9,216 tokens. Although pooling and Perceiver maintain low memory and runtime costs similar to our method, their accuracy is significantly lower. Finally, our method has a runtime cost nearly as low as pooling and can efficiently process sequences up to 64 frames or 36,864 tokens. 
+
+\subsection{Ablation on Architecture Design}
+\label{sec:architecture}
+
+\input{tables/architecture}
+
+In this section, we analyze several key architectural design choices that contribute to the effectiveness of our model. We present the results on the NExT-QA dataset in \Cref{tab:architecture}. First, we observe that initializing visual queries using a 3D pooling layer, as described in \Cref{sec:token selector}, outperforms random initialization, yielding accuracy improvements of +0.94\% and +1.65\% for \modelLlava\ and \modelLlama, respectively. Second, incorporating layer normalization before the spatiotemporal token selector enhances performance (see row 2 vs. row 3). Third, using a bidirectional selective scan improves accuracy over the standard selective scan by +1.83\% and +2.07\%, validating our hypothesis that the standard selective scan, originally developed for NLP, is suboptimal for vision tasks. %The bidirectional scan proves more effective for capturing the 3D spatiotemporal structure in videos. 
+Finally, interleaving queries among spatiotemporal tokens yields better performance than the standard approach (+1.89\% and +2.34\%) since this design allows the model to capture long-range temporal dependencies in video data more effectively.
+
+
+
+\subsection{Question-Conditioned Token Selection}
+\label{sec:question condition}
+
+
+\input{tables/question_condition}
+
+This section analyzes the impact of conditioning our spatiotemporal token selector with information extracted from the textual question. As shown in Table~\ref{tab:question condition}, adding the question as input to the token selector improves the accuracy by 1.04\% on NExT-QA and by 2.13\% on EgoSchema for the \modelLlama\ model. We also observe similar improvements for adding question-conditioning to \modelLlava\. This enhancement demonstrates that including question tokens enables our selective-scan mechanism to focus on content specifically related to the question, allowing it to choose more relevant spatiotemporal tokens from the input video. We do not include this question-conditioned token selection technique in our main \model\ model because we expect \model\ to answer multiple questions about a video efficiently based on one sequence of selected tokens without recomputing them for each question.
+
+\subsection{Comparison with the State of the Art}
+\label{sec:prior methods}
+\input{tables/main_results}
+
+In this section, we compare our model against state-of-the-art video MLLMs on seven different video benchmarks, summarizing the results in \Cref{tab:main result}. Since prior models rely on varying backbones and training datasets, to ensure a fair comparison, we first fine-tune four competitive models, as well as the two default variants of our \model~model on our 370K instruction-tuning dataset. These include PLLaVA~\cite{xu2024pllavaparameterfreellava}, LLaVA-NeXT (Video)~\cite{liu2024llavanext}, LLaMA-3.2~\cite{llama3.2} (Video) and PLLaVA (LLaMA-3.2), a variant of PLLaVA using the stronger LLaMA-3.2~\cite{llama3.2} image MLLM. The results in the second section of the table show that our model achieves better results than all these baselines. In particular, we note that when using the same Vicuna-7B~\cite{vicuna2023} model, \modelLlava\ outperforms both PLLaVA and LLaVA-NeXT (Video) on all benchmarks, achieving an average accuracy of 55.23\% compared to 49.42\% for LLaVA-NeXT and 50.40\% for PLLaVA. Likewise, our \modelLlama\ variant surpasses LLaMA-3.2 (Video) by 3.09\% on average and PLLaVA (LLaMA-3.2) by 4.21\%. These results highlight the effectiveness of our selective-scan-based token compression mechanism, which can be seamlessly integrated into existing MLLMs to enhance performance across a wide range of video understanding tasks.
+
+
+Furthermore, since recent MLLMs~\cite{li2024llava, liu2024kangaroo, shu2024video, shen2024longvu, wang2024qwen2, zhang2024video} have been trained with significantly larger instruction-tuning datasets and stronger LLM backbones, we also trained a variant of \modelLlava\ using approximately 1.6 million video instruction samples and the Qwen2-7B LLM backbone. The results in the third section of \Cref{tab:main result} show that this \modelLlava\ variant achieves state-of-the-art performance on multiple challenging video question-answering benchmarks, including NExT-QA~\cite{xiao2021nextqa}, EgoSchema~\cite{mangalam2023egoschema}, VNBench~\cite{zhao2024needle}, LongVideoBench~\cite{wu2024longvideobench}, and Video-MME~\cite{fu2024video}. On the EgoSchema benchmark, our model surpasses the previous best method, LongVU~\cite{shen2024longvu}, by 3.54\%, demonstrating its superior ability to comprehend egocentric videos and handle questions that require long context understanding. Similarly, on VNBench, which focuses on needle-in-the-haystack questions, our approach outperforms LLaVA-Video~\cite{zhang2024video} by 7.11\%, highlighting its strong capability to extract key information from very long videos. Additionally, \modelLlava\ (Qwen2-7B) substantially outperforms models based on proprietary LMMs. Specifically, it surpasses VideoTree~\cite{wang2024videotree} (GPT-4) by 7.7\% on NExT-QA and 10.04\% on EgoSchema. Finally, on benchmarks requiring long video comprehension, such as LongVideoBench~\cite{wu2024longvideobench}, Video-MME~\cite{fu2024video}, and MLVU~\cite{zhou2024mlvu} our model sets a new state-of-the-art, further demonstrating its effectiveness in processing and understanding hour-long videos.

@@ -1,0 +1,23 @@
+\section{Trabajo relacionado}\label{sec:related}
+
+\subsection{MLLMs para Long Video Understanding}
+Los avances recientes en MLLMs de contexto largo han atraído una atención significativa. Entre los ejemplos destacados se encuentran Gemini-2.0~\cite{google2024cgemini-2.0}, con soporte para streaming video; LongVILA~\cite{Chen2025longvila}, capaz de manejar hasta 6,000 frames de video; LLaVA-Next-Video~\cite{zhang2024llavanext-video}, que aprovecha datos sintéticos de instrucciones de alta calidad; y Qwen-2-VL~\cite{Qwen2VL}, que permite análisis de videos de una hora mediante multimodal RoPE.
+
+\subsection{Input-Vision Compression (IVC)}
+Para abordar las demandas computacionales del procesamiento de videos de larga duración, se han propuesto varios enfoques para comprimir información visual redundante antes de que ingrese al backbone LLM. 
+
+LongVU~\cite{shen2024longvu} adopta muestreo de frames de entrada dependiente de la consulta y eliminación de píxeles redundantes para fine-grained video understanding, pero el vision encoding de dos torres produce alta latencia durante el muestreo de entrada, lo que lo vuelve impráctico para escenarios de streaming. Además, este enfoque requiere entrenar modelos especializados para operar de la manera propuesta, limitando su aplicabilidad a modelos preentrenados existentes. 
+
+DyCoke~\cite{tao2024dycokedynamiccompressiontokens} reduce redundancias entre frames adyacentes a nivel del video de entrada y actualiza dinámicamente tokens relacionados con la consulta en la KV cache desde almacenamiento externo. Slow-Fast-LLaVA-1.5~\cite{xu2025slowfastllava15familytokenefficientvideo} propone dividir el procesamiento del video de entrada en trayectorias slow y fast separadas, usando distintos métodos de proyección para reducir los input vision tokens. Sin embargo, este enfoque todavía sufre la limitación de requerir que todos los input vision tokens se procesen simultáneamente y necesita entrenamiento adicional del modelo.
+
+\subsection{KV Cache Compression (KVC)}
+Comprender el contexto largo en MLLMs exige un control eficiente de la KV cache para manejar el crecimiento de memoria y la sobrecarga de latencia. Los métodos de compresión de KV cache pueden clasificarse, en términos generales, en enfoques dependientes e independientes de la consulta.
+
+\paragraph{Compresión de KV cache dependiente de la consulta.}
+Métodos como SnapKV~\cite{li2024snapkv}, H2O~\cite{zhang2023ho}, HeadKV~\cite{fu2024headkv} y ThinK~\cite{xu2025think} aprovechan puntajes de atención consulta-contexto para identificar entradas KV cruciales, pero requieren que el contexto completo pase por prefill antes de la compresión, lo que los vuelve imprácticos bajo restricciones de memoria. En el dominio multimodal, FastV~\cite{chen2024image} acelera el prefill podando vision tokens en ciertas capas según sus puntajes de atención desde el token final de consulta.
+SparseVLM~\cite{zhang2024sparsevlm} selecciona visual tokens relevantes para las consultas del usuario mediante cross-attention. En general, los métodos dependientes de la consulta comprimen eficazmente el contexto, pero tienen dificultades para manejar consultas diversas sobre un contexto ya comprimido~\cite{tang2025razorattention}. ReKV~\cite{Shangzhe2025streaming} aborda escenarios de streaming video descargando la KV cache relacionada con video a memoria CPU y recuperando bajo demanda entradas de cache dependientes de la consulta. Este enfoque depende de almacenamiento externo y sufre sobrecarga de transferencia de datos, lo que lo vuelve inadecuado para streaming video understanding con memoria restringida.
+
+\paragraph{Compresión de KV cache independiente de la consulta.}
+Trabajos recientes persiguen la compresión de KV cache independiente de la consulta para eliminar la dependencia de consultas futuras~\cite{ge2024model,devoto2024simple,hooper2024squeezed, kim2025kvzipqueryagnostickvcache, corallo2025ragtaskawarekvcache,park2025keydiffkeysimilaritybasedkv}.
+En particular, SqueezedAttention~\cite{hooper2024squeezed} usa clustering basado en keys, pero requiere encoding de contexto completo, lo que limita su aplicabilidad en escenarios con memoria restringida.
+InfiniPot~\cite{kim-etal-2024-infinipot} comprime el contexto aproximando posibles consultas del usuario mediante un proxy prompt específico de la tarea, pero su prompt fijo restringe la flexibilidad. En el dominio de visión, HiRED~\cite{arif2024hired} y FasterVLM~\cite{zhang2024fastervlm} utilizan puntajes de atención del token [CLS] para las decisiones de compresión. Sin embargo, su dependencia de tokens especiales restringe su aplicación a MLLMs recientes que carecen de tales tokens~\cite{qwen2.5,zhang2024llavanext-video}, limitando su aplicabilidad más amplia.

@@ -1,0 +1,108 @@
+\begin{table*}[ht]
+\centering
+\renewcommand{\arraystretch}{1.25}
+
+\caption{Resumen de las categorías de tareas, sus subcategorías y las plantillas de preguntas. }
+
+\resizebox{\textwidth}{!}{
+\begin{tabular}{ccl}
+\hline
+\rowcolor[HTML]{C0C0C0} 
+Escenario objetivo de la tarea & Subtarea & Ejemplos de consultas \\
+\hline
+
+
+% -------- Static-target --------
+\multicolumn{1}{c|}{} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Percepción de tránsito\\en tiempo real\end{tabular}} &
+\begin{tabular}[c]{@{}l@{}}
+1) \textquestiondown Cuál es el significado de la señal de tránsito en [0.61,0.31,0.64,0.38] en la imagen actual? \\
+2) \textquestiondown Cuáles son las coordenadas de posición de la señal de tránsito que indica "Pedestrian Crossing" en la imagen actual? \\
+3) \textquestiondown Cuál es el significado del cartel vial en [0.77,0.08,0.88,0.2] en la imagen actual? \\
+4) Según el cartel vial en [0.09,0.46,0.19,0.52] en este momento, si vamos hacia la izquierda, \textquestiondown adónde iremos \\
+y a qué distancia? \\
+5) \textquestiondown Cuál es el color del semáforo en [0.42,0.01,0.45,0.13] en la imagen actual? Y \textquestiondown cuál es su indicación? \\
+6) Según el cartel vial en [0.65,0.03,0.76,0.16] en este momento, \textquestiondown a qué distancia está Fengle?
+\end{tabular} \\ \cline{2-3}
+
+\multicolumn{1}{c|}{} & \multicolumn{1}{c|}{Memoria de tránsito pasada} &
+\begin{tabular}[c]{@{}l@{}}
+1) \textquestiondown Cuáles eran las coordenadas de posición de la señal de tránsito que indica "No Left Turn" en la escena hace 3 segundos? \\
+2) \textquestiondown Cuál era el significado de la señal de tránsito en [0.39,0.13,0.41,0.17] en la escena hace 1 segundo? \\
+3) La señal de tránsito se encuentra actualmente en [0.92,0.02,0.96,0.09]. \textquestiondown Cuáles eran sus coordenadas hace 2 segundos? \\
+4) \textquestiondown Cuál era el color del semáforo en [0.35,0.1,0.38,0.22] en la escena hace 2 segundos?
+\end{tabular} \\ \cline{2-3}
+
+\multicolumn{1}{c|}{} & \multicolumn{1}{c|}{Toma de decisiones de conducción} &
+\begin{tabular}[c]{@{}l@{}}
+1) Según el cartel vial en [0.37,0.18,0.47,0.31] en la imagen tomada hace 2 segundos, si queremos ir a Renhe, \\
+\textquestiondown en qué dirección debemos ir y a qué distancia está? \\
+2) Según el cartel vial en [0.51,0.18,0.61,0.3] en este momento, si queremos ir a Libai Avenue, \textquestiondown en qué dirección\\
+debemos ir y a qué distancia está? \\
+3) Según el cartel vial en [0.38,0.04,0.63,0.23] en este momento, si queremos girar a la izquierda, \textquestiondown en qué carril deberíamos estar?
+\end{tabular} \\ \cline{2-3}
+
+\multicolumn{1}{c|}{} & \multicolumn{1}{c|}{Extracción de información clave} &
+\begin{tabular}[c]{@{}l@{}}
+1) Si queremos ir a Suzhou, \textquestiondown a qué objetivo deberíamos prestar más atención en este momento? \\
+Indique el tipo y las coordenadas.
+\end{tabular} \\ \cline{2-3}
+
+\multicolumn{1}{c|}{} & \multicolumn{1}{c|}{Detección de alucinaciones} &
+\begin{tabular}[c]{@{}l@{}}
+1) Según el cartel vial en [0.38,0.31,0.52,0.48], \textquestiondown a qué distancia está actualmente Qingpu Town? \\
+2) \textquestiondown Cuál es el significado de la señal de tránsito en [0.34,0.29,0.38,0.38] en la imagen actual? \\
+3) \textquestiondown Cuál es el color del semáforo en [0.9,0.86,0.95,0.92] en la imagen actual?
+\end{tabular} \\ \cline{2-3}
+
+
+\multicolumn{1}{c|}{\multirow{-18}{*}{Objetivo estático}} & \multicolumn{1}{c|}{Detección de cambios de tránsito} &
+\begin{tabular}[c]{@{}l@{}}
+1) En el momento actual, \textquestiondown el semáforo que indica "turn right" más adelante se ha puesto completamente en verde? \\
+2) En el momento actual, \textquestiondown el semáforo de adelante se ha puesto completamente en rojo? 
+\end{tabular} \\
+\hline
+
+% -------- Dynamic-target --------
+\multicolumn{1}{c|}{} & \multicolumn{1}{c|}{Predicción de acción} &
+\begin{tabular}[c]{@{}l@{}}
+1) \textquestiondown Cuál será el estado de movimiento posterior del automóvil ubicado actualmente en [0.993, 0.615, 1.0, 0.63]? 
+\end{tabular} \\ \cline{2-3}
+
+\multicolumn{1}{c|}{} & \multicolumn{1}{c|}{Predicción de ubicación} &
+\begin{tabular}[c]{@{}l@{}}
+1) \textquestiondown Cómo será el cuadro de posición del peatón ubicado en [0.544, 0.561, 0.613, 0.895] en el próximo segundo?
+\end{tabular} \\ \cline{2-3}
+
+\multicolumn{1}{c|}{\multirow{-3}{*}{Objetivo dinámico}} & \multicolumn{1}{c|}{Predicción de distancia} &
+\begin{tabular}[c]{@{}l@{}}
+1) \textquestiondown La distancia entre nuestro automóvil y el automóvil en [0.488, 0.488, 0.501, 0.494] se está haciendo mayor o menor?
+\end{tabular} \\
+\hline
+
+
+% -------- Multi-agent Interaction Events --------
+\multicolumn{1}{c|}{} & \multicolumn{1}{c|}{Predicción de riesgo} &
+\begin{tabular}[c]{@{}l@{}}
+1) \textquestiondown Existe una alta probabilidad de que ocurran accidentes de tránsito dentro de un cierto período en el futuro? \\
+2) \textquestiondown Habrá riesgos de tránsito significativos dentro de un cierto período en el futuro? 
+\end{tabular} \\ \cline{2-3}
+
+\multicolumn{1}{c|}{} & \multicolumn{1}{c|}{Análisis de riesgo} &
+\begin{tabular}[c]{@{}l@{}}
+1) En este momento existe un alto riesgo de accidentes de tránsito. Según el entorno, \textquestiondown qué tipos de accidentes es probable que ocurran \\
+y cuál es la base de esta predicción? \\
+2) En este momento existen riesgos de tránsito significativos. Según el entorno, \textquestiondown cuáles son las fuentes de estos riesgos \\
+y qué tipos de accidentes podrían causar?
+\end{tabular} \\ \cline{2-3}
+
+\multicolumn{1}{c|}{\multirow{-7}{*}{\begin{tabular}[c]{@{}c@{}}Evento de interacción\\ multiagente\end{tabular}}} 
+& \multicolumn{1}{c|}{Respuesta sobre la causa del accidente} &
+\begin{tabular}[c]{@{}l@{}}
+1) \textquestiondown Cuál es la causa del accidente en el video? \textquestiondown Qué medidas pueden tomarse para evitarlo?
+\end{tabular} \\ \hline
+
+\end{tabular}%
+}
+
+\label{app:tab:task_templates}
+\end{table*}

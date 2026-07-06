@@ -1,0 +1,45 @@
+% \begin{table*}[t]
+% \centering
+% \caption{Summary of existing compression / long-video MLLM methods. \xbs{ai generated, to be done.}}
+% \scalebox{0.78}{
+% \begin{tabular}{l|l c c c c c c}
+% \toprule
+% \textbf{Method} & \textbf{LLM Backbone} & \textbf{Strategy} & \textbf{Mechanism} & \textbf{Tasks Reported} & \textbf{Max F.} & \textbf{Trainable Module} & \textbf{Tok/Frm} \\
+% \midrule
+% \multicolumn{8}{c}{\textit{Proprietary Models}} \\
+% \midrule
+% GPT-4o~\cite{hurst2024gpto} & - & - & Closed Source & MCQ, TVG, VDC & - & - & - \\
+% Gemini-1.5-Pro~\cite{team2024gemini1.5pro} & - & - & Closed Source & MCQ, TVG, VDC & 1k & - & - \\
+% \midrule
+% \multicolumn{8}{c}{\textit{Transformer-based Video MLLMs}} \\
+% \midrule
+% LLaMA-VID~\cite{li2024llamavid} & Vicuna-1.5-7B~\cite{touvron2023llama2} & proj-comp & Token Compression & MCQ, VDC & 10k & proj & 2 \\
+% LongVA~\cite{zhang2024longva} & Qwen2-7B~\cite{team2024qwen2} & - & Standard & MCQ & 0.1k & LLM & 144 \\
+% LongVU~\cite{shen2025longvu} & Qwen2-7B~\cite{team2024qwen2} & proj-prune & Visual Pruning & MCQ, VDC & 1k & - & 64 \\
+% LLaVA-OneVision~\cite{lillavaov} & Qwen2-7B~\cite{team2024qwen2} & - & AnyRes Strategy & MCQ, VDC & 0.1K & All & 196 \\
+% LLaVA-Video~\cite{zhang2025llavavideo} & Qwen2-7B~\cite{team2024qwen2} & - & Standard & MCQ, VDC & 100 & All & 676 \\
+% Qwen2-VL~\cite{wang2024qwen2vl} & Qwen2-7B~\cite{team2024qwen2} & ViT-reso & - & MCQ, VDC, TVG & 0.1K & All & 1924 \\
+% Qwen2.5-VL~\cite{bai2025qwen2.5vl} & Qwen2.5-7B~\cite{qwen2.5} & ViT-reso & Naive ViT Reso & MCQ, VDC, TVG & 0.1K & All & 1924 \\
+% LongVILA~\cite{longvila} & Qwen2-7B~\cite{team2024qwen2} & - & Long Context & MCQ & 1K & All & 196 \\
+% Kangaroo~\cite{kangaroogroup} & LLaMA3-8B~\cite{dubey2024llama3} & - & Standard & MCQ, VDC & 0.1K & All & 256 \\
+% Video-XL~\cite{shu2025videoxl1} & Qwen2-7B~\cite{team2024qwen2} & LLM-comp & Vector Summary & MCQ & 1K & All & 144 \\
+% Vamba~\cite{ren2025vamba} & Qwen2-VL-7B~\cite{team2024qwen2} & LLM-comp & Mamba Hybrid & MCQ, VDC & 1k & All & 1924 \\
+% VideoChat-Flash~\cite{li2024videochatflash} & Qwen2-7B~\cite{team2024qwen2} & proj+LLM & Merge \& Prune & MCQ, VDC, TVG & 10K & All & 16 \\
+% AuroraCap~\cite{shu2025videoxl1} & Vicuna-1.5-7B~\cite{touvron2023llama2} & proj-merge & Token Merge & VDC & 1K & All & - \\
+% \rowcolor[HTML]{F2F2F2}
+% Qwen2.5-7B-Base & Qwen2.5-7B~\cite{qwen2.5} & proj-merge & Baseline (Ours) & MCQ, VDC, TVG & 1k & ViT,proj & $\sim$196 \\
+% \midrule
+% \multicolumn{8}{c}{\textit{Linearized / Hybrid Video MLLMs}} \\
+% \midrule
+% LongLLaVA~\cite{wang2024longllava} & Jamba-52B~\cite{lenz2025jamba} & proj-pool & Pooling & MCQ & 1K & All & 144 \\
+% AuroraLong~\cite{xu2025auroralong} & RWKV6-2B~\cite{peng2024rwkv6} & proj-merge & Token Merge & MCQ,VDC & 10k & All & 60 \\
+% Nanov2-VL~\cite{deshmukh2025nanov2vl} & Nanov2-12B~\cite{basant2025nanov2} & proj-merge & Hybrid Upper-bound & MCQ & 0.1K & All & $\sim$196 \\
+% \rowcolor[HTML]{DEEBF7}
+% TimeViper (Ours) & Nanov2-9B~\cite{basant2025nanov2} & proj-merge & Token/Frame Comp. & MCQ, VDC, TVG & 1k & ViT,proj & 16 \\
+% \rowcolor[HTML]{DEEBF7}
+% TimeViper w/ TransV (Ours) & Nanov2-9B~\cite{basant2025nanov2} & TransV & Temp. Token Select & MCQ, VDC, TVG & 10K & ViT,proj & 1$\sim$16 \\
+% \bottomrule
+% \end{tabular}
+% }
+% \label{tab:method_summary}
+% \end{table*}

@@ -1,0 +1,46 @@
+\newpage
+\begin{algorithm}[t]
+\footnotesize
+\caption{Algoritmo de InfiniPot-V}
+\label{alg:infinipot_v}
+\begin{algorithmic}[1]
+\Require Flujo de video ${V}$, restricción de memoria $|M|$, tamaño objetivo de KV cache $|C|$, cantidad reciente de frames $r$, umbrales CV $\{\tau_1, \tau_2, \tau_3\}$, proporción TaR $\alpha \in [0,1]$, $f$ frames correspondientes a $|M|$ tokens, número de vision tokens por frame individual $p=|M|/f$ 
+\Ensure KV cache comprimida $\{\tilde{K}_l, \tilde{V}_l\}_{l=1}^L$
+\State Sea $C_{\text{TaR}} = \alpha|C|$ el presupuesto de selección de TaR
+\State Sea $C_{\text{VaN}} = (1-\alpha)|C|$ el presupuesto de selección de VaN
+\State Inicializar una KV cache vacía para cada capa $l \in \{1,\ldots,L\}$
+\While{procesando el flujo de video ${V}$}
+    \State Acumular embeddings KV hasta alcanzar $|M|$ 
+    \For{each layer $l$}
+        \State \textcolor{teal}{// Redundancia en el eje temporal (TaR)}
+        \State Reshape $K_l$ into $K_{\text{recent},l} \in \mathbb{R}^{H \times r \times p \times D}$ and $K_{\text{past},l} \in \mathbb{R}^{H \times (f-r) \times p \times D}$
+        \For{cada patch $(t,i,j)$ en frames pasados}
+            \State $s(t,i,j) = -\frac{1}{r}\sum_{t'=1}^{r}\text{cos}(K_{\text{past},l}^{(t,i,j)}, K_{\text{recent},l}^{(t',i,j)})$
+        \EndFor
+        \State $\mathcal{I}_l \gets \text{TopK}(S_l, C_{\text{TaR}})$ \Comment{Seleccionar los tokens menos redundantes}
+        
+        \State \textcolor{teal}{// Value Norm (VaN) con Adaptive Pooling}
+        \State $\text{VaN}_l \gets \|V_l\|_2$
+        \State \textcolor{teal}{// Calcular CV para adaptive pooling}
+        \State $\mu_l \gets \text{mean}(\text{VaN}_l)$
+        \State $\sigma_l \gets \text{std}(\text{VaN}_l)$
+        \State $\text{CV}_l \gets \sigma_l / \mu_l$
+        \State \textcolor{teal}{// Determinar el tamaño de pooling usando la función de mapeo $g$}
+\State $\text{pool\_size}_l \gets g(\text{CV}_l)$ \Comment{Usando los umbrales $\{\tau_1, \tau_2, \tau_3\}$}
+\State \textbf{donde} $g(\text{CV}) = 
+\begin{cases}
+    7, & \text{if}\ \text{CV} < \tau_1 \\
+    5, & \text{if}\ \tau_1 \leq \text{CV} < \tau_2 \\
+    3, & \text{if}\ \tau_2 \leq \text{CV} < \tau_3 \\
+    1, & \text{if}\ \text{CV} \geq \tau_3
+\end{cases}$
+        \State $\text{VaN}_{pool,l} \gets \text{AveragePool2d}(\text{VaN}_l, \text{pool\_size}_l)$
+        
+        \State \textcolor{teal}{// Combinar TaR y VaN priorizando los tokens seleccionados por TaR}
+        \State $\text{VaN}_{pool,l}[\mathcal{I}_l] \gets \max(\text{VaN}_{pool,l})$ \Comment{Priorizar los tokens de TaR}
+        \State $\mathcal{J}_l \gets \text{TopK}(\text{VaN}_{pool,l}, |C|)$ \Comment{Selección final de tokens}
+        \State $\tilde{K}_l \gets K_l[:, \mathcal{J}_l, :]$, $\tilde{V}_l \gets V_l[:, \mathcal{J}_l, :]$ \Comment {Actualizar la KV cache de la capa con la KV cache comprimida}
+    \EndFor
+\EndWhile
+\end{algorithmic}
+\end{algorithm}

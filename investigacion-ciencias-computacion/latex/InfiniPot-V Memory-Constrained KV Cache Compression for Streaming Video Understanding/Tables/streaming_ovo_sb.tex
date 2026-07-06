@@ -1,0 +1,18 @@
+\begin{table}[t]
+\small
+\centering
+\begin{tabular}{l c c c c c c c}
+\toprule
+\textbf{Qwen-2.5-VL} & \textbf{Scale}
+& \textbf{OVO-BW} & \textbf{OVO-Real} & \textbf{OVO-FW} 
+& \textbf{OVO-Avg} & \textbf{StreamingBench} \\
+\midrule
+Uniform Select & 7B & 44.5 & 61.1 & 47.8 & 51.7 & 75.2 \\
+InfiniPot-V & 7B & 47.6 & 65.9 & 47.9 & \textbf{53.6} & \textbf{76.4} \\
+\bottomrule
+\end{tabular}
+\vspace{.1in}
+\caption{Comparison on OVO-Bench (BW: Backward, Real: Realtime, FW: Forward) and StreamingBench (Real-time visual understanding) using \texttt{Qwen-2.5-VL-7B} under 4K memory budget.}
+\label{tab:ovo_results}
+\vspace{-.2in}
+\end{table}

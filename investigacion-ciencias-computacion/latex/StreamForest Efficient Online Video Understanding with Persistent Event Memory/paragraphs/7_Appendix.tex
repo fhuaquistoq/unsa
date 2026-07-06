@@ -1,0 +1,211 @@
+\section{Details of node's timestamp}
+\label{app:sec:Details_of_node_timestamp}
+
+Each event node's timestamp is initialized as the average time of the frames it represents (e.g., if an event node spans frames from 10s to 14s, its timestamp is initialized as 12s). When two event nodes are merged, the timestamp of the new node is computed as a token-count-weighted average of the original nodes:
+\begin{equation}
+t_{\text{new}} = \frac{t_i \cdot n_i + t_j \cdot n_j}{n_i + n_j},
+\end{equation}
+where $t_i$, $t_j$ are the timestamps of the original event nodes, and $n_i$, $n_j$ are the numbers of visual tokens contained in each node, respectively. This weighted scheme prevents timestamp drift during multiple rounds of merging, especially when the merged nodes contain significantly different amounts of visual tokens.
+
+\section{Details of OnlineIT}
+\label{app:sec:Details_of_OnlineIT}
+In this section, we provide a comprehensive description of the task categorization and data distribution of the OnlineIT dataset. It is specifically designed to enhance the streaming video understanding capabilities of MLLMs in terms of real-time perception, future prediction, and event continuity. As shown in Table \ref{app:tab:OnlineIT}, the dataset is divided into two major components: OnlineIT-general, which targets general streaming video understanding, and OnlineIT-drive, which focuses on autonomous driving scenarios. Each subset is carefully designed to cover a diverse range of fine-grained perception and reasoning tasks with high-quality annotations.
+
+\input{tables/Appendix/OnlineIT}
+
+
+\subsection{OnlineIT-general}
+\label{app:sec:Details_of_OnlineIT:OnlineIT-general}
+OnlineIT-general encompasses a broad scope of tasks designed to foster a comprehensive understanding of spatiotemporal video content in streaming settings. As shown in Table~\ref{app:tab:OnlineIT}, the dataset is categorized into four primary task types: spatial perception, temporal perception, spatiotemporal perception, and event perception. To ensure diversity, robustness, and fine-grained task coverage, we compiled and refined data from a wide array of sources. In total, OnlineIT-general comprises over 400k instances spanning various difficulty levels and video durations.
+
+\paragraph{Spatial Perception.} This task type includes four subtasks. \textbf{\textit{Spatial Grounding}} requires the model to output the bounding box indicating the location of a queried object. \textbf{\textit{Multi-round Spatial Understanding}} involves identifying the object’s spatial location through multi-turn dialogue or generating a caption for the object within a specified spatial region. \textbf{\textit{Spatial Grounded VQA}} combines visual question answering with spatial localization, requiring the model to provide the bounding box of the relevant area while answering the question. \textbf{\textit{Relative Spatial Localization}} challenges the model to determine the position of a specified object relative to the overall scene. These tasks emphasize spatial grounding and reasoning, which are crucial for enhancing a model’s fine-grained spatial perception in real-time streaming video scenarios.
+
+\paragraph{Temporal Perception.} This category consists of three subtasks. \textbf{\textit{Temporal Grounding}} involves interpreting a natural language query and identifying the start and end timestamps of the corresponding video segment. In streaming scenarios, the model must also assess whether the described event is currently ongoing. \textbf{\textit{Reasoning Temporal Localization}} requires identifying the relevant time span of an event while answering a reasoning-based question. \textbf{\textit{Multi-format Temporal Localization}} incorporates both single-turn and multi-turn dialogues, covering a diverse range of question formats. These tasks focus on strengthening the MLLM’s ability to track and reason about temporal dependencies, improving its understanding of both current and past moments in a video stream.
+
+\paragraph{Spatiotemporal Perception.} This task type integrates spatial and temporal reasoning and includes three subtasks. \textbf{\textit{Spatiotemporal Action Localization}} requires the model to predict both the spatial location and the action being performed by a target at a specific query time. \textbf{\textit{Object Backward Tracking}} tasks the model with identifying the current location of an object and tracing its position at previous time points, such as one or two seconds earlier. \textbf{\textit{Spatiotemporal Detection}} operates over broader temporal windows, asking whether an object visible in the current frame existed several seconds ago or requiring the model to locate an object at a specified historical moment and determine its duration of existence. These tasks combine spatiotemporal cues to capture actions, motion, and transitions, allowing the model to track object trajectories and anticipate future states based on past and present context.
+
+\paragraph{Event Perception.} This category includes two subtasks. \textbf{\textit{Dense Video Captioning}} involves detecting a sequence of events in a video and generating corresponding timestamps along with high-level descriptions. \textbf{\textit{Step Localization and Captioning}} differs by focusing on segmenting and narrating key procedural steps within long-form videos. These tasks are aimed at improving the model’s understanding of complex, multi-step events, enabling structured interpretation of dynamic sequences in streaming video understanding.
+
+
+\subsection{OnlineIT-drive}
+\label{app:sec:Details_of_OnlineIT:OnlineIT-drive}
+OnlineIT-drive is designed specifically for the domain of streaming video understanding in autonomous driving. The dataset includes 89k instances, which are organized into three major task categories. Collectively, these tasks aim to strengthen not only real-time perception capabilities but also the temporal reasoning and decision-making abilities of MLLMs in high-stakes and rapidly evolving environments.
+
+\paragraph{Static Target Understanding.}
+To improve the model’s capacity for static scene understanding, two task types are introduced. \textit{\textbf{Real-time Perception}} requires the model to accurately perceive and interpret the semantics and spatial attributes of traffic-related targets as they appear in real time. \textit{\textbf{Past Memory}} assesses the model’s ability to retain and retrieve the semantics and spatiotemporal characteristics of traffic targets that were observed at a prior point in time. These tasks collectively enhance the model’s capability to perceive, understand, and remember static traffic elements and environmental context, such as road infrastructure and regulatory signage.
+
+\paragraph{Dynamic Target Understanding.}
+It includes two task types that aim to enhance predictive understanding of dynamic traffic participants. \textit{\textbf{Location Prediction}} requires the model to estimate the future position of a moving target based on its historical motion trajectory. \textit{\textbf{Move Distance Prediction}} focuses on predicting the distance traveled between the ego vehicle and other moving agents, given motion-related observations. These tasks are designed to improve the model’s ability to track continuously moving objects and to anticipate future trajectories.
+
+\paragraph{Event Oriented Reasoning.}
+It is intended to foster the development of reasoning abilities necessary for risk assessment and accident interpretation. \textit{\textbf{Risk Analysis}} requires the model to detect potential sources of danger in the current traffic scene and to assess the likelihood of accident occurrence. \textit{\textbf{Accident Reasoning}} involves post hoc analysis, where the model must infer the causes of an observed accident and articulate plausible preventive strategies. These tasks are designed to enhance the model’s ability to reason about causal relationships and to anticipate or reflect on traffic risks with contextual awareness.
+
+
+
+
+
+
+
+
+\section{Details of ODV-Bench}
+\label{app:sec:Details_of_ODVBench}
+
+
+In this section, we detail the task taxonomy and formulation of the ODV-Bench, as well as the dataset statistics. We categorize task scenarios based on target entities and derive key perception and reasoning task types for each scenario in Table \ref{app:tab:task_templates}.
+
+\input{tables/Appendix/bench_task}
+
+\subsection{Task Taxonomy and Formulation}
+\label{app:sec:Details_of_ODVBench:Task}
+We first identify the primary categories of traffic entities relevant to autonomous driving and organize task scenarios into three groups:\textbf{ (1) Tasks for Static Targets}, which involve the recognition and retrieval of stationary traffic elements such as traffic signs, lights, and road indicators; \textbf{ (2) Tasks for dynamic targets}, which focus on behavior prediction and localization of moving entities such as vehicles and pedestrians; and \textbf{ (3) Tasks for multitarget interaction events}, which capture complex interactions, risk scenarios, and accidents involving multiple agents. Based on these categories and guided by temporal cues and the practical needs of driving, we further define fine-grained task types to comprehensively assess model understanding in realistic online driving video scenarios.
+
+\input{figs/Appendix/odvbench_case}
+
+\subsubsection{Tasks for Static Targets}
+Static traffic elements, such as traffic signs and road indicators, play a crucial role in driving decisions and hazard avoidance under normal driving conditions. To evaluate the model’s ability to retrieve and recognize these elements in online video streams, we design a dedicated set of tasks. Specifically, we distinguish between basic perception tasks and more advanced reasoning tasks, and further refine them based on temporal cues and practical driving needs: \textbf{(1) Real-time Traffic Perception:} Perceive and interpret the semantics and spatial locations of static traffic elements in real time; \textbf{(2) Past Traffic Memory:} Recall and track the semantics and spatiotemporal states of previously observed static elements; \textbf{(3) Driving Decision-Making:} make driving decisions based on the perceived information; \textbf{(4) Key Information Extraction:} Identify and locate key traffic elements critical to driving decisions; \textbf{(5) Hallucination Detection:} identify questions irrelevant to the existing video input; and \textbf{(6) Traffic Change Detection:} detect timestamps for changes in traffic elements, such as traffic lights.
+
+
+
+\subsubsection{Tasks for Dynamic Targets}
+The position and behavior of other road participants, such as vehicles and pedestrians, are crucial reference factors influencing autonomous driving decisions and safety. The ability to predict the position and behavior of dynamic traffic objects is essential to ensure the safety of autonomous driving. Therefore, we focus on the following three tasks to effectively evaluate this capability: \textbf{(1) Action Prediction:} predicting the next action of vehicles and pedestrians based on continuous spatiotemporal cues; \textbf{(2) Distance Prediction:} predicting the relative distance change between the ego-vehicle and other vehicles based on motion information; and \textbf{ (3) Location Prediction:} predicting the future spatial position of dynamic traffic targets based on their movement trajectories.
+
+
+\subsubsection{Tasks for Multi-Target Interaction Events}
+To achieve safe and reliable autonomous driving, the system must be able to identify risks and analyze accidents in complex road interaction scenarios. In the context of online video streams, this ability involves the dynamic recognition and analysis of multi-agent interactions, as well as the reasonable prediction of traffic risks. To evaluate this capability, we design the following three task categories: \textbf{(1) Risk Prediction:} predicting the occurrence of significant traffic risks and responding proactively; \textbf{(2) Risk Analysis:} detecting the sources of current traffic risks and analyzing the potential causes of accidents; and \textbf{ (3) Accident Reason Answering:} post-accident analysis, providing potential causes for the incident and summarizing actionable lessons learned.
+
+
+
+\subsection{Dataset Statistics}
+\label{app:sec:Details_of_ODVBench:Statistics}
+ODV-Bench comprises 1,190 unique first-person driving video clips, encompassing a diverse range of driving scenarios across different countries from routine driving conditions to potential hazards and accidents. The length of videos ranges from 5 seconds to 90 seconds, effectively capturing the diversity of real-world streaming driving experiences. The benchmark includes 6,322 question-answer pairs, with an average query timestamp of 18.9 seconds. 
+Specifically, the static-object-oriented category comprises 247 videos with a total of 1,639 questions; the dynamic-object-oriented category includes 162 videos and 2,973 questions; and the event-oriented category consists of 781 videos with 1,710 questions. All questions are in multiple-choice format, with the number of options varying between 2 and 4 depending on the question type.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{More Implementation Details}
+\label{app:sec:More_Implementation_Details}
+
+\input{tables/Appendix/training_stage_offline}
+
+\input{tables/Appendix/training_stage_online}
+
+We adopt a five-stage training strategy to systematically train the proposed StreamForest model, aiming to fully exploit its potential for streaming video understanding tasks. In the first three stages, we follow and extend the training paradigm of VideoChat-Flash \cite{li2024videochatflash}, employing offline training to endow the model with strong capabilities in long-form video comprehension and cross-modal alignment. These stages are designed progressively, covering diverse data scales and task objectives, enabling the model to gradually acquire core competencies such as basic vision-language alignment, long-term temporal modeling, and complex scene reasoning. Detailed training procedures and hyperparameter configurations for these stages are provided in Table~\ref{app:tab:training_strategy_offline}.
+
+
+
+
+In the fourth and fifth stages, we perform online fine-tuning to enhance the model’s ability to process streaming inputs in realistic scenarios. By continuously feeding frame sequences during training, the model learns to retain a fine-grained perception of the current moment while maintaining long-term memory of past events, even under high compression constraints. The full configuration and parameter settings for the online fine-tuning phase are listed in Table~\ref{app:tab:training_strategy_online}. These stages are critical for transitioning the model from offline understanding to real-time reasoning, significantly improving its robustness and practical effectiveness in real-world applications.
+
+
+
+
+
+
+
+
+
+
+
+\section{Full Performances}
+\label{app:sec:Full_Performances}
+In the following parts, we present the full results and compare StreamForest with leading proprietary and open-source models. To comprehensively evaluate the effectiveness of StreamForest, we conduct experiments on three online video understanding benchmarks: StreamingBench, OVBench, and OVO-Bench.
+
+\subsection{StreamingBench}
+\label{app:sec:Full_Performances:StreamingBench}
+\input{tables/Appendix/streamingbench}
+
+Table~\ref{app:tab:streamingbench} presents the full evaluation results on StreamingBench, covering 12 real-time video understanding tasks. StreamForest achieves the highest average score (77.26\%) among all evaluated models, both open-source and proprietary, while operating efficiently at 1 fps. Notably, StreamForest outperforms leading proprietary MLLMs such as GPT-4o (73.28\%) and Gemini 1.5 Pro (75.69\%). It also significantly surpasses top open-source offline models such as LLaVA-OneVision (71.12\%) and Qwen2.5-VL (73.68\%), underscoring its robust multimodal representation and reasoning capabilities. In the online video MLLM category, StreamForest sets a new state-of-the-art, outperforming open-source counterparts Dispider (67.63\%) by a wide margin. Its consistent accuracy and real-time efficiency demonstrate a strong potential for practical deployment in streaming applications.
+
+\subsection{OVBench}
+\label{app:sec:Full_Performances:OVBench}
+\input{tables/Appendix/ovbench}
+
+Table~\ref{app:tab:ov_bench} shows the comprehensive results on OVBench, encompassing six diverse task categories (FP, THV, PM, SP, STP, TP). StreamForest achieves the top average score of 60.5\%, surpassing all open-source online and offline Video MLLMs. It significantly outperforms other open-source online models, e.g., Videochat-Online (54.9\%) and Flash-VStream (31.2\%), as well as offline models such as Qwen2-VL (49.7\%) and LLaVA-OneVision (49.5\%). Compared to Gemini-1.5-Flash (50.7\%), StreamForest delivers nearly 10 points higher accuracy on average, affirming its capability to balance real-time efficiency with high performance.
+
+\subsection{OVO-Bench}
+\label{app:sec:Full_Performances:OVO-Bench}
+\input{tables/Appendix/ovobench}
+
+Table~\ref{app:tab:OVOBench} details performance on OVO-Bench, where StreamForest again leads among open-source online video MLLMs with an overall average of 55.57\%, outperforming Dispidier-7B (41.78\%) and Flash-VStream-7B (33.15\%). It excels in critical areas such as real-time visual perception (61.20\%), backward tracing (52.02\%), and forward active responding (53.49\%), showcasing robust temporal reasoning across both past and future events. These results position StreamForest as a practical and powerful solution for real-time video-language understanding.
+
+
+
+
+
+
+
+\section{Qualitative Comparison}
+\label{app:sec:Qualitative_Comparison}
+\input{figs/Appendix/qualitative_comparison}
+
+
+Figure \ref{app:fig:qualitative_comparison} presents a qualitative comparison between our model and other method. In the top example, StreamForest demonstrates a superior ability to capture fine-grained visual details and maintain persistent memory over time, enabling more coherent and informed inferences. The middle example highlights StreamForest’s strong spatiotemporal grounding capabilities, accurately localizing objects and events across space and time. The bottom example illustrates the model’s potential in intelligent driving scenarios, where it delivers precise real-time perception and supports future predictions based on both historical and current observations.
+
+
+
+
+
+\section{More Ablations}
+\label{app:sec:More_Ablations}
+
+\input{figs/Appendix/ablation_penalty}
+
+To evaluate the effect of each penalty on the effectiveness of long-term memory, we conducted ablation studies by varying the weights of the similarity penalty, merge count penalty, and temporal distance penalty. The results are presented in Figure~\ref{app:fig:ablation_penalty_weight}, which reports the accuracy of both VideoMME and OVBench under different settings. It demonstrates that a balanced combination of penalty weights is more effective. Specifically, 0.4 for both similarity and merge count penalties, and 0.2 for the temporal distance penalty yield the most effective memory construction. This configuration achieves a favorable trade-off between preserving semantic coherence, maintaining diversity in memory representation, and ensuring reasonable temporal continuity.
+
+
+
+
+
+
+
+
+\section{Efficiency of Multi-round Inference}
+\label{app:sec:Efficiency_Multi-round}
+We evaluated StreamForest's multi-round response efficiency by streaming a 600-second video to the model at a constant rate of 1 FPS. To isolate processing throughput from text generation latency, the model was constrained to produce a single-token response for each frame. Under this rigorous setting, StreamForest achieved an average processing speed of 9.9 FPS, which is competitive with VideoLLM-Online (12.3 FPS), a model renowned for its real-time capabilities.
+Crucially, StreamForest delivers this high efficiency without compromising its substantial superiority in reasoning accuracy over VideoLLM-Online. In stark contrast, Qwen2-VL, another model that also prioritizes reasoning accuracy, demonstrated severe performance bottlenecks. Its processing speed dropped below 1 FPS on a video merely two minutes long, and it encountered out-of-memory (OOM) errors on a single A100-80G GPU after processing only 79 frames.
+
+\input{tables/Appendix/efficiency_multiround}
+
+
+
+\section{Discussions}
+\label{app:sec:Discussions}
+\subsection{Limitations}
+\label{app:sec:Discussions:Limitations}
+
+Despite the effectiveness of our proposed method, several limitations remain that warrant further investigation.
+%
+Our approach can only rely on computing inter-frame similarity to determine moments when the model should proactively produce outputs. Specifically, the method identifies local minima in similarity scores to detect transitions. However, this technique primarily captures coarse scene changes and often fails to accurately detect true semantic event boundaries. To address this limitation, one possible solution is to incorporate a lightweight MLLM as an auxiliary reminder module. This module could provide semantic-level guidance to support more precise and context-aware output decisions.
+%
+These limitations suggest promising directions for future work.
+
+
+\subsection{Broader Impacts}
+\label{app:sec:Discussions:Broader Impacts}
+
+Our proposed method shows strong potential for real-world streaming video understanding, especially in critical applications like autonomous driving. With domain-specific fine-tuning, it can be adapted to various downstream tasks that require continuous visual processing. As shown in the main text, the model performs well in autonomous driving scenarios, where accurate and timely perception is crucial for safety and decision-making. It can efficiently process live video streams while preserving fine-grained perception and long-term contextual memory. This capability is particularly valuable under limited computational resources, helping improve the reliability and responsiveness of intelligent systems in dynamic environments.
+
+However, as with many vision-language models, potential negative social impacts must also be considered. If deployed without proper safeguards, models may inherit or amplify biases present in training data, leading to unreliable behavior. For instance, performance disparities across different environments or conditions (e.g., weather, lighting, or geographic location) could affect the robustness of StreamForest. To mitigate such risks, we should explore techniques for enhancing interpretability and controllability of streaming video models in safety contexts.
+

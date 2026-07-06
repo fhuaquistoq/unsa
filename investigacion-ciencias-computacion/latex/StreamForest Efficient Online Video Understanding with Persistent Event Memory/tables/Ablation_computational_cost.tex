@@ -1,0 +1,50 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+% \usepackage{colortbl}
+% \usepackage{graphicx}
+\begin{table}[t]
+    \begin{minipage}[t]{0.40\linewidth}
+        \centering
+        \setlength{\tabcolsep}{4pt}
+        \renewcommand{\arraystretch}{1.1}
+
+        \caption{
+            Análisis cuantitativo del tiempo de ejecución y el uso de memoria de StreamForest. 
+        }
+        
+        \resizebox{1\textwidth}{!}{
+            \begin{tabular}{c|c|c|c}
+            \hline
+            \textbf{Input Frames} & \textbf{Memory (GB)} & \textbf{FLOPs (T)} & \textbf{Latency (s)} \\ \hline
+            64   & 15.8 & 93.1  & 0.776 \\
+            256  & 17.1 & 134.1 & 1.126 \\
+            1024 & 17.2 & 137.3 & 1.497 \\ \hline
+            \end{tabular}
+        }
+
+        \label{tab:runtime_memory}
+    \end{minipage}
+    \hspace{3pt}
+    \begin{minipage}[t]{0.58\linewidth}
+        \centering
+        \setlength{\tabcolsep}{4pt}
+        \renewcommand{\arraystretch}{1.1}
+
+        \caption{
+            Comparación del tiempo de ejecución de PEMF con otros mecanismos de memoria para 500 frames. 
+        }
+        
+        \resizebox{1\textwidth}{!}{
+            \begin{tabular}{l|c|c|c|c}
+            \hline
+            \textbf{Method} & \textbf{Vis. Encode (s)} & \textbf{Mem. Update (s)} & \textbf{LLM infer (s)} & \textbf{Total (s)} \\ \hline
+            Similarity Merge \cite{song2024moviechat} & 5.198 & 0.183 & 1.388 & 6.769 \\
+            PMB \cite{huang2024videochatonline} & 5.203 & 0.451 & 1.381 & 7.035 \\
+            \rowcolor[HTML]{DFF7DC}
+            \textbf{PEMF (Ours)} & 5.218 & \textbf{0.172} & 1.394 & 6.784 \\ \hline
+            \end{tabular}
+        }
+
+        \label{tab:memory_mechanism_comparison}
+    \end{minipage}
+\end{table}

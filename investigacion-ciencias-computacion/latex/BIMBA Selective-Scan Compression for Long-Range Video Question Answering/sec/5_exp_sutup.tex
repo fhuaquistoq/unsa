@@ -1,0 +1,41 @@
+\section{Configuración experimental}
+
+\subsection{Datos de entrenamiento}
+
+
+Para nuestros modelos por defecto, entrenamos el modelo sobre 370K videos de instruction tuning agregados a partir de una colección de datasets, incluidos YouCook2~\cite{zhou2018youcook2}, Ego4D-HCap~\cite{islam2024video}, NExT-QA~\cite{xiao2021nextqa}, IntentQA~\cite{li2023intentqa}, CLEVRER~\cite{yi2020clevrer}, Ego4D~\cite{Grauman2021Ego4DAT}, STAR~\cite{wu2024star} y Perception Test~\cite{patraucean2023perception}. No utilizamos ningún dato generado por ChatGPT o GPT-4, de acuerdo con los términos de uso de OpenAI\footnote{\href{https://openai.com/policies/row-terms-of-use}{https://openai.com/policies/row-terms-of-use}} y nuestra política legal interna. Además, para acelerar los experimentos de ablation, construimos un conjunto de entrenamiento de instruction tuning más pequeño de 70K videos a partir de NExT-QA~\cite{xiao2021nextqa}, IntentQA~\cite{li2023intentqa}, Ego4D~\cite{Grauman2021Ego4DAT} y Ego4D-HCap~\cite{islam2024video}. Las ablaciones se evalúan en NExT-QA~\cite{xiao2021nextqa} y EgoSchema~\cite{mangalam2023egoschema}.
+
+
+\subsection{Benchmarks de evaluación}
+Evaluamos nuestro modelo en siete benchmarks diversos de video question-answering: Perception Test~\cite{patraucean2024perception}, NExT-QA~\cite{xiao2021nextqa}, EgoSchema~\cite{mangalam2023egoschema}, VNBench~\cite{zhao2024needle}, LongVideoBench~\cite{wu2024longvideobench}, Video-MME~\citep{fu2024video} y MLVU~\cite{zhou2024mlvu}. 
+
+\subsection{Variantes de nuestro modelo}
+\begin{itemize}
+
+\item \textbf{\modelLlava.} Implementamos esta variante aplicando \model\ sobre el image-pretrained MLLM LLaVA-NeXT~\cite{liu2024llavanext}, que utiliza el vision encoder CLIP~\cite{radford2021learning} y el LLM Vicuna-7B~\cite{vicuna2023}.  
+
+\item \textbf{\modelLlama.} Implementamos esta variante aplicando \model\ sobre el image-pretrained MLLM LLaMA-3.2~\cite{llama3.2}, que utiliza el vision encoder Meta-CLIP~\cite{xu2023demystifying} y el LLM LLaMA-3.2-LLM-8B.
+
+\end{itemize}
+
+\subsection{Baselines}
+
+Además de comparar con métodos previos basados en distintos MLLMs y entrenados con datos diferentes, implementamos los siguientes baselines para una comparación justa.
+
+\begin{itemize}
+
+\item \textbf{Vanilla.} Implementamos este baseline eliminando el spatiotemporal token selector de nuestro modelo, lo que da como resultado ausencia de compresión de tokens. Todos los tokens generados por el image encoder se pasan directamente al LLM.
+
+\item \textbf{Pooling.} Este baseline aplica spatiotemporal pooling como método de compresión, utilizando la misma razón de compresión que nuestro modelo principal. 
+
+\item \textbf{Self-Attention.} Implementamos este baseline reemplazando la capa selective-scan de nuestro spatiotemporal token selector por capas self-attention. 
+
+\item \textbf{Perceiver.} Este baseline aprovecha el mecanismo Perceiver~\cite{jaegle2021perceiver} para comprimir tokens espaciotemporales y usa la misma razón de compresión que nuestro modelo.
+
+\end{itemize}
+
+\input{figures/performance1}
+
+\subsection{Detalles de implementación}
+
+Usamos una estrategia simple para entrenar tanto nuestros modelos como los baselines: partiendo de un frame encoder image-pretrained, hacemos fine-tuning del MLLM sobre el dataset de video instruction-tuning. Congelamos el image encoder y entrenamos el spatiotemporal token selector y el LLM aplicando LoRA~\cite{hu2021lora} al LLM. Por defecto, el modelo \modelLlava toma 64 video frames divididos en $64 \times 24 \times 24 = 36,864$ tokens y comprime esta secuencia a $16 \times 12 \times 12 = 2,304$ tokens, que se pasan al LLM. Por defecto, \modelLlama procesa 64 frames divididos en $64 \times 40 \times 40 = 102,400$ tokens y comprime esta secuencia a $16 \times 20 \times 20 = 6,400$ tokens para el LLM.

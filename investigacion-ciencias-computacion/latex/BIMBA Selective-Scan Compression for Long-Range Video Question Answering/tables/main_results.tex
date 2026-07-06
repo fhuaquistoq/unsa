@@ -1,0 +1,43 @@
+\begin{table*}[t]
+\vspace{-5mm}
+\resizebox{1\textwidth}{!}{%
+\begin{tabular}{lccccccccc}
+\toprule
+Model & LLM & Frames & PerceptionTest & NExT-QA & EgoSchema & VNBench & LongVideoBench & Video-MME & MLVU \\
+Duration & & & 23 sec & 44 sec & 180 sec & 180 sec & 8 sec - 60 min & 1 - 60 min & 3 - 120 min \\
+\toprule
+\rowcolor{lightgray}\multicolumn{10}{c}{(Based on Proprietary LLMs)} \\
+LLoVi~\cite{zhang2023simple} & GPT3.5 & - & - & 66.30 & 52.00 & - & - & - & - \\
+VideoAgent~\cite{wang2024videoagent} & GPT4 & - & - & 71.30 & 54.10 & - & - & - & - \\
+VideoTree~\cite{wang2024videotree} & GPT4 & - & - & 75.60 & 61.10 & - & - & - & - \\
+\rowcolor{lightgray}\multicolumn{10}{c}{(Open-source MLLMs Trained on Our 370K Video Instruction Data)} \\
+LLaVA-NeXT (Video)~\cite{liu2024llavanext} & Vicuna-7B & 64 & 46.13 & 67.66 & 41.66 & - & - & 42.21 & 42.33 \\
+PLLaVA~\cite{xu2024pllavaparameterfreellava} & Vicuna-7B & 64 & 48.55 & 67.56 & 43.36 & - & - & 42.13 & 44.61 \\
+\textbf{\modelLlava} & Vicuna-7B & 64 & 52.61 & 72.35 & 52.31 & - & - & 45.66 & 47.16 \\
+\hline
+LLaMA-3.2 (Video)~\cite{llama3.2} & LLaMA3.2-8B & 64 & 53.16 & 73.72 & 55.21 & - & - & 47.31 & 47.61 \\
+PLLaVA (LLaMA-3.2)~\cite{llama3.2} & LLaMA3.2-8B & 64 & 53.13 & 72.77 & 52.33 & - & - & 46.56 & 46.56 \\
+\textbf{\modelLlama} & LLaMA3.2-8B & 64 & 56.50 & 76.88 & 60.25 & - & - & 50.11 & 50.60 \\
+\rowcolor{lightgray}\multicolumn{10}{c}{(Open-source MLLMs Trained on Larger Scale Instruction Video Data)} \\
+LLaMA-VID~\cite{Li2023LLaMAVIDAI} & Vicuna-7B & 1fps & 44.60 & - & 38.50 & 10.80 & - & - & 33.20 \\
+Video-LLaVA~\cite{lin2023video} & Vicuna-7B & 8 & 44.30 & 62.60 & 38.40 & - & - & 40.40 & 47.30 \\
+LLaVA-NeXT-Video~\cite{zhang2024llavanextvideo} & Vicuna-7B & 32 & 48.80 & - & 43.90 & 20.10 & 43.50 & 46.50 & - \\
+PLLaVA~\cite{xu2024pllavaparameterfreellava} & Vicuna-7B & 16 & - & 68.17 & 45.16 & - & 40.20 & 44.25 & 47.31 \\
+VideoChat2~\cite{li2023mvbench} & Vicuna-7B & 16 & 47.30 & - & 54.40 & 12.40 & 36.00 & 47.90 & 54.60 \\
+LongVA~\cite{zhang2024long} & Qwen2-7B & 128 & - & 68.30 & - & 41.50 & - & 54.30 & 56.30 \\
+Video-LLaMA2~\cite{cheng2024videollama} & Qwen2-7B & 32 & 51.40 & - & 51.70 & 24.90 & - & 47.90 & 48.50 \\
+LLaVA-OneVision~\cite{li2024llava} & Qwen2-7B & 32 & 57.10 & 79.40 & 60.10 & 51.80 & 56.5 & 58.20 & 64.70 \\
+Kangaroo~\cite{liu2024kangaroo} & LLaMA2-8B & 64 & - & - & 62.70 & - & - & 56.00 & 61.00 \\
+Video-XL~\cite{shu2024video} & Qwen2-7B & 2048 & - & - & - & 61.60 & 49.50 & 55.50 & 64.90 \\
+LongVU~\cite{shen2024longvu} & Qwen2-7B & 1fps & - & - & 67.60 & - & - & 60.60 & 65.40 \\
+Qwen2-VL~\cite{wang2024qwen2} & Qwen2-7B & 2fps & - & - & - & - & 55.60 & 63.30 & - \\
+LLaVA-Video~\cite{zhang2024video} & Qwen2-7B & 64 & 67.90 & 83.20 & 57.30 & 70.77 & 58.20 & 63.30 & 70.80 \\
+\textbf{\modelLlava} & Qwen2-7B & 128 & \textbf{68.51} & \textbf{83.73} & \textbf{71.14} & \textbf{77.88} & \textbf{59.46} & \textbf{64.67} & \textbf{71.37} \\
+\bottomrule
+\end{tabular}
+}
+\vspace{-3mm}
+\caption{We compare \model\ with state-of-the-art video MLLMs across seven diverse video question-answering benchmarks. \modelLlava\ achieves the highest performance on all datasets when using the Qwen2-7B LLM backbone (third section). Since different MLLMs leverage varying LLM backbones and training data, we also conduct a fair comparison by evaluating our model against four baselines trained using the same 370K instruction-tuning dataset and using Vicuna-7B and LLaMA3.2-8B LLM decoders (second section). In this evaluation setting, we observe that our model consistently outperforms all baselines across all benchmarks.}
+\vspace{-5mm}
+\label{tab:main result}
+\end{table*}

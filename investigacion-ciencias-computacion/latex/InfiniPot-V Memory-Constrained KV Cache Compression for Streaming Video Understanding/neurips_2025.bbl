@@ -1,0 +1,258 @@
+\begin{thebibliography}{10}
+
+\bibitem{arif2024hired}
+Kazi Hasan~Ibn Arif, JinYi Yoon, Dimitrios~S. Nikolopoulos, Hans Vandierendonck, Deepu John, and Bo~Ji.
+\newblock Hired: Attention-guided token dropping for efficient inference of high-resolution vision-language models, 2024.
+
+\bibitem{Beltagy2020Longformer}
+Iz~Beltagy, Matthew~E. Peters, and Arman Cohan.
+\newblock Longformer: The long-document transformer.
+\newblock {\em arXiv:2004.05150}, 2020.
+
+\bibitem{chan2025analyzing}
+David Chan, Rodolfo Corona, Joonyong Park, Cheol~Jun Cho, Yutong Bai, and Trevor Darrell.
+\newblock Analyzing the language of visual tokens, 2025.
+
+\bibitem{chen2024image}
+Liang Chen, Haozhe Zhao, Tianyu Liu, Shuai Bai, Junyang Lin, Chang Zhou, and Baobao Chang.
+\newblock An image is worth 1/2 tokens after layer 2: Plug-and-play inference acceleration for large vision-language models, 2024.
+
+\bibitem{Chen2025longvila}
+Yukang Chen, Fuzhao Xue, Dacheng Li, Qinghao Hu, Ligeng Zhu, Xiuyu Li, Yunhao Fang, Haotian Tang, Shang Yang, Zhijian Liu, Ethan He, Hongxu Yin, Pavlo Molchanov, Jan Kautz, Linxi Fan, Yuke Zhu, Yao Lu, and Song Han.
+\newblock Long{VILA}: Scaling long-context visual language models for long videos.
+\newblock In {\em The Thirteenth International Conference on Learning Representations}, 2025.
+
+\bibitem{corallo2025ragtaskawarekvcache}
+Giulio Corallo, Orion Weller, Fabio Petroni, and Paolo Papotti.
+\newblock Beyond rag: Task-aware kv cache compression for comprehensive knowledge reasoning, 2025.
+
+\bibitem{dao2023flashattention2}
+Tri Dao.
+\newblock Flash{A}ttention-2: Faster attention with better parallelism and work partitioning.
+\newblock In {\em International Conference on Learning Representations (ICLR)}, 2024.
+
+\bibitem{devoto2024simple}
+Alessio Devoto, Yu~Zhao, Simone Scardapane, and Pasquale Minervini.
+\newblock A simple and effective $l\_2$ norm-based strategy for {KV} cache compression.
+\newblock In {\em Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing}, pages 18476--18499, November 2024.
+
+\bibitem{farquhar2024detecting}
+Sebastian Farquhar, Jannik Kossen, Livia Kuhn, et~al.
+\newblock Detecting hallucinations in large language models using semantic entropy.
+\newblock {\em Nature}, 630:625--630, 2024.
+
+\bibitem{feichtenhofer2019slowfastnetworksvideorecognition}
+Christoph Feichtenhofer, Haoqi Fan, Jitendra Malik, and Kaiming He.
+\newblock Slowfast networks for video recognition, 2019.
+
+\bibitem{fu2024videomme}
+Chaoyou Fu, Yuhan Dai, Yondong Luo, Lei Li, Shuhuai Ren, Renrui Zhang, Zihan Wang, Chenyu Zhou, Yunhang Shen, Mengdan Zhang, et~al.
+\newblock Video-mme: The first-ever comprehensive evaluation benchmark of multi-modal llms in video analysis.
+\newblock {\em arXiv preprint arXiv:2405.21075}, 2024.
+
+\bibitem{fu2024headkv}
+Yu~Fu, Zefan Cai, Abedelkadir Asi, Wayne Xiong, Yue Dong, and Wen Xiao.
+\newblock Not all heads matter: A head-level kv cache compression method with integrated retrieval and reasoning.
+\newblock In {\em The Thirteenth International Conference on Learning Representations}, 2025.
+
+\bibitem{ge2024model}
+Suyu Ge, Yunan Zhang, Liyuan Liu, Minjia Zhang, Jiawei Han, and Jianfeng Gao.
+\newblock Model tells you what to discard: Adaptive {KV} cache compression for {LLM}s.
+\newblock In {\em The Twelfth International Conference on Learning Representations}, 2024.
+
+\bibitem{deepmind2023astra}
+{Google DeepMind}.
+\newblock Project {ASTRA}.
+\newblock \url{https://deepmind.google/technologies/project-astra/}, 2024.
+
+\bibitem{Grauman_2022_CVPR}
+Kristen Grauman, Andrew Westbury, Eugene Byrne, Zachary Chavis, Antonino Furnari, Rohit Girdhar, Jackson Hamburger, Hao Jiang, Miao Liu, Xingyu Liu, Miguel Martin, Tushar Nagarajan, Ilija Radosavovic, Santhosh~Kumar Ramakrishnan, Fiona Ryan, Jayant Sharma, Michael Wray, Mengmeng Xu, Eric~Zhongcong Xu, Chen Zhao, Siddhant Bansal, Dhruv Batra, Vincent Cartillier, Sean Crane, Tien Do, Morrie Doulaty, Akshay Erapalli, Christoph Feichtenhofer, Adriano Fragomeni, Qichen Fu, Abrham Gebreselasie, Cristina Gonz\'alez, James Hillis, Xuhua Huang, Yifei Huang, Wenqi Jia, Weslie Khoo, J\'achym Kol\'a\v{r}, Satwik Kottur, Anurag Kumar, Federico Landini, Chao Li, Yanghao Li, Zhenqiang Li, Karttikeya Mangalam, Raghava Modhugu, Jonathan Munro, Tullie Murrell, Takumi Nishiyasu, Will Price, Paola Ruiz, Merey Ramazanova, Leda Sari, Kiran Somasundaram, Audrey Southerland, Yusuke Sugano, Ruijie Tao, Minh Vo, Yuchen Wang, Xindi Wu, Takuma Yagi, Ziwei Zhao, Yunyi Zhu, Pablo Arbel\'aez, David Crandall, Dima Damen, Giovanni~Maria
+  Farinella, Christian Fuegen, Bernard Ghanem, Vamsi~Krishna Ithapu, C.~V. Jawahar, Hanbyul Joo, Kris Kitani, Haizhou Li, Richard Newcombe, Aude Oliva, Hyun~Soo Park, James~M. Rehg, Yoichi Sato, Jianbo Shi, Mike~Zheng Shou, Antonio Torralba, Lorenzo Torresani, Mingfei Yan, and Jitendra Malik.
+\newblock Ego4d: Around the world in 3,000 hours of egocentric video.
+\newblock In {\em Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 18995--19012, June 2022.
+
+\bibitem{hooper2024squeezed}
+Coleman Hooper, Sehoon Kim, Hiva Mohammadzadeh, Monishwaran Maheswaran, June Paik, Michael~W Mahoney, Kurt Keutzer, and Amir Gholami.
+\newblock Squeezed attention: Accelerating long context length llm inference.
+\newblock {\em arXiv preprint arXiv:2411.09688}, 2024.
+
+\bibitem{huang2020movienet}
+Qingqiu Huang, Yu~Xiong, Anyi Rao, Jiaze Wang, and Dahua Lin.
+\newblock Movienet: A holistic dataset for movie understanding.
+\newblock In {\em Computer Vision--ECCV 2020: 16th European Conference, Glasgow, UK, August 23--28, 2020, Proceedings, Part IV 16}, pages 709--727. Springer, 2020.
+
+\bibitem{huang2025locretenhancingevictionlongcontext}
+Yuxiang Huang, Binhang Yuan, Xu~Han, Chaojun Xiao, and Zhiyuan Liu.
+\newblock Locret: Enhancing eviction in long-context llm inference with trained retaining heads on consumer-grade devices, 2025.
+
+\bibitem{Karumbunathan2022JetsonAGXOrin}
+Leela~S. Karumbunathan.
+\newblock {NVIDIA Jetson AGX Orin Series Technical Brief}.
+\newblock Technical Report TB\_10749-001\_v1.2, NVIDIA Corporation, July 2022.
+\newblock Version 1.2.
+
+\bibitem{kim2025kvzipqueryagnostickvcache}
+Jang-Hyun Kim, Jinuk Kim, Sangwoo Kwon, Jae~W. Lee, Sangdoo Yun, and Hyun~Oh Song.
+\newblock Kvzip: Query-agnostic kv cache compression with context reconstruction, 2025.
+
+\bibitem{kim-etal-2024-infinipot}
+Minsoo Kim, Kyuhong Shim, Jungwook Choi, and Simyung Chang.
+\newblock {I}nfini{P}ot: Infinite context processing on memory-constrained {LLM}s.
+\newblock In Yaser Al-Onaizan, Mohit Bansal, and Yun-Nung Chen, editors, {\em Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing}, pages 16046--16060, Miami, Florida, USA, November 2024. Association for Computational Linguistics.
+
+\bibitem{li2024llava}
+Bo~Li, Yuanhan Zhang, Dong Guo, Renrui Zhang, Feng Li, Hao Zhang, Kaichen Zhang, Yanwei Li, Ziwei Liu, and Chunyuan Li.
+\newblock Llava-onevision: Easy visual task transfer.
+\newblock {\em arXiv preprint arXiv:2408.03326}, 2024.
+
+\bibitem{li2025ovobenchfarvideollmsrealworld}
+Yifei Li, Junbo Niu, Ziyang Miao, Chunjiang Ge, Yuanhang Zhou, Qihao He, Xiaoyi Dong, Haodong Duan, Shuangrui Ding, Rui Qian, Pan Zhang, Yuhang Zang, Yuhang Cao, Conghui He, and Jiaqi Wang.
+\newblock Ovo-bench: How far is your video-llms from real-world online video understanding?, 2025.
+
+\bibitem{li2024snapkv}
+Yuhong Li, Yingbing Huang, Bowen Yang, Bharat Venkitesh, Acyr Locatelli, Hanchen Ye, Tianle Cai, Patrick Lewis, and Deming Chen.
+\newblock Snap{KV}: {LLM} knows what you are looking for before generation.
+\newblock In {\em The Thirty-eighth Annual Conference on Neural Information Processing Systems}, 2024.
+
+\bibitem{lin2024streaming}
+Junming Lin, Zheng Fang, Chi Chen, Zihao Wan, Fuwen Luo, Peng Li, Yang Liu, and Maosong Sun.
+\newblock Streamingbench: Assessing the gap for mllms to achieve streaming video understanding.
+\newblock {\em arXiv preprint arXiv:2411.03628}, 2024.
+
+\bibitem{ringattention}
+Hao Liu, Matei Zaharia, and Pieter Abbeel.
+\newblock Ringattention with blockwise transformers for near-infinite context.
+\newblock In {\em The Twelfth International Conference on Learning Representations}, 2024.
+
+\bibitem{llava}
+Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong~Jae Lee.
+\newblock Visual instruction tuning.
+\newblock In A.~Oh, T.~Naumann, A.~Globerson, K.~Saenko, M.~Hardt, and S.~Levine, editors, {\em Advances in Neural Information Processing Systems}, volume~36, pages 34892--34916. Curran Associates, Inc., 2023.
+
+\bibitem{mangalam2023egoschema}
+Karttikeya Mangalam, Raiymbek Akshulakov, and Jitendra Malik.
+\newblock Egoschema: A diagnostic benchmark for very long-form video language understanding.
+\newblock In {\em Thirty-seventh Conference on Neural Information Processing Systems Datasets and Benchmarks Track}, 2023.
+
+\bibitem{neo2025towards}
+Clement Neo, Luke Ong, Philip Torr, Mor Geva, David Krueger, and Fazl Barez.
+\newblock Towards interpreting visual information processing in vision-language models.
+\newblock In {\em The Thirteenth International Conference on Learning Representations}, 2025.
+
+\bibitem{openai2023gpt4v}
+{OpenAI}.
+\newblock Gpt-4v(ision) system card, 2023.
+
+\bibitem{openai2023gpt4o}
+{OpenAI}.
+\newblock Hello gpt-4o.
+\newblock \url{https://openai.com/index/hello-gpt-4o/}, 2024.
+
+\bibitem{park2025keydiffkeysimilaritybasedkv}
+Junyoung Park, Dalton Jones, Matthew~J Morse, Raghavv Goel, Mingu Lee, and Chris Lott.
+\newblock Keydiff: Key similarity-based kv cache eviction for long-context llm inference in resource-constrained environments, 2025.
+
+\bibitem{peng2024yarn}
+Bowen Peng, Jeffrey Quesnelle, Honglu Fan, and Enrico Shippole.
+\newblock Ya{RN}: Efficient context window extension of large language models.
+\newblock In {\em The Twelfth International Conference on Learning Representations}, 2024.
+
+\bibitem{google2024cgemini-2.0}
+Sundar Pichai, Demis Hassabis, and Koray Kavukcuoglu.
+\newblock Introducing gemini 2.0: our new ai model for the agentic era.
+\newblock \url{https://blog.google/technology/google-deepmind/google-gemini-ai-update-december-2024}, 2024.
+
+\bibitem{Shangzhe2025streaming}
+Zhelun~Yu Shangzhe~Di.
+\newblock Streaming video question-answering with in-context video {KV}-cache retrieval.
+\newblock In {\em The Thirteenth International Conference on Learning Representations}, 2025.
+
+\bibitem{shen2024longvu}
+Xiaoqian Shen, Yunyang Xiong, Changsheng Zhao, Lemeng Wu, Jun Chen, Chenchen Zhu, Zechun Liu, Fanyi Xiao, Balakrishnan Varadarajan, Florian Bordes, Zhuang Liu, Hu~Xu, Hyunwoo~J. Kim, Bilge Soran, Raghuraman Krishnamoorthi, Mohamed Elhoseiny, and Vikas Chandra.
+\newblock Longvu: Spatiotemporal adaptive compression for long video-language understanding, 2024.
+
+\bibitem{MorganStanley2024FigureAI}
+Morgan Stanley.
+\newblock Humanoids: Investment implications of embodied ai.
+\newblock Technical report, Morgan Stanley, June 2024.
+\newblock Accessed via Future Management Group: https://www.futuremanagementgroup.com/wp-content/uploads/240626-Humanoid-Robots-Morgan-Stanley.pdf.
+
+\bibitem{su2023roformerenhancedtransformerrotary}
+Jianlin Su, Yu~Lu, Shengfeng Pan, Ahmed Murtadha, Bo~Wen, and Yunfeng Liu.
+\newblock Roformer: Enhanced transformer with rotary position embedding, 2023.
+
+\bibitem{tang2025razorattention}
+Hanlin Tang, Yang Lin, Jing Lin, Qingsen Han, Shikuan Hong, Danning Ke, Yiwu Yao, and Gongyi Wang.
+\newblock Razorattention: Efficient {KV} cache compression through retrieval heads.
+\newblock In {\em The Thirteenth International Conference on Learning Representations}, 2025.
+
+\bibitem{tao2024dycokedynamiccompressiontokens}
+Keda Tao, Can Qin, Haoxuan You, Yang Sui, and Huan Wang.
+\newblock Dycoke: Dynamic compression of tokens for fast video large language models, 2024.
+
+\bibitem{NIPS2017_3f5ee243}
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan~N Gomez, \L~ukasz Kaiser, and Illia Polosukhin.
+\newblock Attention is all you need.
+\newblock In I.~Guyon, U.~Von Luxburg, S.~Bengio, H.~Wallach, R.~Fergus, S.~Vishwanathan, and R.~Garnett, editors, {\em Advances in Neural Information Processing Systems}, volume~30. Curran Associates, Inc., 2017.
+
+\bibitem{waisberg2024meta}
+Ethan Waisberg, Joshua Ong, Mouayad Masalkhi, Nasif Zaman, Prithul Sarker, Andrew~G Lee, and Alireza Tavakkoli.
+\newblock Meta smart glasses—large language models and the future for assistive glasses for individuals with vision impairments.
+\newblock {\em Eye}, 38(6):1036--1038, 2024.
+
+\bibitem{Qwen2VL}
+Peng Wang, Shuai Bai, Sinan Tan, Shijie Wang, Zhihao Fan, Jinze Bai, Keqin Chen, Xuejing Liu, Jialin Wang, Wenbin Ge, Yang Fan, Kai Dang, Mengfei Du, Xuancheng Ren, Rui Men, Dayiheng Liu, Chang Zhou, Jingren Zhou, and Junyang Lin.
+\newblock Qwen2-vl: Enhancing vision-language model's perception of the world at any resolution.
+\newblock {\em arXiv preprint arXiv:2409.12191}, 2024.
+
+\bibitem{h264}
+T.~Wiegand, G.J. Sullivan, G.~Bjontegaard, and A.~Luthra.
+\newblock Overview of the h.264/avc video coding standard.
+\newblock {\em IEEE Transactions on Circuits and Systems for Video Technology}, 13(7):560--576, 2003.
+
+\bibitem{wu2024longvideobench}
+Haoning Wu, Dongxu Li, Bei Chen, and Junnan Li.
+\newblock Longvideobench: A benchmark for long-context interleaved video-language understanding.
+\newblock In {\em The Thirty-eight Conference on Neural Information Processing Systems Datasets and Benchmarks Track}, 2024.
+
+\bibitem{xu2025slowfastllava15familytokenefficientvideo}
+Mingze Xu, Mingfei Gao, Shiyu Li, Jiasen Lu, Zhe Gan, Zhengfeng Lai, Meng Cao, Kai Kang, Yinfei Yang, and Afshin Dehghan.
+\newblock Slowfast-llava-1.5: A family of token-efficient video large language models for long-form video understanding, 2025.
+
+\bibitem{xu2025think}
+Yuhui Xu, Zhanming Jie, Hanze Dong, Lei Wang, Xudong Lu, Aojun Zhou, Amrita Saha, Caiming Xiong, and Doyen Sahoo.
+\newblock Think: Thinner key cache by query-driven pruning.
+\newblock In {\em The Thirteenth International Conference on Learning Representations}, 2025.
+
+\bibitem{qwen2.5}
+An~Yang, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo~Zheng, Bowen Yu, Chengyuan Li, Dayiheng Liu, Fei Huang, Haoran Wei, Huan Lin, Jian Yang, Jianhong Tu, Jianwei Zhang, Jianxin Yang, Jiaxi Yang, Jingren Zhou, Junyang Lin, Kai Dang, Keming Lu, Keqin Bao, Kexin Yang, Le~Yu, Mei Li, Mingfeng Xue, Pei Zhang, Qin Zhu, Rui Men, Runji Lin, Tianhao Li, Tingyu Xia, Xingzhang Ren, Xuancheng Ren, Yang Fan, Yang Su, Yichang Zhang, Yu~Wan, Yuqiong Liu, Zeyu Cui, Zhenru Zhang, and Zihan Qiu.
+\newblock Qwen2.5 technical report.
+\newblock {\em arXiv preprint arXiv:2412.15115}, 2024.
+
+\bibitem{zhang2024flashvstream}
+Haoji Zhang, Yiqin Wang, Yansong Tang, Yong Liu, Jiashi Feng, Jifeng Dai, and Xiaojie Jin.
+\newblock Flash-vstream: Memory-based real-time understanding for long video streams, 2024.
+
+\bibitem{zhang2024fastervlm}
+Qizhe Zhang, Aosong Cheng, Ming Lu, Zhiyong Zhuo, Minqi Wang, Jiajun Cao, Shaobo Guo, Qi~She, and Shanghang Zhang.
+\newblock [cls] attention is all you need for training-free visual token pruning: Make vlm inference faster, 2024.
+
+\bibitem{zhang2024sparsevlm}
+Yuan Zhang, Chun-Kai Fan, Junpeng Ma, Wenzhao Zheng, Tao Huang, Kuan Cheng, Denis Gudovskiy, Tomoyuki Okuno, Yohei Nakata, Kurt Keutzer, and Shanghang Zhang.
+\newblock Sparsevlm: Visual token sparsification for efficient vision-language model inference, 2024.
+
+\bibitem{zhang2024llavanext-video}
+Yuanhan Zhang, Bo~Li, haotian Liu, Yong~jae Lee, Liangke Gui, Di~Fu, Jiashi Feng, Ziwei Liu, and Chunyuan Li.
+\newblock Llava-next: A strong zero-shot video understanding model, April 2024.
+
+\bibitem{zhang2023ho}
+Zhenyu Zhang, Ying Sheng, Tianyi Zhou, Tianlong Chen, Lianmin Zheng, Ruisi Cai, Zhao Song, Yuandong Tian, Christopher Re, Clark Barrett, Zhangyang Wang, and Beidi Chen.
+\newblock H2o: Heavy-hitter oracle for efficient generative inference of large language models.
+\newblock In {\em Thirty-seventh Conference on Neural Information Processing Systems}, 2023.
+
+\bibitem{MLVU}
+Junjie Zhou, Yan Shu, Bo~Zhao, Boya Wu, Shitao Xiao, Xi~Yang, Yongping Xiong, Bo~Zhang, Tiejun Huang, and Zheng Liu.
+\newblock Mlvu: A comprehensive benchmark for multi-task long video understanding.
+\newblock {\em arXiv preprint arXiv:2406.04264}, 2024.
+
+\end{thebibliography}

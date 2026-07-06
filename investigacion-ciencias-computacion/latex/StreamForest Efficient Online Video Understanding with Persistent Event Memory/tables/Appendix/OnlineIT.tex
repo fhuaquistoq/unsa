@@ -1,0 +1,46 @@
+\begin{table}[h]
+    \centering
+    \setlength{\tabcolsep}{3pt}
+    \renewcommand{\arraystretch}{1.2}
+    
+    % 
+    \caption{Task types and data volumes of OnlineIT.}
+    
+    \resizebox{0.9\textwidth}{!}{%
+    
+\begin{tabular}{ll|l|lr}
+\hline
+\rowcolor[HTML]{C0C0C0} 
+\multicolumn{1}{l|}{Dataset} & Categories & Task & Sourse & Instance Num \\ \hline
+\multicolumn{1}{c|}{\multirow{19}{*}{\rotatebox[origin=c]{90}{\footnotesize \textit{OnlineIT-general}}}} & \multirow{5}{*}{Spatial Perception} & \multirow{2}{*}{Spatial Grounding} & RefCOCO \cite{yu2016refcoco} & $\sim$43k \\
+\multicolumn{1}{l|}{} &  &  & Allseeing-V2 \cite{wang2024allseeing_v2} & $\sim$45k \\ \cline{3-5} 
+\multicolumn{1}{l|}{} &  & Multi-round Spatial Understanding & Visual Genome \cite{krishna2017vg} & $\sim$43k \\ \cline{3-5} 
+\multicolumn{1}{l|}{} &  & Spatial Grounded VQA & Allseeing-V2 \cite{wang2024allseeing_v2} & $\sim$43k \\ \cline{3-5} 
+\multicolumn{1}{l|}{} &  & Relative Spatial Localization & LaSOT \cite{fan2019lasot} & $\sim$19k \\ \cline{2-5} 
+\multicolumn{1}{l|}{} & \multirow{5}{*}{Temporal Perception} & \multirow{3}{*}{Temporal Grounding} & Charades-STA \cite{charades-sta} & $\sim$11k \\
+\multicolumn{1}{l|}{} &  &  & HiREST \cite{hirest} & $\sim$0.4k \\
+\multicolumn{1}{l|}{} &  &  & QuerYD \cite{queryd} & $\sim$13k \\ \cline{3-5} 
+\multicolumn{1}{l|}{} &  & Reasoning Temporal Localization & ActivityNet-RTL \cite{huang2024lita} & $\sim$10k \\ \cline{3-5} 
+\multicolumn{1}{l|}{} &  & Multi-format Temporal Grounding & InternVid-VTime \cite{huang2024vtimellm} & $\sim$20k \\ \cline{2-5} 
+\multicolumn{1}{l|}{} & \multirow{4}{*}{Spatiotemporal Perception} & Spatiotemporal Action Localization & AVA \cite{ava} & $\sim$6k \\ \cline{3-5} 
+\multicolumn{1}{l|}{} &  & \multirow{2}{*}{Object Backward Tracking} & LaSOT \cite{fan2019lasot} & $\sim$51k \\
+\multicolumn{1}{l|}{} &  &  & GOT \cite{got10k} & $\sim$58k \\ \cline{3-5} 
+\multicolumn{1}{l|}{} &  & Spatiotemporal Detection & LaSOT \cite{fan2019lasot} & $\sim$14k \\ \cline{2-5} 
+\multicolumn{1}{l|}{} & \multirow{5}{*}{Event Perception} & \multirow{3}{*}{Dense Video Captioning} & ActivityNet-Captions \cite{anet} & $\sim$10k \\
+\multicolumn{1}{l|}{} &  &  & ViTT \cite{vitt} & $\sim$5k \\
+\multicolumn{1}{l|}{} &  &  & Youcook2 \cite{youcook} & $\sim$1k \\ \cline{3-5} 
+\multicolumn{1}{l|}{} &  & \multirow{2}{*}{Step Localization and Captioning} & COIN \cite{coin} & $\sim$9k \\
+\multicolumn{1}{l|}{} &  &  & HiREST \cite{hirest} & $\sim$0.5k \\ \hline
+\multicolumn{1}{c|}{\multirow{7}{*}{\rotatebox[origin=c]{90}{\footnotesize \textit{OnlineIT-drive}}}} & \multirow{3}{*}{Static Target} & Past Memory & D²-City \cite{che2019d} & $\sim$9k \\ \cline{3-5} 
+\multicolumn{1}{l|}{} &  & \multirow{2}{*}{Real-time Perception} & TT100k \cite{zhu2016tt100k} & $\sim$46k \\
+\multicolumn{1}{l|}{} &  &  & D²-City \cite{che2019d} & $\sim$13k \\ \cline{2-5} 
+\multicolumn{1}{l|}{} & \multirow{2}{*}{Dynamic Target} & Localization Prediction & Road-waymo \cite{khan2024road} & $\sim$1k \\ \cline{3-5} 
+\multicolumn{1}{l|}{} &  & Move Distance Prediction & Road-waymo \cite{khan2024road} & $\sim$7k \\ \cline{2-5} 
+\multicolumn{1}{l|}{} & \multirow{2}{*}{Event Oriented} & Accident Reasoning & MM-AU \cite{fang2024abductive} & $\sim$6k \\ \cline{3-5} 
+\multicolumn{1}{l|}{} &  & Risk Analysis & MM-AU \cite{fang2024abductive} & $\sim$7k \\ \hline 
+\end{tabular}
+        
+    }
+    
+    \label{app:tab:OnlineIT}
+\end{table}
