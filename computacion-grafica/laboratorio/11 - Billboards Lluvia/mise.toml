@@ -1,0 +1,77 @@
+[tools]
+python = "3.13"
+cmake = "latest"
+ninja = "latest"
+conan = "latest"
+make = "latest"
+
+[env]
+BUILD_TYPE = "Debug"
+BUILD_DIR = "build/debug"
+TARGET_NAME = "opengl_starter"
+
+[tasks.pydeps]
+description = "Instala dependencias Python necesarias para GLAD"
+run_windows = "python -m pip install --upgrade pip jinja2"
+
+[tasks.profile]
+description = "Detecta el perfil de Conan usando MSVC"
+run_windows = "conan profile detect --force"
+
+[tasks.setup]
+description = "Prepara el entorno inicial del proyecto"
+depends = ["pydeps", "profile"]
+
+[tasks.deps]
+description = "Instala dependencias con Conan"
+run_windows = "conan install . --output-folder=build/debug --build=missing -s build_type=Debug -c tools.cmake.cmaketoolchain:generator=Ninja"
+sources = [
+  "conanfile.txt"
+]
+outputs = [
+  "build/debug/conan_toolchain.cmake",
+  "build/debug/conanbuild.bat",
+  "build/debug/conanrun.bat"
+]
+
+[tasks.configure]
+description = "Configura CMake con Ninja y Conan"
+depends = ["deps"]
+run_windows = "cmd /c \"call build\\debug\\conanbuild.bat && cmake -S . -B build/debug -G Ninja -DCMAKE_TOOLCHAIN_FILE=build/debug/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON\""
+sources = [
+  "CMakeLists.txt",
+  "conanfile.txt",
+  "build/debug/conan_toolchain.cmake"
+]
+outputs = [
+  "build/debug/build.ninja",
+  "build/debug/compile_commands.json"
+]
+
+[tasks.build]
+description = "Compila el proyecto"
+depends = ["configure"]
+run_windows = "cmd /c \"call build\\debug\\conanbuild.bat && cmake --build build/debug\""
+sources = [
+  "CMakeLists.txt",
+  "conanfile.txt",
+  "src/**/*.cpp",
+  "src/**/*.hpp",
+  "src/**/*.h"
+]
+outputs = [
+  "build/debug/bin/opengl_starter.exe"
+]
+
+[tasks.run]
+description = "Ejecuta el programa sin forzar recompilación innecesaria"
+depends = ["build"]
+run_windows = "cmd /c \"call build\\debug\\conanrun.bat && .\\build\\debug\\bin\\opengl_starter.exe\""
+
+[tasks.clean]
+description = "Elimina la carpeta build"
+run_windows = "powershell -NoProfile -Command \"Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue\""
+
+[tasks.rebuild]
+description = "Limpia y recompila todo"
+depends = ["clean", "build"]

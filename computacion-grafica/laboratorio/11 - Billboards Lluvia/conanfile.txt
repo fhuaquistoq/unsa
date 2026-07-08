@@ -1,0 +1,14 @@
+[requires]
+glfw/3.4
+glad/2.0.8
+glm/1.0.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+glfw/*:shared=False
+glad/*:shared=False
+glad/*:gl_profile=core
+glad/*:gl_version=3.3
