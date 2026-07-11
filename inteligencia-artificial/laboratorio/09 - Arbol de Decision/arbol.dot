@@ -1,0 +1,235 @@
+digraph ID3Tree {
+  rankdir=TB;
+  graph [bgcolor=white, nodesep=0.4, ranksep=0.6, pad=0.2];
+  node [shape=box, style="rounded,filled", color="#5b5b5b", fontname="Helvetica", fontsize=10];
+  edge [fontname="Helvetica", fontsize=10, color="#555555"];
+  node0 [label="	Nodo 0
+	Decision: Ingresos
+	Entropia: 0.9641
+	n=36 | SI=22 | NO=14", fillcolor="#d9ecff"];
+  node1 [label="	Nodo 1
+	Decision: Miembro
+	Entropia: 1.0000
+	n=18 | SI=9 | NO=9", fillcolor="#ffe8b6"];
+  node2 [label="	Nodo 2
+	Decision: Visito
+	Entropia: 1.0000
+	n=6 | SI=3 | NO=3", fillcolor="#ffe8b6"];
+  node3 [label="	Nodo 3
+	Decision: Edad
+	Entropia: 0.9183
+	n=3 | SI=2 | NO=1", fillcolor="#ffe8b6"];
+  node4 [label="	Nodo 4
+	Clase: SI
+	Entropia: 0.0000
+	n=1 | SI=1 | NO=0", fillcolor="#d8f3dc"];
+  node3 -> node4 [label="Joven"];
+  node5 [label="	Nodo 5
+	Clase: NO
+	Entropia: 0.0000
+	n=1 | SI=0 | NO=1", fillcolor="#d8f3dc"];
+  node3 -> node5 [label="Adulto"];
+  node6 [label="	Nodo 6
+	Clase: SI
+	Entropia: 0.0000
+	n=1 | SI=1 | NO=0", fillcolor="#d8f3dc"];
+  node3 -> node6 [label="AdultoMayor"];
+  node2 -> node3 [label="Si"];
+  node7 [label="	Nodo 7
+	Decision: Edad
+	Entropia: 0.9183
+	n=3 | SI=1 | NO=2", fillcolor="#ffe8b6"];
+  node8 [label="	Nodo 8
+	Clase: NO
+	Entropia: 0.0000
+	n=1 | SI=0 | NO=1", fillcolor="#d8f3dc"];
+  node7 -> node8 [label="Joven"];
+  node9 [label="	Nodo 9
+	Clase: SI
+	Entropia: 0.0000
+	n=1 | SI=1 | NO=0", fillcolor="#d8f3dc"];
+  node7 -> node9 [label="Adulto"];
+  node10 [label="	Nodo 10
+	Clase: NO
+	Entropia: 0.0000
+	n=1 | SI=0 | NO=1", fillcolor="#d8f3dc"];
+  node7 -> node10 [label="AdultoMayor"];
+  node2 -> node7 [label="No"];
+  node1 -> node2 [label="Standard"];
+  node11 [label="	Nodo 11
+	Decision: Edad
+	Entropia: 0.9183
+	n=6 | SI=4 | NO=2", fillcolor="#ffe8b6"];
+  node12 [label="	Nodo 12
+	Decision: Visito
+	Entropia: 1.0000
+	n=2 | SI=1 | NO=1", fillcolor="#ffe8b6"];
+  node13 [label="	Nodo 13
+	Clase: NO
+	Entropia: 0.0000
+	n=1 | SI=0 | NO=1", fillcolor="#d8f3dc"];
+  node12 -> node13 [label="Si"];
+  node14 [label="	Nodo 14
+	Clase: SI
+	Entropia: 0.0000
+	n=1 | SI=1 | NO=0", fillcolor="#d8f3dc"];
+  node12 -> node14 [label="No"];
+  node11 -> node12 [label="Joven"];
+  node15 [label="	Nodo 15
+	Decision: Visito
+	Entropia: 1.0000
+	n=2 | SI=1 | NO=1", fillcolor="#ffe8b6"];
+  node16 [label="	Nodo 16
+	Clase: SI
+	Entropia: 0.0000
+	n=1 | SI=1 | NO=0", fillcolor="#d8f3dc"];
+  node15 -> node16 [label="Si"];
+  node17 [label="	Nodo 17
+	Clase: NO
+	Entropia: 0.0000
+	n=1 | SI=0 | NO=1", fillcolor="#d8f3dc"];
+  node15 -> node17 [label="No"];
+  node11 -> node15 [label="Adulto"];
+  node18 [label="	Nodo 18
+	Clase: SI
+	Entropia: 0.0000
+	n=2 | SI=2 | NO=0", fillcolor="#d8f3dc"];
+  node11 -> node18 [label="AdultoMayor"];
+  node1 -> node11 [label="Premium"];
+  node19 [label="	Nodo 19
+	Decision: Edad
+	Entropia: 0.9183
+	n=6 | SI=2 | NO=4", fillcolor="#ffe8b6"];
+  node20 [label="	Nodo 20
+	Decision: Visito
+	Entropia: 1.0000
+	n=2 | SI=1 | NO=1", fillcolor="#ffe8b6"];
+  node21 [label="	Nodo 21
+	Clase: SI
+	Entropia: 0.0000
+	n=1 | SI=1 | NO=0", fillcolor="#d8f3dc"];
+  node20 -> node21 [label="Si"];
+  node22 [label="	Nodo 22
+	Clase: NO
+	Entropia: 0.0000
+	n=1 | SI=0 | NO=1", fillcolor="#d8f3dc"];
+  node20 -> node22 [label="No"];
+  node19 -> node20 [label="Joven"];
+  node23 [label="	Nodo 23
+	Decision: Visito
+	Entropia: 1.0000
+	n=2 | SI=1 | NO=1", fillcolor="#ffe8b6"];
+  node24 [label="	Nodo 24
+	Clase: NO
+	Entropia: 0.0000
+	n=1 | SI=0 | NO=1", fillcolor="#d8f3dc"];
+  node23 -> node24 [label="Si"];
+  node25 [label="	Nodo 25
+	Clase: SI
+	Entropia: 0.0000
+	n=1 | SI=1 | NO=0", fillcolor="#d8f3dc"];
+  node23 -> node25 [label="No"];
+  node19 -> node23 [label="Adulto"];
+  node26 [label="	Nodo 26
+	Clase: NO
+	Entropia: 0.0000
+	n=2 | SI=0 | NO=2", fillcolor="#d8f3dc"];
+  node19 -> node26 [label="AdultoMayor"];
+  node1 -> node19 [label="VIP"];
+  node0 -> node1 [label="Bajo"];
+  node27 [label="	Nodo 27
+	Decision: Edad
+	Entropia: 0.8524
+	n=18 | SI=13 | NO=5", fillcolor="#ffe8b6"];
+  node28 [label="	Nodo 28
+	Decision: Miembro
+	Entropia: 0.6500
+	n=6 | SI=5 | NO=1", fillcolor="#ffe8b6"];
+  node29 [label="	Nodo 29
+	Clase: SI
+	Entropia: 0.0000
+	n=2 | SI=2 | NO=0", fillcolor="#d8f3dc"];
+  node28 -> node29 [label="Standard"];
+  node30 [label="	Nodo 30
+	Clase: SI
+	Entropia: 0.0000
+	n=2 | SI=2 | NO=0", fillcolor="#d8f3dc"];
+  node28 -> node30 [label="Premium"];
+  node31 [label="	Nodo 31
+	Decision: Visito
+	Entropia: 1.0000
+	n=2 | SI=1 | NO=1", fillcolor="#ffe8b6"];
+  node32 [label="	Nodo 32
+	Clase: NO
+	Entropia: 0.0000
+	n=1 | SI=0 | NO=1", fillcolor="#d8f3dc"];
+  node31 -> node32 [label="Si"];
+  node33 [label="	Nodo 33
+	Clase: SI
+	Entropia: 0.0000
+	n=1 | SI=1 | NO=0", fillcolor="#d8f3dc"];
+  node31 -> node33 [label="No"];
+  node28 -> node31 [label="VIP"];
+  node27 -> node28 [label="Joven"];
+  node34 [label="	Nodo 34
+	Decision: Miembro
+	Entropia: 0.6500
+	n=6 | SI=5 | NO=1", fillcolor="#ffe8b6"];
+  node35 [label="	Nodo 35
+	Clase: SI
+	Entropia: 0.0000
+	n=2 | SI=2 | NO=0", fillcolor="#d8f3dc"];
+  node34 -> node35 [label="Standard"];
+  node36 [label="	Nodo 36
+	Clase: SI
+	Entropia: 0.0000
+	n=2 | SI=2 | NO=0", fillcolor="#d8f3dc"];
+  node34 -> node36 [label="Premium"];
+  node37 [label="	Nodo 37
+	Decision: Visito
+	Entropia: 1.0000
+	n=2 | SI=1 | NO=1", fillcolor="#ffe8b6"];
+  node38 [label="	Nodo 38
+	Clase: SI
+	Entropia: 0.0000
+	n=1 | SI=1 | NO=0", fillcolor="#d8f3dc"];
+  node37 -> node38 [label="Si"];
+  node39 [label="	Nodo 39
+	Clase: NO
+	Entropia: 0.0000
+	n=1 | SI=0 | NO=1", fillcolor="#d8f3dc"];
+  node37 -> node39 [label="No"];
+  node34 -> node37 [label="VIP"];
+  node27 -> node34 [label="Adulto"];
+  node40 [label="	Nodo 40
+	Decision: Miembro
+	Entropia: 1.0000
+	n=6 | SI=3 | NO=3", fillcolor="#ffe8b6"];
+  node41 [label="	Nodo 41
+	Decision: Visito
+	Entropia: 1.0000
+	n=2 | SI=1 | NO=1", fillcolor="#ffe8b6"];
+  node42 [label="	Nodo 42
+	Clase: NO
+	Entropia: 0.0000
+	n=1 | SI=0 | NO=1", fillcolor="#d8f3dc"];
+  node41 -> node42 [label="Si"];
+  node43 [label="	Nodo 43
+	Clase: SI
+	Entropia: 0.0000
+	n=1 | SI=1 | NO=0", fillcolor="#d8f3dc"];
+  node41 -> node43 [label="No"];
+  node40 -> node41 [label="Standard"];
+  node44 [label="	Nodo 44
+	Clase: NO
+	Entropia: 0.0000
+	n=2 | SI=0 | NO=2", fillcolor="#d8f3dc"];
+  node40 -> node44 [label="Premium"];
+  node45 [label="	Nodo 45
+	Clase: SI
+	Entropia: 0.0000
+	n=2 | SI=2 | NO=0", fillcolor="#d8f3dc"];
+  node40 -> node45 [label="VIP"];
+  node27 -> node40 [label="AdultoMayor"];
+  node0 -> node27 [label="Alto"];
+}
