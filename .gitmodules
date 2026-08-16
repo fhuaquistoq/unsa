@@ -10,3 +10,6 @@
 [submodule "investigacion-ciencias-computacion/implementacion/rekv"]
 	path = investigacion-ciencias-computacion/implementacion/rekv
 	url = https://github.com/becomebright/rekv
+[submodule "desarrollo-software-empresarial/laboratorio/07 - Servicio Web"]
+	path = desarrollo-software-empresarial/laboratorio/07 - Servicio Web
+	url = git@github.com:fhuaquistoq/DSE-Little-Caersars-App-Delivery.git
