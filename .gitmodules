@@ -1,0 +1,12 @@
+[submodule "computacion-grafica/proyectos/visor-tomografia"]
+	path = computacion-grafica/proyectos/visor-tomografia
+	url = git@github.com:aqppaulet/TOMOGRAFIA-.git
+[submodule "ingenieria-software-3/altoke"]
+	path = ingenieria-software-3/altoke
+	url = git@github.com:BerlyCS/AlToke.git
+[submodule "desarrollo-software-empresarial/proyecto-final"]
+	path = desarrollo-software-empresarial/proyecto-final
+	url = git@github.com:AlonsoUNSA/Little-Caersars-BPM-Project
+[submodule "investigacion-ciencias-computacion/implementacion/rekv"]
+	path = investigacion-ciencias-computacion/implementacion/rekv
+	url = https://github.com/becomebright/rekv
