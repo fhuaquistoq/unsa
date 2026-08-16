@@ -1,0 +1,8 @@
+# Entorno y caché de Python
+.venv/
+__pycache__/
+
+# Documentos y fuentes locales de análisis (no se versionan)
+*.pdf
+*.zip
+result.txt
