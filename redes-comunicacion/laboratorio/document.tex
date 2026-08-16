@@ -1,0 +1,210 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{geometry}
+
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+\definecolor{codegray}{rgb}{0.45,0.45,0.45}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.94}
+\lstset{basicstyle=\ttfamily\small,breaklines=true,frame=single,backgroundcolor=\color{backcolour},commentstyle=\color{codegray}}
+\newcommand{\ip}[1]{\texttt{#1}}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    {\bfseries\LARGE UNIVERSIDAD NACIONAL DE SAN AGUSTÍN DE AREQUIPA\par}
+    \vspace{0.2cm}
+    {\scshape\LARGE Ciencia de la Computación\par}
+    \vspace{1cm}
+    {\includegraphics[width=0.4\textwidth]{Escudo_UNSA.png}\par}
+    \vspace{1cm}
+    {\Large Redes y Comunicación\par}
+    \vspace{0.25cm}
+    {\bfseries\scshape\LARGE Interconexión de Redes: Enrutamiento Estático\par}
+    \vspace{0.25cm}
+    {\Large Presentado por:\par}
+    {\Large Fabricio Jesús Huaquisto Quispe\par}
+    \vfill
+    {\Large Docente:\par}
+    {\Large Pedro Alex Rodriguez Gonzalez\par}
+    \vfill
+    {\bfseries\Large Perú, Arequipa 2026\par}
+\end{titlepage}
+
+\section{Cuestionario Previo}
+
+\begin{enumerate}[label=\arabic*.]
+    \item \textbf{¿Qué función cumple un router?} Un router opera principalmente en la capa de red del modelo OSI. Recibe paquetes IP, consulta su tabla de enrutamiento y los reenvía por la interfaz que permite alcanzar la red de destino. También separa dominios de broadcast y actúa como puerta de enlace para los hosts de una LAN.
+
+    \item \textbf{¿Qué diferencia existe entre una red directamente conectada y una red remota?} Una red directamente conectada está asociada a una interfaz activa del router y se agrega automáticamente a su tabla de enrutamiento. Una red remota no está unida a ninguna interfaz local; para alcanzarla se requiere una ruta estática o una ruta aprendida mediante un protocolo dinámico.
+
+    \item \textbf{¿Qué es una ruta estática?} Es una entrada configurada manualmente por quien administra la red. En ella se indica la red de destino, su máscara y el siguiente salto o la interfaz de salida. No se adapta de forma automática ante cambios de topología, por lo que resulta apropiada para redes pequeñas, estables o con rutas de respaldo.
+
+    \item \textbf{¿Qué es una puerta de enlace predeterminada?} Es la dirección IP de la interfaz del router ubicada en la misma red que el host. Cuando el destino no pertenece a la red local, el host entrega el paquete a esa dirección para que el router lo encamine.
+
+    \item \textbf{¿Cuál es la función del encapsulamiento PPP?} Point-to-Point Protocol es un protocolo de capa de enlace usado en conexiones seriales punto a punto. Encapsula paquetes de capa de red, establece y mantiene el enlace mediante LCP, permite autenticar extremos y negocia protocolos de red mediante NCP.
+\end{enumerate}
+
+\section{Actividades}
+
+\subsection*{Interconexión de dos redes locales}
+
+Se construyó una topología con dos routers Cisco 1841, dos computadoras y un enlace serial punto a punto. Se asignó al Router Principal la LAN \ip{192.168.20.0/24} y al Router Sede la LAN \ip{192.168.22.0/24}. El enlace WAN utilizó la red \ip{192.168.21.0/24}.
+
+% Insertar aquí la captura de la topología inicial con las dos PCs y los routers.
+
+\begin{center}
+\begin{tabular}{lll}
+\textbf{Dispositivo} & \textbf{Interfaz} & \textbf{Dirección IP / máscara} \\
+PC-A & FastEthernet & \ip{192.168.20.10/24}, gateway \ip{192.168.20.1} \\
+Router Principal & FastEthernet0/0 & \ip{192.168.20.1/24} \\
+Router Principal & Serial0/1/0 & \ip{192.168.21.1/24} \\
+Router Sede & Serial0/1/0 & \ip{192.168.21.2/24} \\
+Router Sede & FastEthernet0/0 & \ip{192.168.22.1/24} \\
+PC-B & FastEthernet & \ip{192.168.22.10/24}, gateway \ip{192.168.22.1} \\
+\end{tabular}
+\end{center}
+
+Se apagó cada router desde la pestaña \textit{Physical}, se agregó el módulo WIC-2T en un slot disponible y se volvió a encender el equipo. Luego se conectaron los puertos seriales con un cable \textit{Serial DCE}; el Router Principal asumió el rol DCE, por lo que en ese extremo se configuró la señal de reloj.
+
+% Insertar aquí una captura del módulo WIC-2T instalado y del enlace Serial DCE.
+
+La configuración aplicada al Router Principal fue la siguiente:
+
+\begin{lstlisting}
+enable
+configure terminal
+hostname RouterP
+interface FastEthernet0/0
+ ip address 192.168.20.1 255.255.255.0
+ no shutdown
+exit
+interface Serial0/1/0
+ ip address 192.168.21.1 255.255.255.0
+ clock rate 128000
+ no shutdown
+exit
+ip route 192.168.22.0 255.255.255.0 192.168.21.2
+end
+copy running-config startup-config
+\end{lstlisting}
+
+En el Router Sede no se configuró \texttt{clock rate}, porque este extremo actúa como DTE. La ruta estática apunta a la LAN remota mediante la dirección serial del Router Principal.
+
+\begin{lstlisting}
+enable
+configure terminal
+hostname RouterS
+interface FastEthernet0/0
+ ip address 192.168.22.1 255.255.255.0
+ no shutdown
+exit
+interface Serial0/1/0
+ ip address 192.168.21.2 255.255.255.0
+ no shutdown
+exit
+ip route 192.168.20.0 255.255.255.0 192.168.21.1
+end
+copy running-config startup-config
+\end{lstlisting}
+
+Inicialmente, cada tabla de enrutamiento mostró únicamente las redes conectadas directamente. Después de agregar las rutas estáticas, cada router incorporó una entrada con código \texttt{S} hacia la LAN remota. Esto permite que los paquetes destinados a \ip{192.168.20.0/24} o \ip{192.168.22.0/24} se reenvíen por el enlace serial.
+
+% Insertar aquí capturas de show ip route en RouterP y RouterS antes y después de las rutas estáticas.
+
+Se verificó el encapsulamiento por defecto con \texttt{show interfaces}; la interfaz serial usaba HDLC. Posteriormente se cambió el encapsulamiento a PPP en ambos extremos. La interfaz se desactivó antes del cambio y se habilitó al finalizar.
+
+\begin{lstlisting}
+configure terminal
+interface Serial0/1/0
+ shutdown
+ encapsulation ppp
+ no shutdown
+end
+show interfaces serial0/1/0
+\end{lstlisting}
+
+La salida final indicó \texttt{Serial0/1/0 is up, line protocol is up} y \texttt{Encapsulation PPP}. Este estado confirma que tanto la capa física como el protocolo de línea se encuentran operativos.
+
+% Insertar aquí una captura de show interfaces serial0/1/0 donde se observe PPP y el estado up/up.
+
+Se realizaron pruebas con \texttt{ping} desde cada router hacia su interfaz serial, su PC local, la interfaz serial remota, la interfaz Ethernet remota y la PC remota. También se enviaron pings desde ambas PCs hacia los routers y hacia el host de la otra LAN. Las respuestas exitosas confirmaron la conectividad extremo a extremo y la configuración correcta de las puertas de enlace.
+
+% Insertar aquí capturas de los pings exitosos desde RouterP, RouterS, PC-A y PC-B.
+
+\subsection*{Escenario con tres routers}
+
+Se configuró el escenario con tres routers y tres redes LAN: \ip{192.168.1.0/24}, \ip{192.168.2.0/24} y \ip{192.168.3.0/24}. Los enlaces entre routers usaron las redes \ip{10.0.0.0/8}, \ip{11.0.0.0/8} y \ip{12.0.0.0/8}. Se asignó a cada host una dirección de su LAN y como gateway la dirección de la interfaz LAN del router correspondiente.
+
+% Insertar aquí la captura de la topología de tres routers completamente configurada.
+
+Al enviar el primer ping entre redes, el host origen consultó ARP para conocer la dirección MAC de su gateway. El switch difundió la solicitud ARP como una trama de broadcast dentro de su LAN y el router respondió con una trama unicast. Luego circularon solicitudes y respuestas ICMP encapsuladas en paquetes IP. En cada salto, el router eliminó la trama recibida, conservó el paquete IP y lo encapsuló nuevamente con las direcciones de enlace correspondientes a la interfaz de salida.
+
+Se probaron al menos tres hosts hacia tres destinos diferentes. También se envió un ping a la dirección de broadcast de cada LAN, empleando las direcciones \ip{192.168.1.255}, \ip{192.168.2.255} y \ip{192.168.3.255}. Las respuestas se limitaron a los hosts de la red de broadcast, ya que los routers no reenvían broadcasts IPv4 entre redes.
+
+% Insertar aquí capturas de los pings entre tres hosts y de las pruebas de broadcast.
+
+\subsection*{Solución de la WAN y modificación de topología}
+
+Para la WAN de cuatro routers se aplicó enrutamiento estático. La topología contiene las LAN de los routers A y D, y los enlaces A--B, B--C, C--D y B--D. En cada router se agregaron rutas hacia las redes no conectadas directamente, utilizando como siguiente salto la interfaz serial del router vecino. La ruta de menor cantidad de saltos hacia la LAN del router D se configuró mediante el enlace B--D; el enlace B--C--D puede mantenerse como ruta de respaldo con una distancia administrativa mayor.
+
+Para incorporar tres computadoras adicionales en la sede A, dos en la sede D y una nueva sede de tres computadoras atendida por el router C, se subdividió \ip{192.168.10.0/24} en subredes /29. Cada subred /29 dispone de seis direcciones útiles, suficientes para una interfaz de router y hasta cinco equipos finales.
+
+\begin{center}
+\begin{tabular}{lll}
+\textbf{Uso} & \textbf{Subred} & \textbf{Asignación sugerida} \\
+LAN A & \ip{192.168.10.0/29} & Router A: \ip{192.168.10.1}; hosts: \ip{.2}--\ip{.5} \\
+LAN D & \ip{192.168.10.8/29} & Router D: \ip{192.168.10.9}; hosts: \ip{.10}--\ip{.12} \\
+LAN C nueva & \ip{192.168.10.16/29} & Router C: \ip{192.168.10.17}; hosts: \ip{.18}--\ip{.20} \\
+Enlace A--B & \ip{192.168.10.24/29} & A: \ip{.25}; B: \ip{.26} \\
+Enlace B--C & \ip{192.168.10.32/29} & B: \ip{.33}; C: \ip{.34} \\
+Enlace C--D & \ip{192.168.10.40/29} & C: \ip{.41}; D: \ip{.42} \\
+Enlace B--D & \ip{192.168.10.48/29} & B: \ip{.49}; D: \ip{.50} \\
+\end{tabular}
+\end{center}
+
+Se reemplazaron las direcciones previas por las subredes asignadas, se actualizaron los gateways de todas las computadoras y se modificaron las rutas estáticas para que apunten a las nuevas redes. Finalmente, se verificó conectividad entre las tres sedes mediante \texttt{ping} y se guardó la configuración de cada router con \texttt{copy running-config startup-config}.
+
+% Insertar aquí la captura de la WAN final, con las subredes 192.168.10.0/29 y las pruebas de conectividad.
+
+\section{Cuestionario Final}
+
+\begin{enumerate}[label=6.1.\alph*)]
+    \item \textbf{¿Cuáles son las funciones de un router?} Un router determina la mejor ruta hacia una red destino, reenvía paquetes entre redes distintas, separa dominios de broadcast y aplica políticas como filtrado o traducción de direcciones cuando se configura para ello.
+    \item \textbf{¿Cuáles son los elementos internos de un router?} Sus elementos principales son CPU, memoria RAM, ROM, memoria flash y NVRAM. La RAM mantiene la tabla de enrutamiento y la configuración en ejecución; la flash almacena el IOS; la NVRAM conserva la configuración de inicio.
+    \item \textbf{¿Cuáles son las interfaces o elementos externos de un router?} Las interfaces son los puertos físicos o lógicos que conectan el router con otras redes, por ejemplo FastEthernet, GigabitEthernet, serial, consola y auxiliar. Cada interfaz de datos requiere una dirección IP perteneciente a una red diferente.
+    \item \textbf{¿Cuáles son los pasos de inicialización o arranque del router?} Al encenderse, el router ejecuta el POST, carga el programa bootstrap desde ROM, localiza y carga el IOS normalmente desde flash, busca \texttt{startup-config} en NVRAM y, si existe, la copia a RAM como \texttt{running-config}.
+    \item \textbf{¿De qué modos se dispone dentro del CLI y cuáles son sus diferencias?} El CLI dispone principalmente de modo EXEC de usuario (\texttt{>}), EXEC privilegiado (\texttt{\#}), configuración global (\texttt{(config)\#}) y modos de configuración específicos, como interfaz o línea. Cada modo habilita un conjunto distinto de comandos; los cambios de configuración se realizan desde los modos de configuración.
+    \item \textbf{¿Qué función cumple la tabla de enrutamiento y cómo se obtiene?} La tabla relaciona redes destino con el siguiente salto o la interfaz de salida. El router la usa para decidir el reenvío de paquetes. Se visualiza con \texttt{show ip route} desde el modo EXEC privilegiado.
+    \item \textbf{¿Qué son métrica, salto, ancho de banda y conmutación?} Una métrica es un valor usado para comparar rutas. El salto es la cantidad de routers que atraviesa un paquete. El ancho de banda es la capacidad nominal de transmisión de un enlace. La conmutación es el proceso de recibir una trama o paquete y enviarlo por la interfaz de salida adecuada.
+    \item \textbf{¿Cuál es la diferencia entre una conexión serial DTE y DCE, y qué cable usan?} DTE es el equipo terminal de datos y DCE es el equipo que proporciona sincronización o reloj. En un enlace serial de laboratorio se utiliza un cable serial DCE/DTE; el extremo identificado como DCE debe configurar \texttt{clock rate}.
+    \item \textbf{¿Cuál es la sintaxis del comando \texttt{ip route}?} La sintaxis básica es \texttt{ip route \textit{red-destino} \textit{máscara} \textit{siguiente-salto}}. También se puede indicar una interfaz de salida. Por ejemplo: \texttt{ip route 192.168.22.0 255.255.255.0 192.168.21.2}.
+\end{enumerate}
+
+\begin{enumerate}[label=6.2.\alph*)]
+    \item \textbf{¿Qué es el enrutamiento?} Es el proceso de seleccionar un camino y reenviar paquetes desde una red origen hacia una red destino a través de dispositivos de capa de red.
+    \item \textbf{¿Cuál es la diferencia entre enrutamiento estático y dinámico?} El enrutamiento estático se configura manualmente y no responde por sí solo ante fallas o cambios. El dinámico usa protocolos para intercambiar información, calcular rutas y adaptarse a cambios de topología.
+    \item \textbf{¿Qué ventajas tiene el enrutamiento estático?} Consume pocos recursos, ofrece rutas predecibles, no genera tráfico de actualizaciones y brinda mayor control administrativo. Es simple de implementar en topologías pequeñas.
+    \item \textbf{¿Por qué cada interfaz del enrutador pertenece únicamente a su propia red?} Cada interfaz se conecta a un único segmento de capa de enlace y, por ello, debe tener una dirección perteneciente a una sola subred IP. Una misma interfaz no puede actuar simultáneamente como miembro de dos redes IP distintas sin usar subinterfaces o mecanismos adicionales.
+    \item \textbf{¿Cuál es la diferencia entre una red directamente conectada y una red remota?} Una red directamente conectada está unida a una interfaz activa del router. Una red remota se alcanza a través de otro router y necesita una entrada de enrutamiento que indique el siguiente salto o la interfaz de salida.
+\end{enumerate}
+
+\begin{enumerate}[label=6.\arabic*.]
+    \setcounter{enumi}{2}
+    \item \textbf{¿Qué función cumplen las claves en los routers y qué tipos existen?} Las claves restringen el acceso administrativo al router y protegen sus modos de operación. Entre ellas se encuentran \texttt{enable secret}, que protege el modo privilegiado y se almacena de forma cifrada; \texttt{enable password}, una alternativa menos segura; y las contraseñas de líneas de consola y VTY, que controlan el acceso local y remoto.
+    \item \textbf{¿Qué se entiende por convergencia de la red?} Es el estado en el que todos los routers que participan en una red poseen información de enrutamiento consistente y han calculado rutas válidas después de iniciar el sistema o luego de un cambio de topología.
+    \item \textbf{¿Qué es un gateway?} Es el dispositivo o dirección que permite a un host comunicarse con redes externas a su propia subred. En una LAN, la puerta de enlace predeterminada suele ser la dirección IP de la interfaz del router conectada a esa LAN.
+    \item \textbf{¿Cuál es la diferencia entre LAN y WAN?} Una LAN cubre un área local, como un aula, laboratorio o edificio, y normalmente pertenece a una sola organización. Una WAN interconecta LAN ubicadas en zonas geográficas distantes mediante enlaces de proveedores o enlaces punto a punto; suele presentar mayor latencia y requiere tecnologías de enlace adecuadas para largas distancias.
+    \item \textbf{¿En qué consiste el encapsulamiento PPP?} PPP es un protocolo de capa de enlace para conexiones punto a punto. Proporciona encapsulamiento estándar de datagramas, establecimiento y prueba del enlace mediante LCP, autenticación opcional mediante PAP o CHAP y negociación de protocolos de red mediante NCP. En esta práctica reemplazó el encapsulamiento HDLC de las interfaces seriales.
+    \item \textbf{¿En qué consiste el encapsulamiento Frame Relay?} Frame Relay es una tecnología WAN de conmutación de paquetes que utiliza circuitos virtuales identificados por DLCI. Permite que varias conexiones lógicas compartan una misma interfaz física y transmite tramas de longitud variable. A diferencia de PPP, se emplea habitualmente para conectar múltiples sitios a través de una nube del proveedor.
+\end{enumerate}
+
+\end{document}
