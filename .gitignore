@@ -21,3 +21,9 @@ ingenieria-software-3/AlToke/
 **/.cph/
 **/input.dat
 **/*.pkt
+# Local Pi runtime state
+.atl/
+
+# Compiled artifacts
+**/*.exe
+**/*.obj
